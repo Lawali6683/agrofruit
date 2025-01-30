@@ -4,7 +4,7 @@
   "description": "A webhook handler for Monnify payments and Monnify backend for secure token generation and verification.",
   "main": "index.html",
   "scripts": {
-    "start": "node index.html",
+    "start": "node main.js", // Canza daga "index.html" zuwa "main.js"
     "test": "echo \"Error: no test specified\" && exit 1",
     "verify": "node main.js"
   },
