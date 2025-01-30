@@ -1,0 +1,23 @@
+{
+  "name": "webhook-handler",
+  "version": "1.0.0",
+  "description": "A webhook handler for Monnify payments and Monnify backend for secure token generation and verification.",
+  "main": "index.html",
+  "scripts": {
+    "start": "node index.html",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "verify": "node main.js"
+  },
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "firebase-admin": "^10.0.0",
+    "node-fetch": "^3.3.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.17.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "AgroFruit",
+  "license": "ISC"
+}
