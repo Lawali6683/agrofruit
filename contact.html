@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fc;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4A90E2;
+        }
+
+        button {
+            background-color: #4A90E2;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #357ABD;
+        }
+
+        .response-message {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+       textarea{
+           width: 100%;
+           Border-radius: 10px;
+        border: 2px solid green;   
+       }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Support team AgroFruit </h1>
+    </header>
+
+    <div class="container">
+        <h2>Contact Us</h2>
+        <textarea id="message" placeholder="Enter your message..." rows="5" required></textarea>
+        <button id="sendMessageButton">Send Message</button>
+        <p id="responseMessage" class="response-message"></p>
+    </div>
+<style>
+    #email-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 2px;
+            width: 70px;
+            height: 70px;
+            Top: 220px;
+            
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        #email-icon:hover {
+            transform: scale(1.1);
+        }
+
+        #email-icon img {
+            width: 70px;
+            height: 70px;
+            Border-radius: 50%;
+        }
+</style>
+
+<div id="email-icon">
+    <img src="sup.png" alt="Support Icon">
+</div>
+
+<script>
+    document.getElementById('email-icon').addEventListener('click', function () {
+        const email = 'agrofruitenterprises@gmail.com';
+        const subject = encodeURIComponent("Customer Inquiry from AFE Invest");
+        const body = encodeURIComponent("Dear AgroFruit ,\n\nI have questions regarding your services. Please assist.\n\nThank you.");
+        const mailtoUrl = `mailto:${email}?subject=${subject}&body=${body}`;
+        window.location.href = mailtoUrl;
+    });
+</script>
+    <script>
+        document.getElementById('sendMessageButton').addEventListener('click', function() {
+            var message = document.getElementById('message').value;
+
+            if (!message) {
+                displayResponseMessage('Please write a message before sending.', 'error');
+                return;
+            }
+
+            // Create mailto link
+            var emailAddress = 'fruitwealthfarming@gmail.com';
+            var subject = 'Contact Us Message from AgroFruit Support';
+            var body = encodeURIComponent(message);
+
+            // Create the mailto link and open email client
+            var mailtoLink = `mailto:${emailAddress}?subject=${subject}&body=${body}`;
+            window.location.href = mailtoLink; // Open the email client
+
+            displayResponseMessage('Your message is ready to be sent via your email client.', 'success');
+        });
+
+        // Function to display response message
+        function displayResponseMessage(message, type) {
+            const responseMessageElement = document.getElementById('responseMessage');
+            responseMessageElement.textContent = message;
+            responseMessageElement.className = `response-message ${type}`;
+        }
+    </script>
+</body>
+</html>
