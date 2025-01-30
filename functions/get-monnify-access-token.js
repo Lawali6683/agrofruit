@@ -1,5 +1,3 @@
-import fetch from "node-fetch";
-
 // Samu keys daga environment variables
 const apiKey = process.env.MONNIFY_API_KEY;
 const secretKey = process.env.MONNIFY_SECRET_KEY;
@@ -8,7 +6,7 @@ const secretKey = process.env.MONNIFY_SECRET_KEY;
 export async function getMonnifyAccessToken() {
     try {
         const authToken = btoa(`${apiKey}:${secretKey}`);
-
+        
         const response = await fetch("https://api.monnify.com/api/v1/auth/login", {
             method: "POST",
             headers: {
