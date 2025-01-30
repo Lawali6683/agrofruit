@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fruit Farming - Login</title>
+    
+    <style>
+        
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom, #4CAF50, #87CEEB);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #333;
+}
+
+/* Loading Screen */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    z-index: 1000;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Form Container */
+.form-container {
+   background: black;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+}
+
+.form-header h1 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.form-header span {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.form-header p {
+    text-align: center;
+    font-size: 14px;
+    color: white;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    color: white;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+.password-container {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #4CAF50;
+}
+
+/* Button Styles */
+.btn-primary {
+    background: #4CAF50;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    font-size: 16px;
+    border-radius: 5px;
+    Border-bottom:4px solid white;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: #45a049;
+}
+
+/* Footer */
+.form-footer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.link {
+    color: #4CAF50;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 10px;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+h1{
+    Color: white;
+}
+
+ #install-btn {
+  display: block;
+  margin: 20px auto;
+  padding: 15px 40px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  background: linear-gradient(90deg, #ff007a, #00d4ff);
+  background-size: 300% 300%;
+  animation: gradientShift 4s infinite;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2), 0px 0px 15px rgba(255, 0, 122, 0.5);
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+#install-btn:hover {
+  transform: translateY(-5px) scale(1.1);
+  box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.3), 0px 0px 25px rgba(0, 212, 255, 0.7);
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+#install-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.8);
+  animation: particleEffect 2s infinite ease-in-out;
+}
+
+@keyframes particleEffect {
+  0% {
+    transform: scale(1) translate(-50%, -50%);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(5) translate(-50%, -50%);
+    opacity: 0;
+  }
+}
+    </style>        
+</head>
+<body>
+    
+    <div id="loadingScreen" class="loading-screen" style="display: none;">
+        <div class="spinner"></div>
+        <p>Please wait...</p>
+    </div>
+
+    <div class="form-container">
+        
+        <div class="form-header">
+            <h1>Welcome Back to <span>AgroFruit</span></h1>
+            
+            <img src="fruit.png" style="width: 100%;">
+          
+            <p>Login to access your dashboard</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-container">
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <span class="toggle-password" onclick="togglePassword('password')">👁️</span>
+                </div>
+            </div>
+<button type="submit" class="btn-primary">Login</button>
+            
+        </form>
+
+        <div class="form-footer">
+          <p>  <a href="forget.html" class="link">Forget Password?</a></p>
+           </p> <a href="register.html" class="link">Register Now</a></p>
+           <button id="install-btn">Install App</button> 
+        </div>
+        
+    </div>
+    <style>
+    #email-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 2px;
+            width: 70px;
+            height: 70px;
+            Top: 220px;
+            
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        #email-icon:hover {
+            transform: scale(1.1);
+        }
+
+        #email-icon img {
+            width: 70px;
+            height: 70px;
+            Border-radius: 50%;
+        }
+</style>
+
+<div id="email-icon">
+    <img src="sup.png" alt="Support Icon">
+</div>
+
+<script>
+    document.getElementById('email-icon').addEventListener('click', function () {
+        const email = 'agrofruitenterprises@gmail.com';
+        const subject = encodeURIComponent("Customer Inquiry from AgroFruit Invest");
+        const body = encodeURIComponent("Dear AgroFruit,\n\nI have questions regarding your services. Please assist.\n\nThank you.");
+        const mailtoUrl = `mailto:${email}?subject=${subject}&body=${body}`;
+        window.location.href = mailtoUrl;
+    });
+</script>
+    <script>
+        function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const icon = field.nextElementSibling;
+
+    if (field.type === "password") {
+        field.type = "text";
+        icon.textContent = "🙈"; 
+    } else {
+        field.type = "password";
+        icon.textContent = "👁️"; 
+    }
+}
+    </script>    
+<script type="module">
+        import { app, analytics, firebaseConfig } from './firebase.js';
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+
+const auth = getAuth(app);
+
+
+// Handle Login Form Submission
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    document.getElementById("loadingScreen").style.display = "flex";
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        alert("Login Successful!");
+        window.location.href = "dashLod.html";
+    } catch (error) {
+        if (error.code === "auth/user-not-found") {
+            alert("This email address is not registered in AgroFruit. Register now!");
+        } else if (error.code === "auth/wrong-password") {
+            alert("The password is not correct. Please try again.");
+        } else {
+            alert("An error occurred. Please try again.");
+        }
+    } finally {
+        document.getElementById("loadingScreen").style.display = "none";
+    }
+});
+
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register('/sw.js')
+    .then(() => console.log('Service Worker registered successfully'))
+    .catch((error) => console.error('Service Worker registration failed:', error));
+}
+
+// Install prompt event
+let deferredPrompt;
+const installButton = document.getElementById('install-btn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installButton.style.display = 'block'; 
+
+  installButton.addEventListener('click', () => {
+    installButton.style.display = 'none'; 
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+        alert('AgroFruit App installed successfully!');
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+      deferredPrompt = null;
+    });
+  });
+});
+
+    </script>
+    <link rel="manifest" href="/manifest.json">
+<script src="/sw.js" defer></script>
+    </body>
+</html>

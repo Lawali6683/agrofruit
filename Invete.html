@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fruit Farming</title>
+    <style>
+        
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Header */
+.header {
+   
+   min-height: 100px;
+    
+    width: 100%;
+    background: url('ba7.png') no-repeat center center/cover;
+    text-align: center;
+    color: white;
+    padding-top: 300px;
+    position: relative;
+    
+}
+ 
+/* Main Content */
+main {
+    padding: 1.5rem;
+}
+
+.welcome-section h2 {
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #4caf50;
+}
+
+.referral-section {
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.referral-link-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.referral-link-container input {
+    padding: 0.5rem;
+    width: 70%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.referral-link-container button {
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.referral-link-container button:hover {
+    background-color: #45a049;
+}
+
+.success-message {
+    display: none;
+    color: #28a745;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+/* Investment Referrals */
+.investment-referrals table {
+    width: 100%;
+    margin-top: 2px;
+    border-collapse: collapse;
+    Font-weight: bold;
+    Font-size: 13px;
+    background-color: white;
+}
+
+.investment-referrals table th,
+.investment-referrals table td {
+    border: 1px solid #ccc;
+    padding: 1px;
+    text-align: left
+}
+
+.investment-referrals table th {
+    background-color: #4caf50;
+    color: white;
+}
+
+.investment-referrals table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Congratulations Section */
+.congrats-section {
+    background-color: #dff0d8;
+    border: 1px solid #d6e9c6;
+    color: #3c763d;
+    padding: 1rem;
+    margin-top: 2rem;
+    text-align: center;
+    display: none;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 1rem 0;
+    background-color: #4caf50;
+    color: white;
+    margin-top: 2rem;
+}
+
+    </style>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        
+        </div>
+        
+        
+        
+    </header>
+
+    <main>
+        <section class="welcome-section">
+            <h2>Welcome, <span id="userFullName"></span></h2>
+        </section>
+
+
+    <style>
+       
+       
+        h1 {
+            text-align: center;
+            color: #2b6cb0;
+            Font-size: 20px;
+        }
+        h2, h3 {
+            color: #4a5568;
+        }
+        h2{
+             Font-size: 15px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            margin: 10px 0;
+            padding: 10px;
+            background: #edf2f7;
+            border-left: 4px solid #2b6cb0;
+            border-radius: 4px;
+            Font-size: 10px;
+            Font-weight: bold;
+        }
+        .cta {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .cta button {
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .cta button:hover {
+            background: #1e4a75;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Invite Referrals & Earn Bonuses</h1>
+        <h2>Investment & Bonuses Breakdown</h2>
+        <ul>
+            <li><strong>₦3,500:</strong> Referral Bonus = ₦280 | Daily Profit = ₦12.8</li>
+            <li><strong>₦8,000:</strong> Referral Bonus = ₦640 | Daily Profit = ₦28</li>
+            <li><strong>₦15,000:</strong> Referral Bonus = ₦1,200 | Daily Profit = ₦62.4</li>
+            <li><strong>₦35,000:</strong> Referral Bonus = ₦2,800 | Daily Profit = ₦124.8</li>
+            <li><strong>₦70,000:</strong> Referral Bonus = ₦5,600 | Daily Profit = ₦245.6</li>
+            <li><strong>₦140,000:</strong> Referral Bonus = ₦11,200 | Daily Profit = ₦499.2</li>
+            <li><strong>₦280,000:</strong> Referral Bonus = ₦22,400 | Daily Profit = ₦998.4</li>
+        </ul>
+        <h2>Special Bonuses & Levels</h2>
+        <ul>
+            <li>Level 1: 15 Referrals = ₦10,000 Bonus</li>
+            <li>Level 2: 30 Referrals = ₦15,000 Bonus</li>
+            <li>Level 3: 70 Referrals = ₦18,000 Bonus</li>
+            <li>Level 4: 100 Referrals = ₦22,000 Bonus</li>
+            <li>Level 5: 150 Referrals = ₦40,000 Bonus + ₦20,000 every Monthly</li>
+        </ul>
+        <h2>
+            Total Earnings: ₦105,000 and + ₦20,000 Monthly Bonus! Every month, if you have 150 investment referrals, 
+</h2>
+<p>Don't miss this opportunity—start now and share your referral link on social media to win in 7 days ally. 
+        </p>
+        <p class="cta">
+            <button>Start Earning Now</button>
+        </p>
+    </div>
+
+
+        <section class="referral-section">
+            <h3>Your Referral Link</h3>
+            <div class="referral-link-container">
+                <input type="text" id="referralLink" readonly>
+                <button id="copyLinkBtn">Copy Link</button>
+            </div>
+            <p id="copySuccessMessage" class="success-message">Copy your referral link successfully!</p>
+        </section>
+
+       <h2>Your Investment Referrals: <span id="totalReferrals">0</span></h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Investment Amount</th>
+            </tr>
+        </thead>
+        <tbody id="referralTable"></tbody>
+    </table>
+        
+             <div id="congratulations" style="display:none;">
+            <p>Congratulations! You are now a professional admin member of Fruit Farming , and you get ₦20,000 bonus every 30 days. Continue to invite referrals and earn bonuses!</p>
+        </section>
+    </main>
+    </div>
+    
+  <style>           
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+      Font-size: 10px;
+      Font-weight: bold;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #0078d7;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .note {
+      background: #e7f4e7;
+      border-left: 5px solid #4caf50;
+      padding: 15px;
+      margin: 20px 0;
+      font-style: italic;
+    }
+
+    .cta {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .cta a {
+      text-decoration: none;
+      color: #fff;
+      background: #0078d7;
+      padding: 10px 20px;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    .cta a:hover {
+      background: #005bb5;
+    }
+    .ghk{
+        Font-size: 16px;
+        Text-align: center;
+        Font-weight:bold;
+    }
+    
+    /* Loading Screen */
+#loadingScreen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#loadingScreen span {
+    animation: spin 1s linear infinite;
+    border: 7px solid white;
+    border-top: 7px solid #00796B;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+  </style>
+</head>
+<body>
+    <div id="loadingScreen">
+        <span></span>        
+    </div>
+  <div class="container">
+    <h1>Referral and Bonus Program</h1>
+    <p class="ghk">Invite your referrals to join and earn amazing bonuses! Here's how it works:</p>
+
+    <h2><center>Referral Bonuses</center></h2>
+    <table>
+      <tr>
+        <th>Investment Amount</th>
+        <th>Referral Bonus (8%)</th>
+        <th>Daily Profit Bonus (8%)</th>
+      </tr>
+      <tr>
+        <td>₦3,500</td>
+        <td>₦280</td>
+        <td>₦12.8</td>
+      </tr>
+      <tr>
+        <td>₦8,000</td>
+        <td>₦640</td>
+        <td>₦28</td>
+      </tr>
+      <tr>
+        <td>₦15,000</td>
+        <td>₦1,200</td>
+        <td>₦62.4</td>
+      </tr>
+      <tr>
+        <td>₦35,000</td>
+        <td>₦2,800</td>
+        <td>₦124.8</td>
+      </tr>
+      <tr>
+        <td>₦70,000</td>
+        <td>₦5,600</td>
+        <td>₦245.6</td>
+      </tr>
+      <tr>
+        <td>₦140,000</td>
+        <td>₦11,200</td>
+        <td>₦499.2</td>
+      </tr>
+      <tr>
+        <td>₦280,000</td>
+        <td>₦22,400</td>
+        <td>₦998.4</td>
+      </tr>
+    </table>
+
+    <h2><center>Bonus Levels</center></h2>
+    <table>
+      <tr>
+        <th>Level</th>
+        <th>Referrals Required</th>
+        <th>Bonus Amount</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>15</td>
+        <td>₦10,000</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>30</td>
+        <td>₦15,000</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>70</td>
+        <td>₦18,000</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>100</td>
+        <td>₦22,000</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>150</td>
+        <td>₦40,000</td>
+      </tr>
+    </table>
+
+    <div class="note">
+      <strong>Note:</strong> Achieve higher referral 150 levels 5 to earn additional ₦40,000 bonuses and an official bonus from Global Fruit Industries. You also receive ₦20,000 every monthly in your Balance. 
+    </div>
+
+    <div class="cta">
+      <a href="#">Start Referring Now</a>
+    </div>
+  </div>
+
+<style>
+    #email-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 2px;
+            width: 70px;
+            height: 70px;
+            Top: 220px;
+            
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        #email-icon:hover {
+            transform: scale(1.1);
+        }
+
+        #email-icon img {
+            width: 70px;
+            height: 70px;
+            Border-radius: 50%;
+        }
+</style>
+
+<div id="email-icon">
+    <img src="sup.png" alt="Support Icon">
+</div>
+
+<script>
+    document.getElementById('email-icon').addEventListener('click', function () {
+        const email = 'agrofruitenterprises@gmail.com';
+        const subject = encodeURIComponent("Customer Inquiry from AgroFruit Invest");
+        const body = encodeURIComponent("Dear AgroFruit,\n\nI have questions regarding your services. Please assist.\n\nThank you.");
+        const mailtoUrl = `mailto:${email}?subject=${subject}&body=${body}`;
+        window.location.href = mailtoUrl;
+    });
+</script>
+    <footer class="footer">
+        <p>&copy; 2024 AgroFruit. All Rights Reserved.</p>
+    </footer>
+    <script type="module">
+    import { app, analytics, firebaseConfig } from './firebase.js'; 
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    // Initialize Firebase services
+    const database = getDatabase(app);
+    const auth = getAuth(app);
+    
+    // DOM Elements
+    const userFullNameEl = document.getElementById("userFullName");
+    const referralLinkEl = document.getElementById("referralLink");
+    const copyLinkBtn = document.getElementById("copyLinkBtn");
+    const copySuccessMessage = document.getElementById("copySuccessMessage");
+    const totalReferralsEl = document.getElementById("totalReferrals");
+    const referralTableEl = document.getElementById("referralTable");
+    const congratsSection = document.getElementById("congratulations");
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const uid = user.uid;
+            const userRef = ref(database, `users/${uid}`);
+            
+            get(userRef).then(snapshot => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    displayUserData(userData, uid);
+                }
+            });
+        }
+    });
+
+    async function displayUserData(userData, uid) {
+        const { fullName, referralLink, userBalance = 0, referralCode } = userData;
+        
+        if (referralLink) {
+    referralLinkEl.value = referralLink;
+} else {
+    referralLinkEl.value = "Referral link not available."; 
+}
+             
+        // Display user full name
+        userFullNameEl.textContent = fullName;
+
+       
+
+        // Fetch and display eligible referrals
+        const eligibleReferrals = await fetchEligibleReferrals(referralCode);
+        totalReferralsEl.textContent = eligibleReferrals.length;
+        updateReferralTable(eligibleReferrals);
+
+        // Bonus Logic
+        calculateReferralBonus(eligibleReferrals.length, uid, userBalance);
+
+        // Recurring bonus for reaching 150 referrals
+        if (eligibleReferrals.length >= 150) {
+            congratsSection.style.display = "block";
+            startRecurringBonus(uid, userBalance);
+        }
+    }
+
+    async function fetchEligibleReferrals(referralCode) {
+        const usersRef = ref(database, "users");
+        const snapshot = await get(usersRef);
+        const referrals = [];
+
+        if (snapshot.exists()) {
+            const users = snapshot.val();
+            for (const key in users) {
+                const user = users[key];
+                if (user.referralBy === referralCode && user.tsohonUser === "yes") {
+                    referrals.push({
+                        fullName: user.fullName || "N/A",
+                        investment: user.investment || 0
+                    });
+                }
+            }
+        }
+
+        return referrals;
+    }
+
+    function updateReferralTable(referrals) {
+        referralTableEl.innerHTML = ""; // Clear table
+        referrals.forEach(ref => {
+            referralTableEl.innerHTML += `
+                <tr>
+                    <td>${ref.fullName}</td>
+                    <td>₦${ref.investment}</td>
+                </tr>
+            `;
+        });
+    }
+
+    function calculateReferralBonus(referralCount, uid, currentBalance) {
+        let bonus = 0;
+        if (referralCount >= 150) bonus = 40000;
+        else if (referralCount >= 100) bonus = 22000;
+        else if (referralCount >= 70) bonus = 18000;
+        else if (referralCount >= 30) bonus = 15000;
+        else if (referralCount >= 15) bonus = 10000;
+
+        if (bonus > 0) {
+            update(ref(database, `users/${uid}`), {
+                userBalance: currentBalance + bonus
+            });
+        }
+    }
+
+    function startRecurringBonus(uid, currentBalance) {
+        const userRef = ref(database, `users/${uid}`);
+
+        get(userRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                let recurringCount = userData.recurringBonusCount || 0;
+
+                if (recurringCount < 12) {
+                    const newBalance = currentBalance + 20000;
+                    const newCount = recurringCount + 1;
+
+                    update(userRef, {
+                        userBalance: newBalance,
+                        recurringBonusCount: newCount,
+                    });
+
+                    console.log(`₦20,000 bonus added. Count: ${newCount}/12`);
+                } else {
+                    console.log("Recurring bonus limit reached (12 months).");
+                }
+            }
+        });
+
+        setTimeout(() => {
+            startRecurringBonus(uid, currentBalance);
+        }, 2592000000); 
+    }
+    copyLinkBtn.addEventListener("click", () => {
+    navigator.clipboard.writeText(referralLinkEl.value).then(() => {
+        copySuccessMessage.style.display = "block";
+        setTimeout(() => copySuccessMessage.style.display = "none", 3000);
+    }).catch(err => {
+        console.error("Failed to copy link:", err);
+        alert("An error occurred while copying the link. Please try again.");
+    });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const loadingScreen = document.getElementById("loadingScreen");
+    loadingScreen.style.display = "flex"; 
+    setTimeout(() => {
+        loadingScreen.style.display = "none"; 
+    }, 3000); 
+    
+});
+
+</script>
+</body>
+</html>

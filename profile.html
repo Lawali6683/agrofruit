@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AFF Account Creation</title>
+  <style>
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #4CAF50, #8BC34A);
+      color: #333;
+    }
+
+    /* Loading Screen */
+#loadingScreen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#loadingScreen span {
+    animation: spin 1s linear infinite;
+    border: 7px solid white;
+    border-top: 7px solid #00796B;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+    #content {
+      display: none;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    #content h1 {
+      font-size: 1.8em;
+      color: #4CAF50;
+      margin-bottom: 15px;
+    }
+
+    #content p {
+      font-size: 1em;
+      color: #555;
+      margin-bottom: 15px;
+    }
+
+    #content input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+
+    #content input:focus {
+      border-color: #4CAF50;
+      outline: none;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    }
+
+    #content button {
+      width: 100%;
+      padding: 12px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    #content button:hover {
+      background: #45A049;
+    }
+  </style>
+</head>
+<body>
+  <div id="loadingScreen">
+            <span></span>
+        </div>
+
+  <div id="content">
+    <h1>AFF Account Creation</h1>
+    <p id="message">Welcome! Please enter your NIN number to proceed.</p>
+    <input type="text" id="ninInput" placeholder="Enter your NIN number" />
+    <button id="submitBtn">Submit</button>
+  </div>
+  <script type="module">
+     import { app, analytics, firebaseConfig } from './firebase.js';
+import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import { getMonnifyAccessToken } from "./functions/get-monnify-access-token.js";
+
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+const loadingScreen = document.getElementById("loadingScreen");
+const content = document.getElementById("content");
+const message = document.getElementById("message");
+const ninInput = document.getElementById("ninInput");
+const submitBtn = document.getElementById("submitBtn");
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    const uid = user.uid;
+    const userRef = ref(db, `users/${uid}`);
+    loadingScreen.style.display = "flex";
+
+    get(userRef)
+      .then((snapshot) => {
+        loadingScreen.style.display = "none";
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          if (userData.accountDetails) {
+            // User already has account details, redirect to profile page
+            window.location.href = "profile2.html";
+          } else {
+            // Display content for NIN input
+            message.innerHTML = `${userData.fullName}, please enter your NIN number to create your AgroFruit account.`;
+            content.style.display = "block";
+
+            submitBtn.addEventListener("click", async () => {
+              const nin = ninInput.value.trim();
+              if (!nin) {
+                alert("NIN number is required!");
+                return;
+              }
+
+              // Prevent duplicate API calls
+              if (userData.monnifyCustomerId) {
+                alert("Account creation is already in progress.");
+                return;
+              }
+
+              loadingScreen.style.display = "flex";
+
+              try {
+                // Generate Monnify Customer ID
+                const monnifyCustomerId = `FWF-${uid}-${Date.now()}`;
+                await update(userRef, { monnifyCustomerId });
+
+                // Get Monnify Access Token
+                const accessToken = await getMonnifyAccessToken();
+
+                // Create Virtual Account
+                const virtualAccountResponse = await fetch(
+                  "https://api.monnify.com/api/v2/bank-transfer/reserved-accounts",
+                  {
+                    method: "POST",
+                    headers: {
+                      Authorization: `Bearer ${accessToken}`,
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      accountReference: monnifyCustomerId,
+                      accountName: userData.fullName,
+                      currencyCode: "NGN",
+                      contractCode: "8389328412",
+                      customerEmail: userData.email,
+                      customerName: userData.fullName,
+                      customerBVN: nin,
+                      bankCode: "035", // Wema Bank code
+                    }),
+                  }
+                );
+
+                const virtualAccountData = await virtualAccountResponse.json();
+                if (!virtualAccountData.requestSuccessful) throw new Error(virtualAccountData.responseMessage);
+
+                const accountDetails = {
+                  bankName: "Wema Bank",
+                  accountNumber: virtualAccountData.responseBody.accountNumber,
+                  accountName: userData.fullName,
+                };
+
+                // Update Firebase with Account Details
+                await update(userRef, { accountDetails });
+
+                loadingScreen.style.display = "none";
+                alert(
+                  `${userData.fullName}, Congratulations! Your AgroFruit account has been created.\n\nBank: ${accountDetails.bankName}\nAccount Number: ${accountDetails.accountNumber}\nAccount Name: ${accountDetails.accountName}`
+                );
+
+                // Redirect to profile page
+                window.location.href = "profile2.html";
+              } catch (error) {
+                loadingScreen.style.display = "none";
+                console.error(error);
+                alert("An error occurred: " + error.message);
+              }
+            });
+          }
+        } else {
+          alert("User data not found.");
+        }
+      })
+      .catch((error) => {
+        loadingScreen.style.display = "none";
+        console.error(error);
+        alert("Failed to fetch user data.");
+      });
+  } else {
+    alert("No user signed in.");
+  }
+});
+
+  </script >
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Fruit Farming</title>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #f5f5f5;
+      }
+
+      .center {
+          max-width: 400px;
+          margin: 100px auto;
+          padding: 20px;
+          background: white;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          border-radius: 8px;
+          text-align: center;
+      }
+
+      h2, h3 {
+          text-align: center;
+          color: #333;
+      }
+
+      label {
+          display: block;
+          margin: 10px 0 5px;
+      }
+
+      input, button {
+          width: 100%;
+          padding: 10px;
+          margin: 5px 0;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+      }
+
+      button {
+          background-color: #007bff;
+          color: white;
+          font-weight: bold;
+          cursor: pointer;
+          text-decoration: none;
+      }
+
+      button:hover {
+          background-color: #0056b3;
+      }
+
+      header {
+          background: #007bff;
+          color: white;
+          padding: 10px 20px;
+      }
+
+      header nav {
+          display: flex;
+          justify-content: space-between;
+      }
+
+      header nav p {
+          margin: 0;
+          font-size: 18px;
+          Text-align: center;
+      }
+
+      main {
+          padding: 20px;
+      }
+
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 20px 0;
+          font-size: 8px;
+          Font-weight: bold;
+          
+      }
+
+      table th, table td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: center;
+      }
+
+      table th {
+          background-color: #f2f2f2;
+      }
+
+      .hidden {
+          display: none;
+      }
+
+      .summary2 p {
+          margin: 10px 0;
+          font-size: 14px;
+          font-weight: bold;
+          Text-align: center;
+      }
+
+      .summary2 span {
+          color: #007bff;
+      }
+
+      .link-btn {
+          display: block;
+          margin: 20px auto;
+          text-align: center;
+          text-decoration: none;
+          color: white;
+          background-color: #007bff;
+          padding: 10px 20px;
+          border-radius: 4px;
+          font-weight: bold;
+      }
+
+      .link-btn:hover {
+          background-color: #0056b3;
+      }
+  </style>  
+</head>
+<body>
+  <div id="login-section" class="center">
+    <h2>Admin Login</h2>
+    <form id="loginForm">
+      <label for="email">Admin Email Address:</label>
+      <input type="email" id="email" placeholder="Enter Admin Email" required>
+      <label for="password">Admin Password:</label>
+      <input type="password" id="password" placeholder="Enter Password" required>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <div id="admin-panel" class="hidden">
+    <header>
+      <h1>Admin Dashboard</h1>
+      <nav>
+        <p>Total Registered Users: <span id="total-users">0</span></p>                  
+      </nav>
+    </header>
+    <div class="summary2">
+      <p>Users Daily Income Total: ₦<span id="daily-income-total">0.00</span></p>
+      <p>Users Withdrawal Balance Total: ₦<span id="withdrawal-balance-total">0.00</span></p>
+      <p>Total Users Invest: ₦<span id="total-invested">0.00</span></p>      
+    </div>
+
+    <main>
+      <section>
+        <h2>Users Summary</h2>
+        <table id="users-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Full Name</th>
+              <th>Investment (₦)</th>
+              <th>Daily Income (₦)</th>
+              <th>Withdrawal Balance (₦)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <h3>Top 20 Users by Referrals</h3>
+      <table id="top-referrals-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>User ID</th>
+            <th>Full Name</th>
+            <th>Referrals</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <h3>Top 20 Users by Referral Register Count</h3>
+      <table id="top-referral-count-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>User ID</th>
+            <th>Full Name</th>
+            <th>Referral Register Count</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <section>
+        <h2>Withdrawal History</h2>
+        <table id="withdrawal-history">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Amount (₦)</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <button id="showResultsButton">Show Results</button>
+
+      <section id="result-received" class="hidden">
+        <h2>Results Received</h2>
+        <form id="result-form">
+          <label for="amount">Amount:</label>
+          <input type="number" id="amount" placeholder="Enter Amount" required>
+          <label for="bank-number">Admin Bank Number:</label>
+          <input type="text" id="bank-number" placeholder="Enter Bank Number" required>
+          <label for="account-name">Admin Account Name:</label>
+          <input type="text" id="account-name" placeholder="Enter Account Name" required>
+          <label for="admin-bank-code">Admin Bank Code:</label>
+          <input type="text" id="admin-bank-code" placeholder="Enter Bank Code" required>
+          <label for="admin-password">Admin Password:</label>
+          <input type="password" id="admin-password" placeholder="Enter Password" required>
+          <label for="email">Admin Email Address:</label>
+          <input type="email" id="result-email" placeholder="Enter Admin Email Address" required>
+          <label for="secondary-password">Secondary Admin Password:</label>
+          <input type="password" id="secondary-password" placeholder="Enter Secondary Password" required>
+          <button type="submit">Submit</button>
+        </form>
+      </section>
+    </main>
+  </div> 
+  <p>
+       <a href="comfim.html" class="link-btn">Check Withdrawal</a>
+  </p>
+
+  <a href="dataAdmin.html" class="link-btn">Data Payment</a>
+  
+  <script type="module">
+  import { app, analytics, firebaseConfig } from './firebase.js'; 
+      
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+  import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+  
+  // Initialize Firebase  
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+
+  // Admin emails
+  const allowedEmails = ["agrofruitenterprises@gmail.com", "harunalawali5522@gmail.com", "lawaliharuna943@gmail.com"];
+
+  // DOM Elements
+  const loginForm = document.getElementById("loginForm");
+  const adminPanel = document.getElementById("admin-panel");
+  const loginSection = document.getElementById("login-section");
+  const usersTableBody = document.querySelector("#users-table tbody");
+  const totalUsers = document.getElementById("total-users");
+  const totalInvested = document.getElementById("total-invested");
+  const dailyIncomeTotalEl = document.getElementById("daily-income-total");
+  const withdrawalBalanceTotalEl = document.getElementById("withdrawal-balance-total");
+  const topReferralsTable = document.querySelector("#top-referrals-table tbody");
+
+  // Handle Admin Login
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    if (!allowedEmails.includes(email)) {
+      alert("Unauthorized email! Please use an approved admin email.");
+      return;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alert("Login successful!");
+      verifyAdminPassword();
+    } catch (error) {
+      alert("Login failed! Please check your credentials.");
+      console.error(error);
+    }
+  });
+
+  // Verify Admin Password
+  async function verifyAdminPassword() {
+    const enteredPassword = prompt("Please enter the admin password:");
+
+    if (enteredPassword !== "Haruna@66") {
+      alert("Incorrect password! You cannot access the admin dashboard.");
+      return;
+    }
+
+    loadDashboard();
+  }
+
+  // Load Admin Dashboard
+  async function loadDashboard() {
+    loginSection.style.display = "none";
+    adminPanel.style.display = "block";
+
+    const usersSnapshot = await get(ref(db, "users"));
+    const usersData = usersSnapshot.val();
+
+    let totalUsersCount = 0;
+    let totalInvestedAmount = 0;
+    let totalDailyIncomeAmount = 0;
+    let totalWithdrawalBalanceAmount = 0;
+    const referralData = {};
+
+    usersTableBody.innerHTML = "";
+    for (const userId in usersData) {
+      const user = usersData[userId];
+      const investment = parseFloat(user.investment || 0);
+      const dailyIncome = parseFloat(user.dailyUpgrade || 0);
+      const withdrawalBalance = parseFloat(user.userBalance || 0);
+
+      const row = `
+        <tr>
+          <td>${user.email}</td>
+          <td>${user.fullName}</td>
+          <td>₦${investment.toFixed(2)}</td>
+          <td>₦${dailyIncome.toFixed(2)}</td>
+          <td>₦${withdrawalBalance.toFixed(2)}</td>
+        </tr>
+      `;
+      usersTableBody.insertAdjacentHTML("beforeend", row);
+
+      totalUsersCount++;
+      totalInvestedAmount += investment;
+      totalDailyIncomeAmount += dailyIncome;
+      totalWithdrawalBalanceAmount += withdrawalBalance;
+
+      // Handle referral data
+      const referralBy = user.referralBy || null;
+      if (referralBy) {
+        if (!referralData[referralBy]) {
+          referralData[referralBy] = { count: 0, fullName: usersData[referralBy]?.fullName || "Unknown" };
+        }
+        referralData[referralBy].count++;
+      }
+    }
+
+    totalUsers.textContent = totalUsersCount;
+    totalInvested.textContent = totalInvestedAmount.toFixed(2);
+    dailyIncomeTotalEl.textContent = totalDailyIncomeAmount.toFixed(2);
+    withdrawalBalanceTotalEl.textContent = totalWithdrawalBalanceAmount.toFixed(2);
+
+    displayTopReferrals(referralData);
+  }
+
+  // Display Top Referrals
+  function displayTopReferrals(referralData) {
+    const sortedReferrals = Object.entries(referralData)
+      .sort(([, a], [, b]) => b.count - a.count)
+      .slice(0, 20);
+
+    topReferralsTable.innerHTML = ""; // Clear previous data
+
+    sortedReferrals.forEach(([userId, data], index) => {
+      const row = `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${data.fullName}</td>
+          <td>${data.count} referrals</td>
+        </tr>
+      `;
+      topReferralsTable.insertAdjacentHTML("beforeend", row);
+    });
+  }
+</script>
+</body>
+</html>

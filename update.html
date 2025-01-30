@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Password & PIN</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: black;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 400px;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: #6a1b9a;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #6a1b9a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #4a148c;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: white;
+    }
+    header {
+      background-color: #4CAF50;
+      padding: 10px 0;
+      text-align: center;
+      Font-size: 11px;
+      Font-weight: bold;
+      Color: blue;
+    }
+    P{
+        Font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Reset Password & PIN</h1>
+    <p>Securely update your password or PIN, and once done, log in to confirm the changes. If you encounter any issues, please contact AFE Support for assistance.</p>
+  </header>
+  
+  <div class="container">
+    <h2>Reset Your New Password</h2>
+    <input type="password" id="newPassword" placeholder="New Password" />
+    <input type="password" id="confirmPassword" placeholder="Confirm Password" />
+    <button id="resetPasswordButton">Submit</button>
+  </div>
+
+  <div class="container">
+    <h2>Update Your Transfer PIN</h2>
+    <input type="password" id="newPin" placeholder="New 5-Digit PIN" maxlength="5" />
+    <input type="password" id="confirmPin" placeholder="Confirm 5-Digit PIN" maxlength="5" />
+    <button id="updatePinButton">Submit</button>
+  </div>
+
+  <div>
+    <button onclick="window.location.href='login.html'">Go to Login</button>
+  </div>
+
+  <footer>
+    <p>&copy; AgroFruit</p>
+  </footer>
+
+  <script type="module">
+    import { app, analytics, firebaseConfig } from './firebase.js';
+    import { getAuth, verifyPasswordResetCode, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+   
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    // Get oobCode from localStorage
+    const oobCode = localStorage.getItem("oobCode");
+    if (!oobCode) {
+      alert("Verification code not found. Please try resetting your password again.");
+      window.location.href = "forget.html";
+    }
+
+    // Reset Password
+    document.getElementById("resetPasswordButton").addEventListener("click", async () => {
+      const newPassword = document.getElementById("newPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (!newPassword || !confirmPassword) {
+        alert("Both fields are required.");
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+
+      try {
+        await verifyPasswordResetCode(auth, oobCode); // Verify the oobCode
+        await confirmPasswordReset(auth, oobCode, newPassword); // Confirm password reset
+        alert("Password updated successfully. You can now log in.");
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+      }
+    });
+
+    // Update Transfer PIN
+    document.getElementById("updatePinButton").addEventListener("click", () => {
+      const newPin = document.getElementById("newPin").value;
+      const confirmPin = document.getElementById("confirmPin").value;
+
+      if (!newPin || !confirmPin) {
+        alert("Both fields are required.");
+        return;
+      }
+
+      if (newPin !== confirmPin) {
+        alert("PINs do not match.");
+        return;
+      }
+
+      if (!/^\d{5}$/.test(newPin)) {
+        alert("PIN must be exactly 5 digits.");
+        return;
+      }
+
+      const userId = "user123"; // Replace with dynamic userId
+      const transferRef = ref(database, `users/${userId}`);
+
+      update(transferRef, { transferP: newPin })
+        .then(() => {
+          alert("Transfer PIN updated successfully.");
+        })
+        .catch((error) => {
+          alert(`Error: ${error.message}`);
+        });
+    });
+    
+  </script>
+</body>
+</html>

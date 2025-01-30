@@ -1,0 +1,20 @@
+{
+  "name": "AgroFruit",
+  "short_name": "AgroFruit",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#47498e",
+  "theme_color": "#5bff15",
+  "icons": [
+    {
+      "src": "fruit.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "fruit.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verification & Password Reset</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #89fffd, #0051ff);
+    }
+
+    .container {
+      width: 90%;
+      max-width: 400px;
+      padding: 40px;
+      background: linear-gradient(to right, #d4fc79, #96e6a1);
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      Text-align: center;
+    }
+
+    h2 {
+      color: #6a1b9a;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #6a1b9a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #4a148c;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    header {
+      background-color: ;
+      padding: 1px 0;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: blue;
+    }
+
+    p {
+      font-size: 20px;
+      Font-weight: bold;
+      Color: #ff0034;
+      
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Email Verification </h1>
+    <p>Securely verify your email Please wait...</p>
+  </header>    
+
+  <div class="container">
+    <h2>Processing...</h2>
+    <p>Please wait while we verify your email or reset your password.</p>
+  </div>
+
+  <footer>
+    <p>&copy; AgroFruit</p>
+  </footer>
+
+  <script type="module">
+    import { app, analytics, firebaseConfig } from './firebase.js';
+    import { getAuth, applyActionCode, verifyPasswordResetCode, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    
+    const auth = getAuth(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const oobCode = urlParams.get('oobCode');
+    const mode = urlParams.get('mode');
+
+    if (oobCode) {
+      if (mode === 'verifyEmail') {
+        verifyEmail(oobCode);
+      } else if (mode === 'resetPassword') {
+        resetPassword(oobCode);
+      } else {
+        displayError('An unexpected issue occurred. Please try again.');
+      }
+    } else {
+      displayError('The link is invalid or expired. Please request a new one.');
+    }
+
+    function verifyEmail(oobCode) {
+      applyActionCode(auth, oobCode)
+        .then(() => {
+          document.querySelector('.container').innerHTML = `
+            <h2>Success!</h2>
+            <p>Your email has been successfully verified. Redirecting to login...</p>`;
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 3000);
+        })
+        .catch(() => {
+          alert('This link has expired or is invalid. Try registering again.');
+          window.location.href = 'register.html';
+        });
+    }
+
+    function resetPassword(oobCode) {
+      verifyPasswordResetCode(auth, oobCode)
+        .then(() => {
+          document.querySelector('.container').innerHTML = `
+            <h2>Reset Your New Password</h2>
+            <input type="password" id="newPassword" placeholder="New Password" />
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" />
+            <button id="resetPasswordButton">Submit</button>`;
+
+          document.getElementById("resetPasswordButton").addEventListener("click", async () => {
+            const newPassword = document.getElementById("newPassword").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+
+            if (newPassword !== confirmPassword) {
+              alert('Passwords do not match.');
+              return;
+            }
+
+            try {
+              await confirmPasswordReset(auth, oobCode, newPassword);
+              alert('Password reset successful. Redirecting to login...');
+              window.location.href = 'login.html';
+            } catch {
+              alert('An error occurred while resetting your password. Please try again.');
+            }
+          });
+        })
+        .catch(() => {
+          alert('This link has expired or is invalid. Try resetting your password again.');
+          window.location.href = 'forgot-password.html';
+        });
+    }
+
+    function displayError(message) {
+      document.querySelector('.container').innerHTML = `
+        <h2>Error</h2>
+        <p>${message}</p>`;
+    }
+  </script>
+</body>
+</html>

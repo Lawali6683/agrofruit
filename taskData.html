@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tasks Completed</title>
+  
+  <style>            
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
+  color: #333;
+}
+
+.header {
+  background: #6200ea;
+  color: #fff;
+  padding: 1rem 0;
+  text-align: center;
+}
+
+.header .container h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.header .container p {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.banner {
+  text-align: center;
+  background: #e3f2fd;
+  padding: 1rem;
+  font-size: 1.2rem;
+  color: #007bb6;
+}
+
+.main-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin: 2rem;
+}
+
+.card {
+  background: #fff;
+  border: 2px solid #1c15ff;
+  border-radius: 10px;
+  text-align: center;
+  padding: 10px;
+  width: 250px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.card img {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 0;
+}
+
+.card h2 {
+  font-size: 9px;
+  color: #333;
+  Font-weight:bold;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.footer {
+  text-align: center;
+  background: #6200ea;
+  color: #fff;
+  padding: 1rem 0;
+  margin-top: 2rem;
+}
+
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <h1>Welcome, <span id="userName"></span></h1>
+      <p>Your Data Balance: <span id="dataBalance">0 MB</span></p>
+    </div>
+  </header>
+
+  <section class="banner">
+    <p>Complete Task and earn Data easily. Minimum withdrawal 500 MB.</p>
+  </section>
+
+  <main class="main-container">
+    <div class="card" onclick="navigateTo('datawithdrawal.html')" >
+      <img src="d1.png" alt="Withdraw Data">
+      <h2>Withdrawal Your Data</h2>
+    </div>
+
+    <div class="card" onclick="navigateTo('task.html')">
+      <img src="d2.png" alt="Complete Tasks">
+      <h2>Complete Tasks and Earn Data</h2>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; AgroFruit </p>
+  </footer>
+  
+  
+  <script type="module">
+  import { app, analytics, firebaseConfig } from './firebase.js';
+  import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+  const db = getDatabase(app);
+  const auth = getAuth();
+  
+  // Helper function to navigate to other pages
+  function navigateTo(page) {
+    window.location.href = page;
+  }
+
+  // Attach navigateTo to the window object
+  window.navigateTo = navigateTo;
+
+  // Display user information
+  function displayUserInfo(user) {
+    const userId = user.uid;
+    const userRef = ref(db, `users/${userId}`);
+
+    get(userRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        if (!userData.dataBalance) {
+          set(userRef, {
+            ...userData,
+            dataBalance: 10,
+          }).then(() => {
+            document.getElementById("dataBalance").textContent = "10 MB";
+          });
+        } else {
+          document.getElementById("dataBalance").textContent = `${userData.dataBalance} MB`;
+        }
+        document.getElementById("userName").textContent = userData.fullName || "User";
+      } else {
+        set(userRef, {
+          fullName: user.displayName || "User",
+          dataBalance: 10,
+        }).then(() => {
+          document.getElementById("userName").textContent = user.displayName || "User";
+          document.getElementById("dataBalance").textContent = "10 MB";
+        });
+      }
+    });
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      displayUserInfo(user);
+    } else {
+      alert("You need to log in to access this page.");
+      window.location.href = "login.html";
+    }
+  });
+
+  
+  if (window.history && window.history.pushState) {
+    window.history.pushState(null, null, window.location.href);
+    window.onpopstate = function () {
+      window.location.replace("dashboard.html"); 
+    };
+  }
+</script>
+</body>
+</html>

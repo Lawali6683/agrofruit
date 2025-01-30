@@ -13,23 +13,15 @@
     <link rel="manifest" href="/manifest.json">
  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
-   body {
-    font-family: 'Arial', sans-serif;
-    
-    background: black;
-    color: white;
-    text-shadow: 2px 3px 6px rgba(255, 255, 255, 0.2);
-    
-    max-width: 100vw;
-    margin: 0 auto;
-    padding: 10px;
-    
-    line-height: 1.4;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    scroll-behavior: smooth;
-    
-}
+    body {
+  font-family: 'Arial', sans-serif;
+  background: black;
+   
+   text-shadow: 3px 4px 8px rgba(0, 0, 0, 0.3); 
+   Color: white;
+        
+  }
+
     .header {
        background-color: #3115ff;
            
@@ -44,8 +36,8 @@
             left: 0;
                         z-index: 1000;
             display: flex;
-            Gap: 3p;
-            
+            Gap: 2px;
+            justify-content: space-between
             Space: 10px;
             align-items: center;
             Color: #a2ed14c9;
@@ -118,11 +110,11 @@
         }
 
         .nav ul {
-            
+            list-style: none;
             padding: 0;
         }
 
-        .navx ul li {
+        .nav ul li {
                         padding: 0px 0px;
         }
 
@@ -366,6 +358,14 @@ button::before {
 
 #about .button_1:hover {
     background-color: #e76f51;
+}
+
+/* Footer */
+footer {
+    background-color: #1e3a3a;
+    color: white;
+    padding: 20px;
+    text-align: center;
 }
 
 /* Media Queries */
@@ -670,12 +670,10 @@ h3:hover {
         <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
         <nav class="nav">
         <ul>
-            
+            <li><a href="contact.html"><i class="fas fa-phone"></i> Contact</a></li>
             <li><a href="register.html"><i class="fas fa-user-plus"></i> Register</a></li>
             <li><a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-             <li><a href="about.html"><i class="fas fa-info-circle"></i> About Us</a></li>
-          <li><a href="contact.html"><i class="fas fa-phone"></i> Contact</a></li>   
-            <li><a href="howuse.html"><i class="fas fa-info-circle"></i> How to AgroFruit App</a></li>
+            <li><a href="howuse.html"><i class="fas fa-info-circle"></i> How Using AFE App</a></li>
             </ul>
         </nav>
     </header>
@@ -1848,7 +1846,37 @@ Minimum Withdrawal: You can withdraw starting from ₦500.
     </div>
  <p>
      <p>
-                            
+         
+         
+          <style>                    
+        
+
+         footer {            
+           text-align: center;
+            margin-top: 40px;
+        }
+
+        footer p {
+            font-size: 18px;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+     footer  button {
+            padding: 15px 30px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+  
+    </style>
 </head>
 <body>
     <div class="contaie">
@@ -2060,126 +2088,14 @@ Minimum Withdrawal: You can withdraw starting from ₦500.
     </div>
   
      </p>
-     
-
-<style>
-    .footery {
-        width: 100%;
-        background: linear-gradient(to right, #2575fc, #6a11cb);
-        color: white;
-        margin-top: 30px;
-        border-top-left-radius: 30px;
-        border-top-right-radius: 30px;
-        padding: 20px 0;
-    }
-
-    .footer-container {
-        width: 100%;
-        max-width: 1200px;
-        margin: 0 auto;
-        text-align: center;
-    }
-
-    .footer-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center
-    }
-
-    .footer-title {
-        font-size: 28px;
-        margin-bottom: 15px;
-        font-weight: 700;
-    }
-
-    .footer-description {
-        font-size: 18px;
-        margin-bottom: 20px;
-        font-weight: 300;
-    }
-
-    .footer-links {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin-bottom: 20px;
-    }
-
-    .footer-link-item {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 5px 10px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 5px;
-    }
-
-    .footer-links a {
-        color: white;
-        text-decoration: none;
-        font-size: 16px;
-        font-weight: 500;
-        transition: color 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .footer-links a:hover {
-        color: #4CAF50;
-    }
-
-    .footer-social-media {
-        margin: 10px 0;
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        flex-wrap: wrap;
-    }
-
-    .footer-social-media i {
-        color: white;
-        font-size: 24px;
-        transition: color 0.3s ease;
-    }
-
-    .footer-social-media i:hover {
-        color: #4CAF50;
-    }
-
-    .footer-bottom {
-        margin-top: 10px;
-        font-size: 14px;
-        font-weight: 300;
-    }
-
-   
-</style>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-<footer class="footery">
-  <div class="footer-container">
-    <div class="footer-content">
-      <h3 class="footer-title">AgroFruit</h3>
-      <p class="footer-description">Invest in a fruitful future with sustainable farming.</p>
+     <footer style="background-color: #2d2d2d; color: #fff; padding: 20px 0; text-align: center; font-family: Arial, sans-serif;">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <h3 style="margin-bottom: 10px;">AgroFruit</h3>
+    <p style="margin: 0;">Invest in a fruitful future with sustainable farming.</p>
+    <div style="margin: 20px 0;">
       
-      <div class="footer-links">
-        
-      <div class="footer-social-media">
-        <i href="https://facebook.com" class="fab fa-facebook"></i>
-        <i href="https://twitter.com" class="fab fa-twitter"></i>
-        <i href="https://instagram.com" class="fab fa-instagram"></i>
-        <i href="https://linkedin.com" class="fab fa-linkedin"></i>
-        <i href="https://youtube.com" class="fab fa-youtube"></i>
-      </div>
-
-      <div class="footer-bottom">
-        <p>&copy; AgroFruit. All Rights Reserved.</p>
-        <p>Contact us: agrofruitenterprises@gmail.com</p>
-      </div>
-    </div>
+    <p style="font-size: 14px; margin: 0;">&copy; AgroFruit. All Rights Reserved.</p>
+    <img src="tt2.png" style="width:100%;">
   </div>
 </footer>
 

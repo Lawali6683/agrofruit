@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Withdrawals</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+
+    header {
+      text-align: center;
+      background: #6200ea;
+      color: #fff;
+      padding: 1rem 0;
+    }
+
+    main {
+      padding: 2rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+    }
+
+    table th, table td {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      text-align: left;
+    }
+
+    table th {
+      background-color: #6200ea;
+      color: white;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      background: #6200ea;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #4a00d1;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: #333;
+      color: white;
+    }
+
+    .login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .login-box {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .feedback {
+      color: red;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <h2>Admin Login</h2>
+      <input type="email" id="adminEmail" placeholder="Enter Admin Email" />
+      <input type="password" id="adminPassword" placeholder="Enter Admin Password" />
+      <button id="loginButton">Login</button>
+      <p id="loginFeedback" class="feedback"></p>
+    </div>
+  </div>
+
+  <header>
+    <h1>Admin Panel</h1>
+    <p>Manage User Data Withdrawals</p>
+  </header>
+
+  <main id="adminPanel" class="hidden">
+    <table>
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Phone Number</th>
+          <th>SIM Network</th>
+          <th>Data Amount</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="withdrawalTable">
+        
+      </tbody>
+    </table>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Fruit Wealth Farming</p>
+  </footer>
+
+  <script type="module">
+    import { app, analytics, firebaseConfig } from './firebase.js';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+   
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    // DOM Elements
+    const loginOverlay = document.getElementById("loginOverlay");
+    const adminPanel = document.getElementById("adminPanel");
+    const withdrawalTable = document.getElementById("withdrawalTable");
+    const loginButton = document.getElementById("loginButton");
+    const adminPassword = document.getElementById("adminPassword");
+    const adminEmail = document.getElementById("adminEmail");
+    const loginFeedback = document.getElementById("loginFeedback");
+
+    // Allowed admin emails
+    const ALLOWED_EMAILS = [
+      "agrofruitenterprises@gmail.com",
+      "harunalawali5522@gmail.com"
+    ];
+
+    // Admin Password
+    const ADMIN_PASSWORD = "Haruna@66";
+
+    // Admin login
+    loginButton.addEventListener("click", () => {
+      const email = adminEmail.value.trim();
+      const password = adminPassword.value;
+
+      if (!ALLOWED_EMAILS.includes(email)) {
+        loginFeedback.textContent = "Unauthorized Email!";
+        return;
+      }
+
+      if (password === ADMIN_PASSWORD) {
+        // Sign in admin with Firebase Auth
+        signInWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            console.log("Admin authenticated:", user.uid);
+            loginOverlay.classList.add("hidden");
+            adminPanel.classList.remove("hidden");
+            loadWithdrawals();
+          })
+          .catch((error) => {
+            console.error("Authentication error:", error.message);
+            loginFeedback.textContent = "Authentication failed!";
+          });
+      } else {
+        loginFeedback.textContent = "Incorrect Password!";
+      }
+    });
+
+    // Load withdrawals
+    function loadWithdrawals() {
+      get(ref(db, "users"))
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const users = snapshot.val();
+            withdrawalTable.innerHTML = ""; // Clear table
+
+            Object.keys(users).forEach((userId) => {
+              const user = users[userId];
+              if (user.dataWithdrawal) {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                  <td>${userId}</td>
+                  <td>${user.dataWithdrawal.phoneNumber}</td>
+                  <td>${user.dataWithdrawal.simNetwork}</td>
+                  <td>${user.dataWithdrawal.dataAmount} MB</td>
+                  <td><button data-id="${userId}" class="delete-btn">Mark as Sent</button></td>
+                `;
+                withdrawalTable.appendChild(row);
+              }
+            });
+
+            // Add event listeners to delete buttons
+            document.querySelectorAll(".delete-btn").forEach((btn) => {
+              btn.addEventListener("click", (e) => {
+                const userId = e.target.getAttribute("data-id");
+                processWithdrawal(userId);
+              });
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error loading withdrawals:", error.message);
+        });
+    }
+
+    // Process withdrawal
+    function processWithdrawal(userId) {
+      const userRef = ref(db, `users/${userId}/dataWithdrawal`);
+      get(userRef)
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            remove(userRef)
+              .then(() => {
+                console.log(`Withdrawal for user ${userId} processed.`);
+                loadWithdrawals(); // Reload table
+              })
+              .catch((error) => {
+                console.error("Error processing withdrawal:", error.message);
+              });
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching withdrawal data:", error.message);
+        });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading Screen Example</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>     
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  Color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.dots {
+  display: flex;
+  justify-content: space-around;
+  width: 100px;
+}
+
+.dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: red;
+  animation: bounce 1.5s infinite ease-in-out;
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-15px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+}
+.do{
+    Font-size: 35px;
+    Font-weight: bold;
+    Color: white;    
+}
+h2{
+    Text-align: center;
+    Font-size: 20px;
+    Font-weight: bold;
+    Color: red;
+    
+}
+  </style>
+</head>
+<body>
+  <div id="loadingScreen" class="loading-screen">  
+      <i class="do">A</i>    
+    <div class="dots">
+      <div class="dot"></div>
+      <div class="do">F</div>
+      <div class="dot"></div>
+    </div>
+    <i class="do">E</i>
+  </div>  
+  <div>
+  <h2>"Please wait while we verify you're human."</h2>
+  </div>
+  <script type="module">
+      import { app, analytics, firebaseConfig } from './firebase.js';
+      
+import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+const db = getDatabase(app);
+const auth = getAuth();
+
+// Get user information
+const loadingScreen = document.getElementById("loadingScreen");
+
+// Clear loading screen once everything is ready
+window.onload = () => {
+  
+  
+// Handle user logic after authentication and data retrieval
+onAuthStateChanged(auth, user => {
+  if (user) {
+    const userId = user.uid;
+    const userRef = ref(db, `users/${userId}`);
+    
+    // Fetch user data from Firebase
+    get(userRef).then(snapshot => {
+      if (snapshot.exists()) {
+        handleInvestmentLogic(userId, snapshot.val());
+      } else {
+        alert("User data not found.");
+        window.location.href = "register.html"; 
+      }
+    }).catch((error) => {
+      console.error("Error fetching user data: ", error);
+      alert("An error occurred while fetching user data.");
+      window.location.href = "register.html"; 
+    });
+  } else {
+    alert("Please register before proceeding.");
+    window.location.href = "register.html"; 
+  }
+});
+
+
+function handleInvestmentLogic(userId, userData) {
+  const investmentData = parseFloat(userData.investment) || 0; 
+  const registrationDate = userData.registrationDate || new Date().toISOString();
+  const tsohonUser = userData.tsohonUser || "no";
+  const investmentTime = new Date(userData.investmentTime || new Date().toISOString());
+  const currentTime = new Date();
+  const daysElapsed = Math.floor((currentTime - investmentTime) / (1000 * 60 * 60 * 24));
+
+  const investmentMap = [
+    { amount: 3500, dailyUpgrade: 160, referralBonus: 280, referralUpgrade: 12.8, days: 35 },
+    { amount: 8000, dailyUpgrade: 350, referralBonus: 640, referralUpgrade: 28, days: 35 },
+    { amount: 15000, dailyUpgrade: 780, referralBonus: 1200, referralUpgrade: 124.8, days: 36 },
+    { amount: 35000, dailyUpgrade: 1560, referralBonus: 2800, referralUpgrade: 124.8, days: 37 },
+    { amount: 70000, dailyUpgrade: 3120, referralBonus: 5600, referralUpgrade: 245.6, days: 39 },
+    { amount: 140000, dailyUpgrade: 6240, referralBonus: 11200, referralUpgrade: 499.2, days: 40 },
+    { amount: 280000, dailyUpgrade: 12480, referralBonus: 22400, referralUpgrade: 998.4, days: 42 },
+  ];
+
+  const matchedPlan = investmentMap.find(plan => plan.amount === investmentData);
+
+  const updates = {};
+
+  // Validate that the user has valid investment data
+  if (investmentData <= 0 || !matchedPlan) {
+    alert("You need to make a valid investment to proceed. Please deposit your funds first.");
+    window.location.href = "dashboard.html"; 
+    return; 
+  }
+
+  if (matchedPlan) {
+    if (daysElapsed >= matchedPlan.days) {      
+      updates.investment = 0;
+      updates.dailyUpgrade = 0;
+    }
+
+    // Check if the user is new and give a welcome bonus
+    if (tsohonUser === "no" && investmentData >= 3500) {
+      updates.userBalance = (userData.userBalance || 0) + 500; 
+      updates.tsohonUser = "yes"; 
+    }
+
+    // If user has no dailyUpgrade, assign the correct dailyUpgrade based on their plan
+    if (!userData.dailyUpgrade || userData.dailyUpgrade !== matchedPlan.dailyUpgrade) {
+      updates.dailyUpgrade = matchedPlan.dailyUpgrade;
+    }
+
+    // Save investment time if not already set
+    if (!userData.investmentTime) {
+      updates.investmentTime = currentTime.toISOString(); 
+    }
+    
+    if (userData.investment !== matchedPlan.amount) {
+      updates.investment = matchedPlan.amount;
+      updates.dailyUpgrade = matchedPlan.dailyUpgrade; 
+      updates.investmentTime = currentTime.toISOString(); 
+    }
+
+    updates.lastUpdate = currentTime.toISOString();
+
+    // Handle referral bonus if a referrer exists
+    if (userData.referralBy) {
+      const referrerRef = ref(db, `users/${userData.referralBy}`);
+      get(referrerRef).then(snapshot => {
+        if (snapshot.exists()) {
+          const referrerData = snapshot.val();
+          const referrerUpdates = {
+            userBalance: (referrerData.userBalance || 0) + matchedPlan.referralBonus,
+            dailyUpgrade: (referrerData.dailyUpgrade || 0) + matchedPlan.referralUpgrade,
+            investmentReferral: (referrerData.investmentReferral || 0) + 1,
+          };
+          update(referrerRef, referrerUpdates);
+        }
+      });
+    }
+
+    // Update user data
+    const userRef = ref(db, `users/${userId}`);
+    update(userRef, updates).then(() => {
+      if (daysElapsed >= matchedPlan.days) {
+        alert("👋 Hello, Renew Your Investment Now! Your investment period has ended! You can reinvest today to continue earning daily profits. AFF is proud of you! 🎉");
+      }
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 200);
+    });
+  } else {
+    alert("🎉 Start Your Business with AFE ! Easily deposit your funds into your AFE account via bank transfer, POS, or other payment methods. Copy your account number, send your funds effortlessly, and start earning profits immediately. AFE is proud to have you with us! 🙏");
+    loadingScreen.style.display = "none";
+  console.log("Page loaded and loading screen removed.");
+};
+    window.location.href = "dashboard.html";
+  }
+}
+  </script>   
+</body>
+</html>

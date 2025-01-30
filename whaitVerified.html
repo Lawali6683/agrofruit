@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verification - AFE</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+     background-color: black;
+      color: #fff;
+    }
+    .container {
+      background: #fff;
+      color: #333;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .container h1 {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+      color: #4caf50;
+    }
+    .container p {
+      font-size: 1rem;
+      line-height: 1.5;
+      margin: 10px 0;
+    }
+    .progress-bar {
+      background: #e0e0e0;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    .progress {
+      height: 20px;
+      width: 0;
+      background: #4caf50;
+      transition: width 1s linear;
+    }
+    .timer {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #f44336;
+    }
+    .btn-container {
+      margin-top: 20px;
+    }
+    .btn {
+      text-decoration: none;
+      padding: 10px 20px;
+      background: #4caf50;
+      color: #fff;
+      border-radius: 5px;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    .btn:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Verify Your Email Now. Check Your Inbox Email.</h1>
+
+    <p id="message">You need to verify your email to start joining AFE. Please check your email inbox now.</p>
+    <div class="progress-bar">
+      <div class="progress" id="progress"></div>
+    </div>
+    <div class="timer" id="timer">20:00</div>
+    <div class="btn-container" id="action">
+     
+    </div>
+  </div>
+
+  <script>
+    const progress = document.getElementById("progress");
+    const timerDisplay = document.getElementById("timer");
+    const message = document.getElementById("message");
+    const action = document.getElementById("action");
+
+    // Timer settings
+    let timeLeft = 20 * 60; // 20 minutes in seconds
+    const totalDuration = timeLeft;
+
+    // Countdown function
+    function updateTimer() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+
+      // Update timer display
+      timerDisplay.textContent = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+
+      // Update progress bar
+      const progressPercentage = ((totalDuration - timeLeft) / totalDuration) * 100;
+      progress.style.width = `${progressPercentage}%`;
+
+      // Check if time is up
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        showExpiredMessage();
+      } else {
+        timeLeft--;
+      }
+    }
+
+    // Show expired message
+    function showExpiredMessage() {
+      message.textContent = "Your time is full. Register here to join AFE.";
+      action.innerHTML = `<a href="register.html" class="btn">Register Now</a>`;
+      progress.style.width = "100%";
+      progress.style.background = "#f44336";
+    }
+
+    // Start the countdown
+    const timerInterval = setInterval(updateTimer, 1000);
+
+    // Initialize the timer immediately
+    updateTimer();
+  </script>
+</body>
+</html>
