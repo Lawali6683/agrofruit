@@ -16,5 +16,8 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "description": "AgroFruit is a web app for managing fruit farming.",
+  "orientation": "portrait",
+  "scope": "/"
 }
