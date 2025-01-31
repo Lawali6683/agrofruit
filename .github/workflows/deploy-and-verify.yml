@@ -26,12 +26,9 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Install dependencies if needed
+      - name: Install dependencies
         run: |
           if [ -f package.json ]; then
-            if [ ! -f package-lock.json ] && [ ! -f npm-shrinkwrap.json ]; then
-              npm install --package-lock-only
-            fi
             npm ci
           elif [ -f yarn.lock ]; then
             yarn install
