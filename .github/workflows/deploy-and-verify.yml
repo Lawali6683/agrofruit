@@ -1,9 +1,11 @@
-name: Deploy and Verify Webhook Handler
+jobs:
+name: Node.js CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
@@ -13,28 +15,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set Environment Variables
-        run: |
-          echo "MONNIFY_API_KEY=${{ secrets.MONNIFY_API_KEY }}" >> $GITHUB_ENV
-          echo "MONNIFY_SECRET_KEY=${{ secrets.MONNIFY_SECRET_KEY }}" >> $GITHUB_ENV
-          echo "FIREBASE_ADMIN_SDK=${{ secrets.FIREBASE_ADMIN_SDK }}" >> $GITHUB_ENV
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
 
-      - name: Dummy Build Step
-        run: echo "Skipping npm install and build steps"
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Check for changes before deploying
-        run: |
-          git diff --quiet || echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
-
-      - name: Deploy to GitHub Pages (if changes detected)
-        if: env.CHANGES_DETECTED == 'true'
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add .
-          git commit -m 'Deploy to GitHub Pages' || exit 0
-          git push --force origin HEAD:gh-pages
-
-      - name: Dummy Verification Step
-        run: echo "Skipping verification script"
-        
+      - name: Run tests
+        run: npm test
+        env:
+          MONNIFY_API_KEY: ${{ secrets.MONNIFY_API_KEY }}
+          MONNIFY_SECRET_KEY: ${{ secrets.MONNIFY_SECRET_KEY }}          
