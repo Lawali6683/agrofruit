@@ -12,48 +12,56 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
+          cache: 'npm'
 
       - name: Cache Node.js modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Install dependencies and create yarn.lock
+      - name: Install dependencies (npm or yarn)
         run: |
-          yarn install
-          if [ ! -f yarn.lock ]; then
+          if [ -f package.json ]; then
+            if [ ! -f package-lock.json ] && [ ! -f npm-shrinkwrap.json ]; then
+              npm install --package-lock-only
+            fi
+            npm ci
+          elif [ -f yarn.lock ] || [ -f package.json ]; then
             yarn install
+          else
+            echo "No package.json or yarn.lock found!"
+            exit 1
           fi
 
       - name: Run tests
-        run: yarn test
+        run: npm test || yarn test
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: test-results
           path: test-results/
 
       - name: Upload code coverage
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: coverage
           path: coverage/
 
       - name: Upload logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: logs
           path: logs/
