@@ -59,7 +59,8 @@ button:hover {
 }
 
 #stats p {
-  font-size: 10px;
+  font-size: 15px;
+  Font-weight: bold;
 }
 
 #withdrawalList {
@@ -85,12 +86,62 @@ button#approveAllBtn:hover {
   background-color: #45a049;
 }
 
+/* Style for each withdrawal entry */
+.withdrawal-row {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.withdrawal-row p {
+  font-size: 13px;
+  margin: 5px 0;
+}
+
+.withdrawal-row p strong {
+  color: #333;
+  font-weight: bold;
+}
+
+/* Container for action buttons */
+.action-buttons {
+  display: flex; 
+  justify-content: space-between; 
+  gap: 15px; 
+  margin-top: 10px;
+}
+
+.approveBtn, .rejectBtn {
+  font-size: 24px; 
+  padding: 10px 15px; 
+  border: 2px solid #ccc; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease, transform 0.2s; 
+  background-color: #fff; 
+}
+
+.approveBtn:hover {
+  background-color: #4CAF50; 
+  color: white; 
+  border-color: #4CAF50; 
+  transform: translateY(-3px); 
+}
+
+.rejectBtn:hover {
+  background-color: #f44336; 
+  color: white; 
+  border-color: #f44336; 
+  transform: translateY(-3px); 
+}
   </style>
 </head>
 
 <body>
   <header>
-    <h1>Welcome <span id="fullName"></span></h1>
+    <h1>Welcome <span id="fullName">Leader</span></h1>
   </header>
 
   <div id="loginSection">
@@ -129,43 +180,33 @@ button#approveAllBtn:hover {
   </div>
   
   <script type="module">
-      import { app, analytics, firebaseConfig } from './firebase.js';
-import { getMonnifyAccessToken } from "./functions/get-monnify-access-token.js";
-
+import { app } from './firebase.js';
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
-
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
 const auth = getAuth();
 const database = getDatabase(app);
 
-// Initialize Elements
 const loginBtn = document.getElementById('loginBtn');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const secondaryPasswordInput = document.getElementById('secondaryPassword');
 const verifySecondaryPasswordBtn = document.getElementById('verifySecondaryPasswordBtn');
-const adminPasswordInput = document.getElementById('adminPassword');
-const verifyAdminPasswordBtn = document.getElementById('verifyAdminPasswordBtn');
 const adminDashboard = document.getElementById('adminDashboard');
 const totalUsersElem = document.getElementById('totalUsers');
 const totalAmountElem = document.getElementById('totalAmount');
 const totalInvestmentElem = document.getElementById('totalInvestment');
 const withdrawalListElem = document.getElementById('withdrawalList');
-const approveAllBtn = document.getElementById('approveAllBtn');
-
-// Predefined list of allowed emails for admin login
+const approveAllBtn = document.getElementById('approveAllBtn');  
 const allowedEmails = [
   "harunalawali5522@gmail.com",
   "agrofruitenterprises@gmail.com",
   "lawaliharuna943@gmail.com"
 ];
 
-// Global variable to store current user UID
 let currentUserUID = "";
 
-// Login User Function
+// *** Admin Login ***
 loginBtn.addEventListener('click', () => {
   const email = emailInput.value.trim();
   const password = passwordInput.value.trim();
@@ -174,231 +215,147 @@ loginBtn.addEventListener('click', () => {
     signInWithEmailAndPassword(auth, email, password)
       .then(userCredential => {
         currentUserUID = userCredential.user.uid;
-        displaySecondaryPasswordSection();
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('secondaryPasswordSection').style.display = 'block';
       })
-      .catch(error => {
+      .catch(() => {
         alert("Invalid email or password");
       });
   } else {
-    alert("This email is not authorized to login.");
+    alert("Unauthorized email");
   }
 });
 
-// Show secondary password input after successful login
-function displaySecondaryPasswordSection() {
-  document.getElementById('loginSection').style.display = 'none';
-  document.getElementById('secondaryPasswordSection').style.display = 'block';
-}
-
-// Verify secondary password
+// *** Verify Secondary Password ***
 verifySecondaryPasswordBtn.addEventListener('click', () => {
   const secondaryPassword = secondaryPasswordInput.value.trim();
+  if (!secondaryPassword) return;
 
-  if (secondaryPassword) {
-    const userRef = ref(database, 'users/' + currentUserUID);
-    get(userRef)
-      .then(snapshot => {
-        const userData = snapshot.val();
-        if (userData && userData.secondaryPassword === secondaryPassword) {
-          displayAdminPasswordSection();
-        } else {
-          alert("Incorrect secondary password");
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        alert("Error verifying secondary password");
-      });
-  }
+  const userRef = ref(database, 'users/' + currentUserUID);
+  get(userRef).then(snapshot => {
+    const userData = snapshot.val();
+    if (userData && userData.secondaryPassword === secondaryPassword) {
+      document.getElementById('secondaryPasswordSection').style.display = 'none';
+      adminDashboard.style.display = 'block';
+      fetchWithdrawalStats();
+      loadWithdrawalPending();
+    } else {
+      alert("Incorrect secondary password");
+    }
+  });
 });
 
-function displayAdminPasswordSection() {
-  document.getElementById('secondaryPasswordSection').style.display = 'none';
-  document.getElementById('adminPasswordSection').style.display = 'block';
-}
-
-// Verify admin password
-verifyAdminPasswordBtn.addEventListener('click', () => {
-  const adminPassword = adminPasswordInput.value.trim();
-
-  if (adminPassword === "haruna66") {    
-    displayAdminDashboard();
-    loadWithdrawalPending();
-  } else {
-    
-    alert("Admin password is incorrect");
-  }
-});
-
-
-function displayAdminDashboard() {
-  document.getElementById('adminPasswordSection').style.display = 'none';
-  adminDashboard.style.display = 'block';
-  document.getElementById('fullName').innerText = "Admin";
-  fetchWithdrawalStats();
-}
-
-
-// Fetch withdrawal statistics
+// *** Fetch Withdrawal Stats ***
 function fetchWithdrawalStats() {
   const usersRef = ref(database, 'users');
-
   get(usersRef).then(snapshot => {
     const users = snapshot.val();
-
     if (!users) {
       totalUsersElem.innerText = "0";
-      totalAmountElem.innerText = "0.00";
-      totalInvestmentElem.innerText = "0.00";
+      totalAmountElem.innerText = "₦0.00";
+      totalInvestmentElem.innerText = "₦0.00";
       return;
     }
 
-    let totalUsers = 0;
-    let totalAmount = 0;
-    let totalInvestment = 0;
-
-    for (let userId in users) {
-      if (users[userId].withdrawalPending) { 
+    let totalUsers = 0, totalAmount = 0, totalInvestment = 0;
+    Object.values(users).forEach(user => {
+      if (user.withdrawalPending) {
         totalUsers++;
-        totalAmount += parseFloat(users[userId].withdrawalPending.amount) || 0;
-        totalInvestment += parseFloat(users[userId].investment) || 0;
+        totalAmount += parseFloat(user.withdrawalPending.amount) || 0;
+        totalInvestment += parseFloat(user.investment) || 0;
       }
-    }
+    });
 
     totalUsersElem.innerText = totalUsers.toLocaleString();
-    totalAmountElem.innerText = `₦${totalAmount.toLocaleString('en-NG', { style: 'currency', currency: 'NGN' })}`;
-    totalInvestmentElem.innerText = `₦${totalInvestment.toLocaleString('en-NG', { style: 'currency', currency: 'NGN' })}`;
-  })
-  .catch(error => {
-    console.error("Error fetching withdrawal stats:", error);
+    totalAmountElem.innerText = `₦${totalAmount.toLocaleString()}`;
+    totalInvestmentElem.innerText = `₦${totalInvestment.toLocaleString()}`;
   });
 }
 
-
-// Load pending withdrawals
+// *** Load Pending Withdrawals ***
 function loadWithdrawalPending() {
   const usersRef = ref(database, 'users');
-
   get(usersRef).then(snapshot => {
     const users = snapshot.val();
-    withdrawalListElem.innerHTML = ""; 
+    withdrawalListElem.innerHTML = "";
 
     if (users) {
-      for (let userId in users) {
-        if (users[userId].withdrawalPending) { 
-          const withdrawalData = users[userId].withdrawalPending;
-          const investAmount = users[userId].investment|| 0;
-          const phoneNumber = users[userId].phoneNumber || "N/A";
-
-          const withdrawalDiv = document.createElement('div');
-          withdrawalDiv.innerHTML = `
-            <p><strong>${withdrawalData.accountName}</strong></p>
-            <p>Amount: ${parseFloat(withdrawalData.amount || 0).toLocaleString('en-NG', {style: 'currency', currency: 'NGN'})}</p>
-            <p>Investment: ${parseFloat(investAmount).toLocaleString('en-NG', {style: 'currency', currency: 'NGN'})}</p>        
-            <p>Email: ${users[userId].email}</p>
-            <p>Phone: ${phoneNumber}</p>
-            <p>Bank Name: ${withdrawalData.bankName}</p>
-            <p>Account Number: ${withdrawalData.accountNumber}</p>
-            <button class="approveBtn" data-user-id="${userId}">✔️</button>
-            <button class="rejectBtn" data-user-id="${userId}">✖️</button>
-          `;
-          withdrawalListElem.appendChild(withdrawalDiv);
-
-          withdrawalDiv.querySelector('.approveBtn').addEventListener('click', () => approveWithdrawal(userId));
-          withdrawalDiv.querySelector('.rejectBtn').addEventListener('click', () => rejectWithdrawal(userId));
+      Object.entries(users).forEach(([userId, user]) => {
+        if (user.withdrawalPending) {
+          createWithdrawalRow(userId, user);
         }
-      }
+      });
     }
-  })
-  .catch(error => {
-    console.error("Error fetching withdrawals:", error);
   });
 }
 
+// *** Create Withdrawal Row ***
+function createWithdrawalRow(userId, user) {
+  const withdrawalData = user.withdrawalPending;
+  const row = document.createElement('tr');
 
-// Approve a withdrawal and process payment
-async function approveWithdrawal(userId) {
-  const withdrawalRef = ref(database, `users/${userId}/withdrawalPending`);
-  get(withdrawalRef)
-    .then(async (snapshot) => {
-      const withdrawalData = snapshot.val();
-      if (withdrawalData) {
-        try {
-          await processPayment(withdrawalData);
-                    
-          const successfulRef = ref(database, `users/${userId}/withdrawalSuccessfully`);
-          await set(successfulRef, withdrawalData);
-          
-          // Cire daga withdrawalPending
-          await set(withdrawalRef, null);
-          alert("Payment processed successfully!");
-        } catch (error) {
-          console.error(error);
-          alert("Error processing payment");
-        }
-      } else {
-        alert("No withdrawal data found.");
-      }
-    })
-    .catch(error => {
-      console.error(error);
-      alert("Error fetching withdrawal data");
-    });
+  row.innerHTML = `
+  <div class="withdrawal-row">
+    <p><strong>Account Name:</strong> ${withdrawalData.accountName}</p>
+    <p><strong>Amount:</strong> ₦${parseFloat(withdrawalData.amount).toLocaleString()}</p>
+    <p><strong>Email:</strong> ${user.email}</p>
+    <p><strong>Bank Name:</strong> ${withdrawalData.bankName}</p>
+    <p><strong>Account Number:</strong> ${withdrawalData.accountNumber}</p>
+    <div class="action-buttons">
+     <button class="approveBtn" data-user-id="${userId}">✔️</button>
+      <button class="rejectBtn" data-user-id="${userId}">✖️</button>
+    </div>
+  </div>
+`;
+
+  withdrawalListElem.appendChild(row);
+
+  row.querySelector('.approveBtn').addEventListener('click', () => approveWithdrawal(userId));
+  row.querySelector('.rejectBtn').addEventListener('click', () => rejectWithdrawal(userId));
 }
 
+// *** Approve All Withdrawals ***
+approveAllBtn.addEventListener('click', () => {
+  const usersRef = ref(database, 'users');
+  get(usersRef).then(snapshot => {
+    const users = snapshot.val();
+    if (users) {
+      Object.entries(users).forEach(([userId, user]) => {
+        if (user.withdrawalPending) {
+          approveWithdrawal(userId);
+        }
+      });
+    }
+  });
+});
 
+// *** Approve Withdrawal (Move to Cloudflare Workers ID) ***
+function approveWithdrawal(userId) {
+  const withdrawalRef = ref(database, `users/${userId}/withdrawalPending`);
+  get(withdrawalRef).then(snapshot => {
+    const withdrawalData = snapshot.val();
+    if (!withdrawalData) {
+      alert("No withdrawal data found.");
+      return;
+    }
+
+    // ** Tura zuwa sabuwar ID don Cloudflare Workers **
+    const approvedRef = ref(database, `approvedWithdrawals/${userId}`);
+    set(approvedRef, withdrawalData).then(() => {
+      alert("Withdrawal approved and sent to payment queue!");
+    });
+  });
+}
+
+// *** Reject Withdrawal (Remove from Pending) ***
 function rejectWithdrawal(userId) {
   const withdrawalRef = ref(database, `users/${userId}/withdrawalPending`);
-  set(withdrawalRef, null)
-    .then(() => {
-      alert("Withdrawal rejected.");
-    })
-    .catch(error => {
-      console.error("Error rejecting withdrawal:", error);
-    });
+  set(withdrawalRef, null).then(() => {
+    alert("Withdrawal rejected.");
+    loadWithdrawalPending();
+  });
 }
+</script>
 
-// Process payment through Monnify API
-async function processPayment(withdrawalData) {
-  try {
-    const token = await getMonnifyAccessToken(); 
-
-    const paymentData = {
-      amount: withdrawalData.amount,
-      bankCode: withdrawalData.bankCode,
-      accountNumber: withdrawalData.accountNumber,
-      paymentReference: generatePaymentReference(),
-      customerEmail: withdrawalData.email,
-      customerPhone: withdrawalData.phoneNumber,
-      narration: "Withdrawal from AgroFruit",
-    };
-
-    const paymentResponse = await fetch("https://api.monnify.com/api/v2/disbursements/single", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(paymentData),
-    });
-
-    const paymentDataResponse = await paymentResponse.json();
-    if (paymentDataResponse.responseCode === "00") {
-      return true;
-    } else {
-      throw new Error("Payment processing failed.");
-    }
-  } catch (error) {
-    console.error("Error processing payment:", error.message);
-    throw error;
-  }
-}
-
-// Generate unique payment reference
-function generatePaymentReference() {
-  return "AFE" + Math.floor(Math.random() * 1000000);
-}
-
-  </script>
 </body>
 </html>
