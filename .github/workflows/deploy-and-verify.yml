@@ -13,28 +13,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Cache npm dependencies
+      - name: Cache yarn dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-yarn-
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
-          cache: 'npm'
 
       - name: Install dependencies if needed
         run: |
           if [ -f package.json ]; then
-            if [ ! -f package-lock.json ] && [ ! -f npm-shrinkwrap.json ]; then
-              npm install --package-lock-only
+            if [ ! -f yarn.lock ]; then
+              yarn install
             fi
-            npm ci
-          elif [ -f yarn.lock ] || [ -f package.json ]; then
+          elif [ -f yarn.lock ]; then
             yarn install
           else
             echo "No package.json or yarn.lock found!"
@@ -48,7 +46,7 @@ jobs:
           echo "FIREBASE_ADMIN_SDK=${{ secrets.FIREBASE_ADMIN_SDK }}" >> $GITHUB_ENV
 
       - name: Build project
-        run: npm run build || yarn build
+        run: yarn build
 
       - name: Check for changes before deploying
         run: |
@@ -64,4 +62,4 @@ jobs:
           git push --force origin HEAD:gh-pages
 
       - name: Run Verification Script
-        run: npm run verify || yarn verify
+        run: yarn verify
