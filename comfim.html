@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Approval Page</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+      body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #4CAF50;
+  color: white;
+  padding: 15px;
+  text-align: center;
+}
+
+h2 {
+  text-align: center;
+}
+
+input[type="email"], input[type="password"] {
+  width: 80%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+button {
+  width: 50%;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+button:hover {
+  background-color: #ff153f;
+}
+
+#adminDashboard {
+  margin-top: 30px;
+}
+
+#stats p {
+  font-size: 10px;
+}
+
+#withdrawalList {
+  margin-top: 20px;
+}
+
+#withdrawalList div {
+  background-color: #fff;
+  padding: 15px;
+  border: 1px solid #ddd;
+  margin: 5px 0;
+  border-radius: 4px;
+  Font-size: 10px;
+  Font-weight: bold;
+}
+
+button#approveAllBtn {
+  background-color: #4CAF50;
+  Font-size: 13px; 
+}
+
+button#approveAllBtn:hover {
+  background-color: #45a049;
+}
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Welcome <span id="fullName"></span></h1>
+  </header>
+
+  <div id="loginSection">
+    <h2>Login</h2>
+    <label for="email">Email:</label>
+    <input type="email" id="email" placeholder="Enter Email" required>
+    <label for="password">Password:</label>
+    <input type="password" id="password" placeholder="Enter Password" required>
+    <button id="loginBtn">Login</button>
+  </div>
+
+  <div id="secondaryPasswordSection" style="display:none;">
+    <h2>Enter Secondary Password</h2>
+    <input type="password" id="secondaryPassword" placeholder="Enter Secondary Password" required>
+    <button id="verifySecondaryPasswordBtn">Verify</button>
+  </div>
+
+  <div id="adminPasswordSection" style="display:none;">
+    <h2>Admin Password</h2>
+    <input type="password" id="adminPassword" placeholder="Enter Admin Password" required>
+    <button id="verifyAdminPasswordBtn">Verify</button>
+  </div>
+
+  <div id="adminDashboard" style="display:none;">
+    <h2>Admin Dashboard</h2>
+    <div id="stats">
+      <p>Total Users Requesting Withdrawal: <span id="totalUsers"></span></p>
+      <p>Total Amount Requested: <span id="totalAmount"></span></p>
+      <p>Total Investment: <span id="totalInvestment"></span></p>
+    </div>
+    <div id="withdrawalList">
+      <h3>Pending Withdrawals</h3>
+      
+    </div>
+    <button id="approveAllBtn">Approve All Withdrawals</button>
+  </div>
+  
+  <script type="module">
+      import { app, analytics, firebaseConfig } from './firebase.js';
+import { getMonnifyAccessToken } from "./functions/get-monnify-access-token.js";
+
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js";
+
+
+const auth = getAuth();
+const database = getDatabase(app);
+
+// Initialize Elements
+const loginBtn = document.getElementById('loginBtn');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const secondaryPasswordInput = document.getElementById('secondaryPassword');
+const verifySecondaryPasswordBtn = document.getElementById('verifySecondaryPasswordBtn');
+const adminPasswordInput = document.getElementById('adminPassword');
+const verifyAdminPasswordBtn = document.getElementById('verifyAdminPasswordBtn');
+const adminDashboard = document.getElementById('adminDashboard');
+const totalUsersElem = document.getElementById('totalUsers');
+const totalAmountElem = document.getElementById('totalAmount');
+const totalInvestmentElem = document.getElementById('totalInvestment');
+const withdrawalListElem = document.getElementById('withdrawalList');
+const approveAllBtn = document.getElementById('approveAllBtn');
+
+// Predefined list of allowed emails for admin login
+const allowedEmails = [
+  "harunalawali5522@gmail.com",
+  "agrofruitenterprises@gmail.com",
+  "lawaliharuna943@gmail.com"
+];
+
+// Global variable to store current user UID
+let currentUserUID = "";
+
+// Login User Function
+loginBtn.addEventListener('click', () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  if (allowedEmails.includes(email)) {
+    signInWithEmailAndPassword(auth, email, password)
+      .then(userCredential => {
+        currentUserUID = userCredential.user.uid;
+        displaySecondaryPasswordSection();
+      })
+      .catch(error => {
+        alert("Invalid email or password");
+      });
+  } else {
+    alert("This email is not authorized to login.");
+  }
+});
+
+// Show secondary password input after successful login
+function displaySecondaryPasswordSection() {
+  document.getElementById('loginSection').style.display = 'none';
+  document.getElementById('secondaryPasswordSection').style.display = 'block';
+}
+
+// Verify secondary password
+verifySecondaryPasswordBtn.addEventListener('click', () => {
+  const secondaryPassword = secondaryPasswordInput.value.trim();
+
+  if (secondaryPassword) {
+    const userRef = ref(database, 'users/' + currentUserUID);
+    get(userRef)
+      .then(snapshot => {
+        const userData = snapshot.val();
+        if (userData && userData.secondaryPassword === secondaryPassword) {
+          displayAdminPasswordSection();
+        } else {
+          alert("Incorrect secondary password");
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        alert("Error verifying secondary password");
+      });
+  }
+});
+
+function displayAdminPasswordSection() {
+  document.getElementById('secondaryPasswordSection').style.display = 'none';
+  document.getElementById('adminPasswordSection').style.display = 'block';
+}
+
+// Verify admin password
+verifyAdminPasswordBtn.addEventListener('click', () => {
+  const adminPassword = adminPasswordInput.value.trim();
+
+  if (adminPassword === "haruna66") {    
+    displayAdminDashboard();
+    loadWithdrawalPending();
+  } else {
+    
+    alert("Admin password is incorrect");
+  }
+});
+
+
+function displayAdminDashboard() {
+  document.getElementById('adminPasswordSection').style.display = 'none';
+  adminDashboard.style.display = 'block';
+  document.getElementById('fullName').innerText = "Admin";
+  fetchWithdrawalStats();
+}
+
+
+// Fetch withdrawal statistics
+function fetchWithdrawalStats() {
+  const usersRef = ref(database, 'users');
+
+  get(usersRef).then(snapshot => {
+    const users = snapshot.val();
+
+    if (!users) {
+      totalUsersElem.innerText = "0";
+      totalAmountElem.innerText = "0.00";
+      totalInvestmentElem.innerText = "0.00";
+      return;
+    }
+
+    let totalUsers = 0;
+    let totalAmount = 0;
+    let totalInvestment = 0;
+
+    for (let userId in users) {
+      if (users[userId].withdrawalPending) { 
+        totalUsers++;
+        totalAmount += parseFloat(users[userId].withdrawalPending.amount) || 0;
+        totalInvestment += parseFloat(users[userId].investment) || 0;
+      }
+    }
+
+    totalUsersElem.innerText = totalUsers.toLocaleString();
+    totalAmountElem.innerText = `₦${totalAmount.toLocaleString('en-NG', { style: 'currency', currency: 'NGN' })}`;
+    totalInvestmentElem.innerText = `₦${totalInvestment.toLocaleString('en-NG', { style: 'currency', currency: 'NGN' })}`;
+  })
+  .catch(error => {
+    console.error("Error fetching withdrawal stats:", error);
+  });
+}
+
+
+// Load pending withdrawals
+function loadWithdrawalPending() {
+  const usersRef = ref(database, 'users');
+
+  get(usersRef).then(snapshot => {
+    const users = snapshot.val();
+    withdrawalListElem.innerHTML = ""; 
+
+    if (users) {
+      for (let userId in users) {
+        if (users[userId].withdrawalPending) { 
+          const withdrawalData = users[userId].withdrawalPending;
+          const investAmount = users[userId].investment|| 0;
+          const phoneNumber = users[userId].phoneNumber || "N/A";
+
+          const withdrawalDiv = document.createElement('div');
+          withdrawalDiv.innerHTML = `
+            <p><strong>${withdrawalData.accountName}</strong></p>
+            <p>Amount: ${parseFloat(withdrawalData.amount || 0).toLocaleString('en-NG', {style: 'currency', currency: 'NGN'})}</p>
+            <p>Investment: ${parseFloat(investAmount).toLocaleString('en-NG', {style: 'currency', currency: 'NGN'})}</p>        
+            <p>Email: ${users[userId].email}</p>
+            <p>Phone: ${phoneNumber}</p>
+            <p>Bank Name: ${withdrawalData.bankName}</p>
+            <p>Account Number: ${withdrawalData.accountNumber}</p>
+            <button class="approveBtn" data-user-id="${userId}">✔️</button>
+            <button class="rejectBtn" data-user-id="${userId}">✖️</button>
+          `;
+          withdrawalListElem.appendChild(withdrawalDiv);
+
+          withdrawalDiv.querySelector('.approveBtn').addEventListener('click', () => approveWithdrawal(userId));
+          withdrawalDiv.querySelector('.rejectBtn').addEventListener('click', () => rejectWithdrawal(userId));
+        }
+      }
+    }
+  })
+  .catch(error => {
+    console.error("Error fetching withdrawals:", error);
+  });
+}
+
+
+// Approve a withdrawal and process payment
+async function approveWithdrawal(userId) {
+  const withdrawalRef = ref(database, `users/${userId}/withdrawalPending`);
+  get(withdrawalRef)
+    .then(async (snapshot) => {
+      const withdrawalData = snapshot.val();
+      if (withdrawalData) {
+        try {
+          await processPayment(withdrawalData);
+                    
+          const successfulRef = ref(database, `users/${userId}/withdrawalSuccessfully`);
+          await set(successfulRef, withdrawalData);
+          
+          // Cire daga withdrawalPending
+          await set(withdrawalRef, null);
+          alert("Payment processed successfully!");
+        } catch (error) {
+          console.error(error);
+          alert("Error processing payment");
+        }
+      } else {
+        alert("No withdrawal data found.");
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      alert("Error fetching withdrawal data");
+    });
+}
+
+
+function rejectWithdrawal(userId) {
+  const withdrawalRef = ref(database, `users/${userId}/withdrawalPending`);
+  set(withdrawalRef, null)
+    .then(() => {
+      alert("Withdrawal rejected.");
+    })
+    .catch(error => {
+      console.error("Error rejecting withdrawal:", error);
+    });
+}
+
+// Process payment through Monnify API
+async function processPayment(withdrawalData) {
+  try {
+    const token = await getMonnifyAccessToken(); 
+
+    const paymentData = {
+      amount: withdrawalData.amount,
+      bankCode: withdrawalData.bankCode,
+      accountNumber: withdrawalData.accountNumber,
+      paymentReference: generatePaymentReference(),
+      customerEmail: withdrawalData.email,
+      customerPhone: withdrawalData.phoneNumber,
+      narration: "Withdrawal from AgroFruit",
+    };
+
+    const paymentResponse = await fetch("https://api.monnify.com/api/v2/disbursements/single", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(paymentData),
+    });
+
+    const paymentDataResponse = await paymentResponse.json();
+    if (paymentDataResponse.responseCode === "00") {
+      return true;
+    } else {
+      throw new Error("Payment processing failed.");
+    }
+  } catch (error) {
+    console.error("Error processing payment:", error.message);
+    throw error;
+  }
+}
+
+// Generate unique payment reference
+function generatePaymentReference() {
+  return "AFE" + Math.floor(Math.random() * 1000000);
+}
+
+  </script>
+</body>
+</html>
