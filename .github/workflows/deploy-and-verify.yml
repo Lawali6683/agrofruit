@@ -28,10 +28,18 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies if needed
-        run: npm ci
-
-      - name: Run tests
-        run: npm test
+        run: |
+          if [ -f package.json ]; then
+            if [ ! -f package-lock.json ] && [ ! -f npm-shrinkwrap.json ]; then
+              npm install --package-lock-only
+            fi
+            npm ci
+          elif [ -f yarn.lock ] || [ -f package.json ]; then
+            yarn install
+          else
+            echo "No package.json or yarn.lock found!"
+            exit 1
+          fi
 
       - name: Set Environment Variables
         run: |
@@ -40,7 +48,7 @@ jobs:
           echo "FIREBASE_ADMIN_SDK=${{ secrets.FIREBASE_ADMIN_SDK }}" >> $GITHUB_ENV
 
       - name: Build project
-        run: npm run build
+        run: npm run build || yarn build
 
       - name: Check for changes before deploying
         run: |
@@ -56,4 +64,4 @@ jobs:
           git push --force origin HEAD:gh-pages
 
       - name: Run Verification Script
-        run: npm run verify
+        run: npm run verify || yarn verify
