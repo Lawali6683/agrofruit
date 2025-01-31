@@ -20,48 +20,29 @@ jobs:
           node-version: '16'
           cache: 'npm'
 
+      - name: Ensure lock file exists
+        run: |
+          if [ -f package.json ]; then
+            if [ ! -f package-lock.json ] && [ ! -f npm-shrinkwrap.json ]; then
+              echo "package-lock.json is missing, creating it..."
+              npm install --package-lock-only
+            fi
+            if [ ! -f yarn.lock ]; then
+              echo "yarn.lock is missing, creating it..."
+              yarn install --check-files
+            fi
+          fi
+
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Install dependencies (npm or yarn)
-        run: |
-          if [ -f package.json ]; then
-            if [ ! -f package-lock.json ] && [ ! -f npm-shrinkwrap.json ]; then
-              npm install --package-lock-only
-            fi
-            npm ci
-          elif [ -f yarn.lock ] || [ -f package.json ]; then
-            yarn install
-          else
-            echo "No package.json or yarn.lock found!"
-            exit 1
-          fi
+      - name: Install dependencies
+        run: npm ci || yarn install
 
       - name: Run tests
         run: npm test || yarn test
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: test-results/
-
-      - name: Upload code coverage
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage
-          path: coverage/
-
-      - name: Upload logs
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: logs
-          path: logs/
