@@ -500,9 +500,7 @@ footer {
     <footer>
         <p>&copy; AgroFruit. All rights reserved.</p>
     </footer>
-    <script type="module">
-           import { getMonnifyAccessToken } from "./get-monnify-access-token.js"; 
-       
+    <script type="module">                  
          import { app, analytics, firebaseConfig } from './firebase.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
@@ -641,20 +639,23 @@ withdrawalForm.addEventListener("submit", async (e) => {
                     return;
                 }
 
-                // Get Monnify Access Token
-                const accessToken = await getMonnifyAccessToken();
 
-                // Validate Account Details
-                const validateResponse = await fetch(
-                    `https://api.monnify.com/api/v1/disbursements/account/validate?accountNumber=${accountNumber}&bankCode=${bankCode}`,
+
+                //Verification using Monnify
+                const apiKey = "MK_TEST_7FBWHU9H7U";
+                const secretKey = "YJV0GE4LT2B1WE4FD4H5XY4ZU6WC2VVJ";
+                const authToken = btoa(`${apiKey}:${secretKey}`);
+
+                const tokenResponse = await fetch(
+                    "https://api.monnify.com/api/v1/auth/login",
                     {
-                        method: "GET",
+                        method: "POST",
                         headers: {
-                            Authorization: `Bearer ${accessToken}`,
+                            Authorization: `Basic ${authToken}`,
                             "Content-Type": "application/json",
                         },
                     }
-                );
+                       );
 
                 const validateData = await validateResponse.json();
 
