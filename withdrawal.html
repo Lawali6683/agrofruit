@@ -641,7 +641,7 @@ withdrawalForm.addEventListener("submit", async (e) => {
 
 
 
-                //Verification using Monnify
+               // Verification using Monnify
                 const apiKey = "MK_TEST_7FBWHU9H7U";
                 const secretKey = "YJV0GE4LT2B1WE4FD4H5XY4ZU6WC2VVJ";
                 const authToken = btoa(`${apiKey}:${secretKey}`);
@@ -655,46 +655,62 @@ withdrawalForm.addEventListener("submit", async (e) => {
                             "Content-Type": "application/json",
                         },
                     }
-                       );
+                );
+                const tokenData = await tokenResponse.json();
 
-                const validateData = await validateResponse.json();
-
-                if (validateData.requestSuccessful) {
-                    const accountName = validateData.responseBody.accountName;
-                    const confirmTransfer = confirm(
-                        `Are you sure you want to withdraw ₦${amount} to ${accountName} ${bankName}  ${accountNumber}?`
+                if (tokenData.requestSuccessful) {
+                    const accessToken = tokenData.responseBody.accessToken;
+                    const validateResponse = await fetch(
+                        `https://api.monnify.com/api/v1/disbursements/account/validate?accountNumber=${accountNumber}&bankCode=${bankCode}`,
+                        {
+                            method: "GET",
+                            headers: {
+                                Authorization: `Bearer ${accessToken}`,
+                                "Content-Type": "application/json",
+                            },
+                        }
                     );
+                    const validateData = await validateResponse.json();
 
-                    if (!confirmTransfer) {
+                    if (validateData.requestSuccessful) {
+                        const accountName = validateData.responseBody.accountName;
+                        const confirmTransfer = confirm(
+                            `Are you sure you want to withdraw ₦${amount} to ${accountName} ${bankName} ${accountNumber}?`
+                        );
+                        if (!confirmTransfer) {
+                            hideLoading();
+                            return;
+                        }
+
+                        const userPin = prompt("Enter your 5-digit Transfer PIN:");
+                        if (!userPin || userPin !== userData.transferP) {
+                            alert("Incorrect PIN. Please try again.");
+                            hideLoading();
+                            return;
+                        }
+
+                        const netAmount = amount - amount * 0.07;
+                        const withdrawalData = {
+                            amount: netAmount,
+                            bankCode,
+                            accountNumber,
+                            bankName,
+                            accountName,
+                            date: new Date().toLocaleString("en-NG"),
+                        };
+
+                        await addPendingWithdrawal(user.uid, withdrawalData);
+
+                        alert(
+                            "Withdrawal request submitted successfully. Pending approval. You will be paid within 4 to 24 hours."
+                        );
                         hideLoading();
-                        return;
-                    }
-
-                    const userPin = prompt("Enter your 5-digit Transfer PIN:");
-                    if (!userPin || userPin !== userData.transferP) {
-                        alert("Incorrect PIN. Please try again.");
+                    } else {
+                        alert(`Error: ${validateData.responseMessage}`);
                         hideLoading();
-                        return;
                     }
-
-                    const netAmount = amount - amount * 0.07;
-                    const withdrawalData = {
-                        amount: netAmount,
-                        bankCode,
-                        accountNumber,
-                        bankName,
-                        accountName,
-                        date: new Date().toLocaleString("en-NG"),
-                    };
-
-                    await addPendingWithdrawal(user.uid, withdrawalData);
-
-                    alert(
-                        "Withdrawal request submitted successfully. Pending approval. You will be paid within 4 to 24 hours."
-                    );
-                    hideLoading();
                 } else {
-                    alert(`Error: ${validateData.responseMessage}`);
+                    alert("Error authenticating with Monnify.");
                     hideLoading();
                 }
             } catch (error) {
@@ -707,6 +723,7 @@ withdrawalForm.addEventListener("submit", async (e) => {
         }
     });
 });
+   
 
 // Initialize App
 onAuthStateChanged(auth, async (user) => {
