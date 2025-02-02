@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AFF Account Creation</title>
   <style>
-    
     * {
       margin: 0;
       padding: 0;
@@ -113,134 +112,108 @@
 </head>
 <body>
   <div id="loadingScreen">
-            <span></span>
-        </div>
+    <span></span>
+  </div>
 
   <div id="content">
     <h1>AFF Account Creation</h1>
     <p id="message">Welcome! Please enter your NIN number to proceed.</p>
-    <input type="text" id="ninInput" placeholder="Enter your NIN number" />
+    <input type="text" id="ninInput" placeholder="Enter your NIN number" maxlength="11" />
     <button id="submitBtn">Submit</button>
   </div>
+
   <script type="module">
-     import { app, analytics, firebaseConfig } from './firebase.js';
-import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-import { getMonnifyAccessToken } from "./functions/get-monnify-access-token.js";
+    import { app, analytics, firebaseConfig } from './firebase.js';
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-const db = getDatabase(app);
-const auth = getAuth(app);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+    const cloudflareWorkerURL = "https://agrofruit.pages.dev/api/virtual"; 
 
-const loadingScreen = document.getElementById("loadingScreen");
-const content = document.getElementById("content");
-const message = document.getElementById("message");
-const ninInput = document.getElementById("ninInput");
-const submitBtn = document.getElementById("submitBtn");
+    const loadingScreen = document.getElementById("loadingScreen");
+    const content = document.getElementById("content");
+    const message = document.getElementById("message");
+    const ninInput = document.getElementById("ninInput");
+    const submitBtn = document.getElementById("submitBtn");
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    const uid = user.uid;
-    const userRef = ref(db, `users/${uid}`);
-    loadingScreen.style.display = "flex";
+    function showLoading(show) {
+      loadingScreen.style.display = show ? "flex" : "none";
+    }
 
-    get(userRef)
-      .then((snapshot) => {
-        loadingScreen.style.display = "none";
-        if (snapshot.exists()) {
-          const userData = snapshot.val();
-          if (userData.accountDetails) {
-            // User already has account details, redirect to profile page
-            window.location.href = "profile2.html";
-          } else {
-            // Display content for NIN input
-            message.innerHTML = `${userData.fullName}, please enter your NIN number to create your AgroFruit account.`;
-            content.style.display = "block";
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        alert("No user signed in. Redirecting to login.");
+        window.location.href = "login.html";
+        return;
+      }
 
-            submitBtn.addEventListener("click", async () => {
-              const nin = ninInput.value.trim();
-              if (!nin) {
-                alert("NIN number is required!");
-                return;
-              }
+      const uid = user.uid;
+      const userRef = ref(db, `users/${uid}`);
+      showLoading(true);
 
-              // Prevent duplicate API calls
-              if (userData.monnifyCustomerId) {
-                alert("Account creation is already in progress.");
-                return;
-              }
+      try {
+        const snapshot = await get(userRef);
+        showLoading(false);
 
-              loadingScreen.style.display = "flex";
-
-              try {
-                // Generate Monnify Customer ID
-                const monnifyCustomerId = `FWF-${uid}-${Date.now()}`;
-                await update(userRef, { monnifyCustomerId });
-
-                // Get Monnify Access Token
-                const accessToken = await getMonnifyAccessToken();
-
-                // Create Virtual Account
-                const virtualAccountResponse = await fetch(
-                  "https://api.monnify.com/api/v2/bank-transfer/reserved-accounts",
-                  {
-                    method: "POST",
-                    headers: {
-                      Authorization: `Bearer ${accessToken}`,
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      accountReference: monnifyCustomerId,
-                      accountName: userData.fullName,
-                      currencyCode: "NGN",
-                      contractCode: "8389328412",
-                      customerEmail: userData.email,
-                      customerName: userData.fullName,
-                      customerBVN: nin,
-                      bankCode: "035", // Wema Bank code
-                    }),
-                  }
-                );
-
-                const virtualAccountData = await virtualAccountResponse.json();
-                if (!virtualAccountData.requestSuccessful) throw new Error(virtualAccountData.responseMessage);
-
-                const accountDetails = {
-                  bankName: "Wema Bank",
-                  accountNumber: virtualAccountData.responseBody.accountNumber,
-                  accountName: userData.fullName,
-                };
-
-                // Update Firebase with Account Details
-                await update(userRef, { accountDetails });
-
-                loadingScreen.style.display = "none";
-                alert(
-                  `${userData.fullName}, Congratulations! Your AgroFruit account has been created.\n\nBank: ${accountDetails.bankName}\nAccount Number: ${accountDetails.accountNumber}\nAccount Name: ${accountDetails.accountName}`
-                );
-
-                // Redirect to profile page
-                window.location.href = "profile2.html";
-              } catch (error) {
-                loadingScreen.style.display = "none";
-                console.error(error);
-                alert("An error occurred: " + error.message);
-              }
-            });
-          }
-        } else {
+        if (!snapshot.exists()) {
           alert("User data not found.");
+          return;
         }
-      })
-      .catch((error) => {
-        loadingScreen.style.display = "none";
-        console.error(error);
-        alert("Failed to fetch user data.");
-      });
-  } else {
-    alert("No user signed in.");
-  }
-});
 
-  </script >
+        const userData = snapshot.val();
+
+        if (userData.accountDetails) {
+          window.location.href = "profile2.html";
+          return;
+        }
+
+        message.innerHTML = `${userData.fullName}, please enter your NIN number to create your AgroFruit account.`;
+        content.style.display = "block";
+
+        submitBtn.addEventListener("click", async () => {
+          const nin = ninInput.value.trim();
+
+          if (!/^\d{11}$/.test(nin)) {
+            alert("Invalid NIN. Please enter a valid 11-digit number.");
+            return;
+          }
+
+          showLoading(true);
+
+          try {
+            const response = await fetch(cloudflareWorkerURL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                nin: nin,
+                userId: uid,
+                fullName: userData.fullName,
+                email: userData.email,
+              }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              await update(userRef, { accountDetails: data.accountDetails });
+              alert(`${userData.fullName}, Congratulations! Your AgroFruit account Details has been created successfully.`);
+              window.location.href = "profile2.html";
+            } else {
+              throw new Error(data.message || 'An error occurred.');
+            }
+          } catch (error) {
+            alert("Error: " + error.message);
+          } finally {
+            showLoading(false);
+          }
+        });
+
+      } catch (error) {
+        showLoading(false);
+        alert("Failed to fetch user data.");
+      }
+    });
+  </script>
 </body>
 </html>
