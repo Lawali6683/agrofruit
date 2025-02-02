@@ -179,10 +179,11 @@ button#approveAllBtn:hover {
     <button id="approveAllBtn">Approve All Withdrawals</button>
   </div>
   
-  <script type="module">
+  
+<script type="module">
 import { app } from './firebase.js';
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
 const auth = getAuth();
 const database = getDatabase(app);
@@ -197,7 +198,8 @@ const totalUsersElem = document.getElementById('totalUsers');
 const totalAmountElem = document.getElementById('totalAmount');
 const totalInvestmentElem = document.getElementById('totalInvestment');
 const withdrawalListElem = document.getElementById('withdrawalList');
-const approveAllBtn = document.getElementById('approveAllBtn');  
+const approveAllBtn = document.getElementById('approveAllBtn');
+
 const allowedEmails = [
   "harunalawali5522@gmail.com",
   "agrofruitenterprises@gmail.com",
@@ -302,7 +304,7 @@ function createWithdrawalRow(userId, user) {
     <p><strong>Bank Name:</strong> ${withdrawalData.bankName}</p>
     <p><strong>Account Number:</strong> ${withdrawalData.accountNumber}</p>
     <div class="action-buttons">
-     <button class="approveBtn" data-user-id="${userId}">✔️</button>
+      <button class="approveBtn" data-user-id="${userId}">✔️</button>
       <button class="rejectBtn" data-user-id="${userId}">✖️</button>
     </div>
   </div>
@@ -314,48 +316,82 @@ function createWithdrawalRow(userId, user) {
   row.querySelector('.rejectBtn').addEventListener('click', () => rejectWithdrawal(userId));
 }
 
-// *** Approve All Withdrawals ***
-approveAllBtn.addEventListener('click', () => {
-  const usersRef = ref(database, 'users');
-  get(usersRef).then(snapshot => {
-    const users = snapshot.val();
-    if (users) {
-      Object.entries(users).forEach(([userId, user]) => {
-        if (user.withdrawalPending) {
-          approveWithdrawal(userId);
-        }
-      });
-    }
-  });
-});
-
-// *** Approve Withdrawal (Move to Cloudflare Workers ID) ***
+// *** Approve a Single Withdrawal ***
 function approveWithdrawal(userId) {
-  const withdrawalRef = ref(database, `users/${userId}/withdrawalPending`);
-  get(withdrawalRef).then(snapshot => {
+  const userRef = ref(database, `users/${userId}/withdrawalPending`);
+
+  get(userRef).then(snapshot => {
     const withdrawalData = snapshot.val();
+
     if (!withdrawalData) {
       alert("No withdrawal data found.");
       return;
     }
 
-    // ** Tura zuwa sabuwar ID don Cloudflare Workers **
-    const approvedRef = ref(database, `approvedWithdrawals/${userId}`);
-    set(approvedRef, withdrawalData).then(() => {
-      alert("Withdrawal approved and sent to payment queue!");
-    });
+    const approvedRef = ref(database, `users/${userId}/approvedWithdrawals`);
+    set(approvedRef, withdrawalData)
+      .then(() => {
+        sendToCloudflareWorkers({ userId, ...withdrawalData });
+        alert("Withdrawal approved and sent to payment queue!");
+        remove(userRef); // Remove after approval
+      })
+      .catch(error => {
+        console.error("Error approving withdrawal:", error);
+      });
+  }).catch(error => {
+    console.error("Error getting user data:", error);
   });
 }
 
-// *** Reject Withdrawal (Remove from Pending) ***
+// *** Reject a Withdrawal ***
 function rejectWithdrawal(userId) {
-  const withdrawalRef = ref(database, `users/${userId}/withdrawalPending`);
-  set(withdrawalRef, null).then(() => {
-    alert("Withdrawal rejected.");
-    loadWithdrawalPending();
-  });
-}
-</script>
+  const userRef = ref(database, `users/${userId}/withdrawalPending`);
 
+  remove(userRef)
+    .then(() => {
+      alert("Withdrawal request rejected.");
+      loadWithdrawalPending(); 
+    })
+    .catch(error => {
+      console.error("Error rejecting withdrawal:", error);
+    });
+}
+
+// *** Send Data to Cloudflare Workers ***
+function sendToCloudflareWorkers(withdrawalData) {
+  const cloudflareWorkersUrl = "https://agrofruit.pages.dev/api/action";
+
+  fetch(cloudflareWorkersUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(withdrawalData),
+  })
+    .then(response => response.ok ? console.log("Data sent successfully") : console.error("Failed to send data"))
+    .catch(error => console.error("Error sending data:", error));
+}
+
+// *** Approve All Withdrawals ***
+approveAllBtn.addEventListener("click", () => {
+  const usersRef = ref(database, "users");
+
+  get(usersRef)
+    .then(snapshot => {
+      const users = snapshot.val();
+
+      if (users) {
+        Object.keys(users).forEach(userId => {
+          if (users[userId].withdrawalPending) {
+            approveWithdrawal(userId);
+          }
+        });
+      }
+    })
+    .catch(error => {
+      console.error("Error getting users:", error);
+    });
+});
+</script>
 </body>
 </html>
