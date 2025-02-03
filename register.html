@@ -384,7 +384,7 @@ async function registerUser(referralCode) {
         const user = userCredential.user;
 
         const generatedReferralCode = Math.random().toString(36).substring(2, 8);
-        const referralLink = `https://www.agrofruit.com.ng/referral?user=${encodeURIComponent(username)}&ref=${generatedReferralCode}`;
+        const referralLink = `https://agrofruit.pages.dev/?user=${encodeURIComponent(username)}&ref=${generatedReferralCode}`;
 
         await set(ref(db, `users/${user.uid}`), {
             fullName,
