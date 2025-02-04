@@ -72,7 +72,7 @@ async function processDeposit(transactionReference, env) {
   const userUid = await getUserUidByEmail(email, env);
   if (!userUid) return new Response("User not found", { status: 400 });
 
-  await updateInvestment(userUid, investment, transactionReference, env);
+  await updateInvestment(userUid, investmentAmount, transactionReference, env);
   return new Response("Payment verified and investment updated", { status: 200 });
 }
 
@@ -132,37 +132,14 @@ async function updateInvestment(userUid, investmentAmount, transactionReference,
   });
 }
 
-// Helper function to get the user UID by email
-async function getUserUidByEmail(email, env) {
-  try {
-    const usersRef = admin.database().ref("users"); 
-    const usersSnapshot = await usersRef.once("value"); 
-    const usersData = usersSnapshot.val();
-    
-    for (let userId in usersData) {
-      if (usersData[userId].email === email) {
-        return userId; 
-      }
-    }
-
-    // If no user found with email, return null
-    return null;
-  } catch (error) {
-    console.error("Error fetching user UID:", error.message);
-    return null;
-  }
-}
-
 async function updateUserBalanceWithNetworkFee(email, networkFee, env) {
-  const userUid = await getUserUidByEmail(email, env); 
-
+  const userUid = await getUserUidByEmail(email, env);
   if (!userUid) {
     console.error("User not found.");
     return;
   }
 
   const userRef = `${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`;
-  
   const userData = await fetch(userRef).then(res => res.json());
   
   const updatedNetworkFee = (userData.networkFee || 0) + networkFee;
@@ -171,7 +148,7 @@ async function updateUserBalanceWithNetworkFee(email, networkFee, env) {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      networkFee: updatedNetworkFee,  
+      networkFee: updatedNetworkFee,
     }),
   });
 
