@@ -693,7 +693,8 @@ width: 70px;
         const mailtoUrl = `mailto:${email}?subject=${subject}&body=${body}`;
         window.location.href = mailtoUrl;
     });
-</script>  
+</script>
+  
    <script type="module">
        import { app, analytics, firebaseConfig } from './firebase.js';
  
@@ -734,15 +735,17 @@ onAuthStateChanged(auth, (user) => {
     const accountRef = ref(db, `users/${userId}/accountDetails`);
 
     // Load User Data
-    onValue(userRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const userData = snapshot.val();
-        displayUserData(userData);
-        checkAndNotify(userData);
-      } else {
-        console.error("User data not found.");
-      }
-    });
+onValue(userRef, (snapshot) => {
+  if (snapshot.exists()) {
+    const userData = snapshot.val();
+    displayUserData(userData);
+    checkAndNotify(userData);
+            checkInvestmentStatus(userData);
+  } else {
+    console.error("User data not found.");
+  }
+});
+
 
     // Load Account Details
     onValue(accountRef, (snapshot) => {
@@ -858,13 +861,13 @@ function formatCurrency(amount) {
   }
 
   // Check Investment Status
-  function checkInvestmentStatus(userData) {
-    if (!userData.investment || parseFloat(userData.investment) === 0) {
-      newWelcomeMessage.style.display = "block";
-    } else {
-      newWelcomeMessage.style.display = "none";
-    }
+function checkInvestmentStatus(userData) {
+  if (!userData.investment || parseFloat(userData.investment) === 0) {
+    newWelcomeMessage.style.display = "block";
+  } else {
+    newWelcomeMessage.style.display = "none";
   }
+}
 
   // Show Welcome Message
   startInvestment.addEventListener("click", () => {
@@ -913,16 +916,6 @@ function formatCurrency(amount) {
       }
          
 }
-</script>
-
-<script> document.getElementById('close-message').addEventListener('click', function () {
-    const welcomeMessage = document.getElementById('new-welcome-message');
-    welcomeMessage.style.display = 'none'; 
-  });
-</script>
-<script> document.getElementById('start-investment').addEventListener('click', function () {
-    window.location.href = 'invested.html'; 
-  });  
 </script>
 </body>
 </html>
