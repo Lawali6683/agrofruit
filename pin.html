@@ -87,109 +87,84 @@
       <h2>Create New Transfer Pin</h2>
       <div class="form-group">
         <label for="newPin">New Pin (5 Digits)</label>
-        <input type="text" id="newPin" maxlength="5" placeholder="Enter new pin" required>
+        <input type="number" id="newPin" maxlength="5" placeholder="Enter new pin" required>
       </div>
       <div class="form-group">
-        <label for="confirmPin">Confirm Pin</label>        
-<input type="text" id="confirmPin" maxlength="5" placeholder="Confirm new pin" required>
-
+        <label for="confirmPin">Confirm Pin</label>
+        <input type="number" id="confirmPin" maxlength="5" placeholder="Confirm new pin" required>
       </div>
       <button type="submit" class="btn">Update Pin</button>
     </form>
   </div>
+
   <script type="module">
-      import { app, analytics, firebaseConfig } from './firebase.js';
-    
-import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    import { app, analytics, firebaseConfig } from './firebase.js';
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-const database = getDatabase(app);
-const auth = getAuth(app);
+    const database = getDatabase(app);
+    const auth = getAuth(app);
 
-// UI Elements
-const authForm = document.getElementById("authForm");
-const pinForm = document.getElementById("pinForm");
+    const authForm = document.getElementById("authForm");
+    const pinForm = document.getElementById("pinForm");
 
-// Authenticate User
-authForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+    // Authentication process
+    authForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const phone = document.getElementById("phone").value;
+      const password = document.getElementById("password").value;
 
-  const email = document.getElementById("email").value;
-  const phone = document.getElementById("phone").value;
-  const password = document.getElementById("password").value;
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const userRef = ref(database, `users/${user.uid}`);
+        const snapshot = await get(userRef);
 
-  try {
-    // Sign in user with email and password
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+        if (!snapshot.exists() || snapshot.val().phoneNumber !== phone) {
+          alert("Phone number does not match your registered details.");
+          return;
+        }
 
-    // Fetch user's data from Firebase Realtime Database
-    const userRef = ref(database, `users/${user.uid}`);
-    const snapshot = await get(userRef);
+        authForm.classList.add("hidden");
+        pinForm.classList.remove("hidden");
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
+    });
 
-    if (!snapshot.exists()) {
-      alert("Phone number does not match registered details.");
-      return;
-    }
+    // Update PIN functionality
+    pinForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const newPin = document.getElementById("newPin").value.trim();
+      const confirmPin = document.getElementById("confirmPin").value.trim();
 
-    const userData = snapshot.val();
+      if (newPin.length !== 5 || confirmPin.length !== 5 || !/^\d+$/.test(newPin)) {
+        alert("Pins must be exactly 5 numeric digits.");
+        return;
+      }
 
-    if (userData.phoneNumber !== phone) {
-      alert("Phone number does not match your registered details.");
-      return;
-    }
+      if (newPin !== confirmPin) {
+        alert("Pins do not match.");
+        return;
+      }
 
-    // Move to the next form
-    authForm.classList.add("hidden");
-    pinForm.classList.remove("hidden");
-  } catch (error) {
-    alert(error.message);
-  }
-});
+      try {
+        const user = auth.currentUser;
+        if (!user) {
+          alert("User not authenticated. Please log in again.");
+          return;
+        }
 
-// Update Transfer Pin
-pinForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+        const userRef = ref(database, `users/${user.uid}`);
+        await update(userRef, { transferP: newPin });
 
-  let newPin = document.getElementById("newPin").value.trim();
-  let confirmPin = document.getElementById("confirmPin").value.trim();
-
-  // Validate Pin Length
-  if (newPin.length !== 5 || confirmPin.length !== 5) {
-    alert("Pin must be exactly 5 digits.");
-    return;
-  }
-
-  // Validate if PIN is numeric
-  if (!/^\d{5}$/.test(newPin)) {
-    alert("Pin must be exactly 5 numeric digits.");
-    return;
-  }
-
-  // Ensure PINs match
-  if (newPin !== confirmPin) {
-    alert("Pins do not match. Please try again.");
-    return;
-  }
-
-  try {
-    // Ensure user is authenticated
-    const user = auth.currentUser;
-    if (!user) {
-      alert("User not authenticated. Please log in again.");
-      return;
-    }
-
-    const userRef = ref(database, `users/${user.uid}`);
-    await update(userRef, { transferP: newPin });
-
-    alert("Your pin was updated successfully.");
-    window.location.href = "dashboard.html";
-  } catch (error) {
-    alert("An error occurred while updating the pin. Please try again.");
-  }
-});
-
+        alert("Your pin was updated successfully.");
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        alert("Failed to update PIN: " + error.message);
+      }
+    });
   </script>
 </body>
 </html>
