@@ -557,7 +557,7 @@ width: 70px;
     </footer>
     
       <div id="new-welcome-message" class="hidden">
-  <p>You are welcome, <span id="userName"></span> clear your Welcome Bonus ₦500 </p>
+  <p>Welcome, <span id="fullNameDisplay2"></span> clear your Welcome Bonus ₦500 </p>
   <img src="bonus2.png" alt="Bonus">
   <p>Invest Now and Get ₦500</p>
   <button id="start-investment"> Invest Now</button>
@@ -708,6 +708,7 @@ width: 70px;
   const loadingSpinner = document.getElementById("loading-spinner");
   const dashboardContent = document.getElementById("dashboard-content");
   const fullNameDisplay = document.getElementById("fullNameDisplay");
+  const fullNameDisplay2 = document.getElementById("fullNameDisplay2");
   const userProductDisplay = document.getElementById("userProductDisplay");
   const userDailyIncomeDisplay = document.getElementById("userDailyIncomeDisplay");
   const userBalanceDisplay = document.getElementById("userBalanceDisplay");
@@ -855,6 +856,7 @@ function formatCurrency(amount) {
   // Display User Data Function
   function displayUserData(userData) {
     fullNameDisplay.textContent = userData.fullName || "User";
+    fullNameDisplay2.textContent = userData.fullName || "User";
     userProductDisplay.textContent = formatCurrency(userData.investment || 0);
     userDailyIncomeDisplay.textContent = formatCurrency(userData.dailyUpgrade || 0);
     userBalanceDisplay.textContent = formatCurrency(userData.userBalance || 0);
