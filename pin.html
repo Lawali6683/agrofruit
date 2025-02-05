@@ -1,170 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Change Transfer Pin</title>
-  <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(to right, #4facfe, #00f2fe);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change Transfer PIN</title>
+    
+    <style>
+        
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #00c6ff, #0072ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Container */
+.container {
+    width: 350px;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Title */
+h2 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 22px;
+}
+
+/* Inputs */
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: 0.3s;
+    outline: none;
+}
+
+/* Input Focus Effect */
+input:focus {
+    border-color: #0072ff;
+    box-shadow: 0 0 5px rgba(0, 114, 255, 0.5);
+}
+
+/* Button */
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(to right, #00c6ff, #0072ff);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+Color: red;
+    transform: scale(1.05);
+    box-shadow: 0px 4px 8px rgba(0, 114, 255, 0.4);
+}
+
+button:active {
+Color: red;
+    transform: scale(0.98);
+    box-shadow: none;
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
     }
-    .container {
-      background: white;
-      padding: 20px 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      width: 100%;
-      max-width: 400px;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    h1, h2 {
-      text-align: center;
-      color: #333;
-    }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      font-size: 14px;
-      margin-bottom: 8px;
-      color: #555;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid blue;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    input:focus {
-      outline: none;
-      border-color: #4facfe;
-    }
-    .btn {
-      width: 100%;
-      padding: 12px;
-      background: #4facfe;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .btn:hover {
-      background: red;
-    }
-    .hidden {
-      display: none;
-    }
-  </style>
+}
+
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Change Transfer Pin</h1>
-    <form id="authForm">
-      <div class="form-group">
-        <label for="email">Email Address</label>
-        <input type="email" id="email" placeholder="Enter your email" required>
-      </div>
-      <div class="form-group">
-        <label for="phone">Phone Number</label>
-        <input type="tel" id="phone" placeholder="Enter your phone number" required>
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="Enter your password" required>
-      </div>
-      <button type="submit" class="btn">Submit</button>
-    </form>
 
-    <form id="pinForm" class="hidden">
-      <h2>Create New Transfer Pin</h2>
-      <div class="form-group">
-        <label for="newPin">New Pin (5 Digits)</label>
-        <input type="number" id="newPin" maxlength="5" placeholder="Enter new pin" required>
-      </div>
-      <div class="form-group">
-        <label for="confirmPin">Confirm Pin</label>
-        <input type="number" id="confirmPin" maxlength="5" placeholder="Confirm new pin" required>
-      </div>
-      <button type="submit" class="btn">Update Pin</button>
-    </form>
-  </div>
+    <div class="container">
+        <h2>Change Transfer PIN</h2>
+        <p id="alert-message"></p>
 
-  <script type="module">
-    import { app, analytics, firebaseConfig } from './firebase.js';
-    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        <form id="verifyUserForm">
+            <label>Email Address</label>
+            <input type="email" id="email" required>
+            
+            <label>Phone Number</label>
+            <input type="text" id="phone" required>
 
-    const database = getDatabase(app);
-    const auth = getAuth(app);
+            <label>Password</label>
+            <input type="password" id="password" required>
+            
+            <button type="submit">Verify</button>
+        </form>
 
-    const authForm = document.getElementById("authForm");
-    const pinForm = document.getElementById("pinForm");
+        <form id="changePinForm" style="display: none;">
+            <label>New 5-Digit PIN</label>
+            <input type="text" id="newPin" pattern="\d{5}" maxlength="5" required>
 
-    // Authentication process
-    authForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const phone = document.getElementById("phone").value;
-      const password = document.getElementById("password").value;
+            <label>Confirm PIN</label>
+            <input type="text" id="confirmPin" pattern="\d{5}" maxlength="5" required>
 
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        const userRef = ref(database, `users/${user.uid}`);
-        const snapshot = await get(userRef);
+            <button type="submit">Update PIN</button>
+        </form>
+    </div>
 
-        if (!snapshot.exists() || snapshot.val().phoneNumber !== phone) {
-          alert("Phone number does not match your registered details.");
-          return;
-        }
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
-        authForm.classList.add("hidden");
-        pinForm.classList.remove("hidden");
-      } catch (error) {
-        alert("Error: " + error.message);
-      }
-    });
+        const firebaseConfig = {
+            apiKey: "AIzaSyBtwsxKGlpX-ofm-yE4o6_5FNYyKFy7X7w",
+            authDomain: "fruit-wealth-farming.firebaseapp.com",
+            databaseURL: "https://fruit-wealth-farming-default-rtdb.firebaseio.com/",
+            projectId: "fruit-wealth-farming",
+            storageBucket: "fruit-wealth-farming.firebasestorage.app",
+            messagingSenderId: "417203511096",
+            appId: "1:417203511096:web:1ecaca3d0a705a8c16ebcd",
+            measurementId: "G-BZFLHB4KM2"
+        };
 
-    // Update PIN functionality
-    pinForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const newPin = document.getElementById("newPin").value.trim();
-      const confirmPin = document.getElementById("confirmPin").value.trim();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
 
-      if (newPin.length !== 5 || confirmPin.length !== 5 || !/^\d+$/.test(newPin)) {
-        alert("Pins must be exactly 5 numeric digits.");
-        return;
-      }
+        alert("If you want to change your Transfer PIN, input your account information.");
 
-      if (newPin !== confirmPin) {
-        alert("Pins do not match.");
-        return;
-      }
+        document.getElementById("verifyUserForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("email").value;
+            const phone = document.getElementById("phone").value;
+            const password = document.getElementById("password").value;
 
-      try {
-        const user = auth.currentUser;
-        if (!user) {
-          alert("User not authenticated. Please log in again.");
-          return;
-        }
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                const userRef = ref(db, "users/" + user.uid);
 
-        const userRef = ref(database, `users/${user.uid}`);
-        await update(userRef, { transferP: newPin });
+                const snapshot = await get(userRef);
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
 
-        alert("Your pin was updated successfully.");
-        window.location.href = "dashboard.html";
-      } catch (error) {
-        alert("Failed to update PIN: " + error.message);
-      }
-    });
-  </script>
+                    if (userData.phoneNumber !== phone) {
+                        alert("This phone number does not match your registered phone number. Contact support.");
+                        return;
+                    }
+
+                    document.getElementById("verifyUserForm").style.display = "none";
+                    document.getElementById("changePinForm").style.display = "block";
+
+                } else {
+                    alert("This email address is not registered in FWF Company.");
+                }
+            } catch (error) {
+                alert("This password is not correct. Contact support.");
+            }
+        });
+
+        document.getElementById("changePinForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const newPin = document.getElementById("newPin").value;
+            const confirmPin = document.getElementById("confirmPin").value;
+
+            if (newPin !== confirmPin) {
+                alert("PINs do not match. Try again.");
+                return;
+            }
+
+            const user = auth.currentUser;
+            if (!user) {
+                alert("User not authenticated. Please log in again.");
+                return;
+            }
+
+            const userRef = ref(db, "users/" + user.uid);
+            await update(userRef, { transferP: newPin });
+
+            alert("Your update PIN successfully!");
+            window.location.href = "dashboard.html";
+        });
+    </script>
+
 </body>
 </html>
