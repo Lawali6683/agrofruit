@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fruit Farming - Login</title>
-    
+    <link rel="manifest" href="/manifest.json">
+<script src="/sw.js" defer></script>
     <style>
         
 body {
@@ -351,39 +352,41 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
     </script>
     <script>
-        if ('serviceWorker' in navigator) {
-  navigator.serviceWorker
-    .register('/sw.js')
-    .then(() => console.log('Service Worker registered successfully'))
-    .catch((error) => console.error('Service Worker registration failed:', error));
-}
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then(() => console.log('Service Worker registered successfully'))
+      .catch((error) => console.error('Service Worker registration failed:', error));
+  }
 
-// Install prompt event
-let deferredPrompt;
-const installButton = document.getElementById('install-btn');
+  // Install prompt event
+  let deferredPrompt;
+  const installButton = document.getElementById('install-btn');
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installButton.style.display = 'block'; 
-
-  installButton.addEventListener('click', () => {
-    installButton.style.display = 'none'; 
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('User accepted the install prompt');
-        alert('AgroFruit App installed successfully!');
-      } else {
-        console.log('User dismissed the install prompt');
-      }
-      deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installButton.style.display = 'block'; 
+    installButton.addEventListener('click', () => {
+      installButton.style.display = 'none'; 
+      deferredPrompt.prompt(); 
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+          alert('AgroFruit App installed successfully!');
+        } else {
+          console.log('User dismissed the install prompt');
+        }
+        deferredPrompt = null; 
+      });
     });
   });
-});
 
-    </script>
-    <link rel="manifest" href="/manifest.json">
-<script src="/sw.js" defer></script>
+  window.addEventListener('appinstalled', (e) => {
+    console.log('App was installed');
+    alert('Thanks for installing the AgroFruit App!');
+  });
+</script>
     </body>
 </html>
