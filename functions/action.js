@@ -29,8 +29,8 @@ async function handleRequest(request) {
                 const withdrawal = firebaseData[uid].approvedWithdrawals;
                 const user = await getUserDetails(uid);
 
-                if (user && user.monnifyCustomerId) {
-                    const withdrawalResponse = await performMonnifyWithdrawal(withdrawal, user);
+                if (user && user.paystackCustomerId) {
+                    const withdrawalResponse = await performPaystackWithdrawal(withdrawal, user);
 
                     if (withdrawalResponse.success) {
                         await updateFirebase(uid, withdrawal, 'withdrawalSuccessful');
@@ -78,54 +78,51 @@ async function getUserDetails(uid) {
     return response.json();
 }
 
-async function performMonnifyWithdrawal(withdrawal, user) {
-    const token = await getMonnifyToken();
-
-    const withdrawalData = {
-        reference: `withdrawal_${Date.now()}`,
-        amount: withdrawal.amount,
-        bankCode: withdrawal.bankCode,
-        accountNumber: withdrawal.accountNumber,
-        narration: 'Withdrawals from AgroFruit',
-        currency: 'NGN',
-        destinationAccountName: withdrawal.accountName,
-        destinationBankCode: withdrawal.bankCode,
-        destinationAccountNumber: withdrawal.accountNumber,
-        customerEmail: user.email,
-        customerName: withdrawal.accountName,
-        customerPhone: user.phoneNumber,
-        monnifyCustomerId: user.monnifyCustomerId
+async function performPaystackWithdrawal(withdrawal, user) {
+    const reference = `withdrawal_${Date.now()}`;
+    const requestBody = {
+        type: "nuban",
+        name: withdrawal.accountName,
+        account_number: withdrawal.accountNumber,
+        bank_code: withdrawal.bankCode,
+        currency: "NGN"
     };
 
-    const response = await fetch('https://api.monnify.com/api/v2/transactions/initiate', {
+    const transferRecipientResponse = await fetch('https://api.paystack.co/transferrecipient', {
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(withdrawalData)
+        body: JSON.stringify(requestBody)
     });
 
-    if (!response.ok) return { success: false };
+    if (!transferRecipientResponse.ok) return { success: false };
 
-    const result = await response.json();
-    return result.responseBody ? { success: true } : { success: false };
-}
+    const recipientData = await transferRecipientResponse.json();
+    const recipientCode = recipientData.data.recipient_code;
 
-async function getMonnifyToken() {
-    const authToken = btoa(`${MONNIFY_API_KEY}:${MONNIFY_SECRET_KEY}`);
-    const response = await fetch('https://api.monnify.com/api/v1/auth/login', {
+    const transferData = {
+        source: "balance",
+        amount: withdrawal.amount * 100, 
+        recipient: recipientCode,
+        reason: "Withdrawal from AgroFruit",
+        reference: reference
+    };
+
+    const transferResponse = await fetch('https://api.paystack.co/transfer', {
         method: 'POST',
         headers: {
-            'Authorization': `Basic ${authToken}`,
+            'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`,
             'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify(transferData)
     });
 
-    if (!response.ok) throw new Error('Failed to get Monnify token');
+    if (!transferResponse.ok) return { success: false };
 
-    const data = await response.json();
-    return data.responseBody.accessToken;
+    const transferResult = await transferResponse.json();
+    return transferResult.data.status === 'success' ? { success: true } : { success: false };
 }
 
 async function updateFirebase(uid, withdrawal, status) {
