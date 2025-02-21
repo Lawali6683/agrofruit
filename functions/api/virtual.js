@@ -44,7 +44,7 @@ export async function onRequest(context) {
     const paystackResponse = await fetch('https://api.paystack.co/dedicated_account', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${env.PAYSTACK_SECRET_KEY}`,
+        'Authorization': `Bearer sk_live_c7dea73bd75e9e45f5d5e63620b7526811cd1be2`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(paystackData)
