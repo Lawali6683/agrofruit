@@ -23,20 +23,60 @@ export async function onRequest(context) {
 
     const { fullName, email, phoneNumber, paystackCustomerId } = requestData;
 
-    if (!fullName || !email || !phoneNumber || !paystackCustomerId) {
-      console.error("Missing required fields:", { fullName, email, phoneNumber, paystackCustomerId });
+    if (!fullName || !email || !phoneNumber) {
+      console.error("Missing required fields:", { fullName, email, phoneNumber });
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
+    // Raba fullName zuwa firstName da lastName
+    const nameParts = fullName.trim().split(" ");
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ") || "N/A"; // Idan babu lastName, za a cike da "N/A"
+
+    let customerId = paystackCustomerId;
+
+    // Idan babu paystackCustomerId, sai a kirkiri sabon customer
+    if (!customerId) {
+      const customerData = {
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        phone: phoneNumber
+      };
+
+      console.log("Creating new Paystack customer:", customerData);
+
+      const customerResponse = await fetch('https://api.paystack.co/customer', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.PAYSTACK_SECRET_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(customerData)
+      });
+
+      const customerResult = await customerResponse.json();
+      console.log("Paystack Customer Response:", customerResult);
+
+      if (!customerResponse.ok || !customerResult.status) {
+        return new Response(JSON.stringify({
+          status: "failed",
+          error: customerResult.message || 'Failed to create Paystack customer'
+        }), {
+          status: customerResponse.status || 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      customerId = customerResult.data.customer_code; // Ajiye customer ID
+    }
+
     const paystackData = {
-      customer: paystackCustomerId,
-      preferred_bank: "wema-bank",
-      account_name: fullName,
-      email: email,
-      phone: phoneNumber
+      customer: customerId,
+      preferred_bank: "wema-bank"
     };
 
     console.log("Sending request to Paystack:", paystackData);
@@ -44,7 +84,7 @@ export async function onRequest(context) {
     const paystackResponse = await fetch('https://api.paystack.co/dedicated_account', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer sk_live_c7dea73bd75e9e45f5d5e63620b7526811cd1be2`,
+        'Authorization': `Bearer ${env.PAYSTACK_SECRET_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(paystackData)
@@ -58,11 +98,7 @@ export async function onRequest(context) {
         status: "success",
         message: "Virtual account created successfully",
         accountNumber: paystackResult.data.account_number,
-        bankName: paystackResult.data.bank.name,
-        accountName: paystackResult.data.account_name,
-        customerId: paystackCustomerId,
-        email: email,
-        phoneNumber: phoneNumber
+        bankName: paystackResult.data.bank.name
       }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
