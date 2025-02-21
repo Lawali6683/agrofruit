@@ -267,7 +267,8 @@
 </script>
 
 <script type="module">
-    import { app } from './firebase.js';
+    
+    import { app, analytics, firebaseConfig } from './firebase.js';
 import { getDatabase, ref, get, set, child } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
