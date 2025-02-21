@@ -12,11 +12,6 @@ export async function onRequest(context) {
     return new Response("Invalid JSON", { status: 400 });
   }
 
-  const signature = request.headers.get("x-paystack-signature");
-  if (!await validatePaystackSignature(body, signature, env.PAYSTACK_SECRET_KEY)) {
-    return new Response("Invalid Signature", { status: 400 });
-  }
-
   const { event, data } = body;
   if (event === "charge.success") {
     return await processDeposit(data, env);
@@ -25,27 +20,6 @@ export async function onRequest(context) {
   } else {
     return new Response("Invalid Event", { status: 400 });
   }
-}
-
-async function validatePaystackSignature(body, signature, secretKey) {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secretKey),
-    { name: "HMAC", hash: "SHA-512" },
-    false,
-    ["sign"]
-  );
-
-  const signatureBytes = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    new TextEncoder().encode(JSON.stringify(body))
-  );
-  
-  const hashArray = Array.from(new Uint8Array(signatureBytes));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  
-  return hashHex === signature;
 }
 
 async function processDeposit(data, env) {
