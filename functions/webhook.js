@@ -5,9 +5,30 @@ export async function onRequest(context) {
     return new Response("Method Not Allowed", { status: 405 });
   }
 
+  let bodyText;
+  try {
+    bodyText = await request.text();
+  } catch (error) {
+    return new Response("Invalid Request Body", { status: 400 });
+  }
+
+  // Get signature from headers
+  const signature = request.headers.get("X-Signature");
+  if (!signature) {
+    return new Response("Missing Signature", { status: 400 });
+  }
+
+  // Verify signature
+  const secret = env.WEBHOOK_SECRET;
+  const isValid = await verifySignature(secret, bodyText, signature);
+  if (!isValid) {
+    return new Response("Invalid Signature", { status: 403 });
+  }
+
+  // Parse JSON body
   let body;
   try {
-    body = await request.json();
+    body = JSON.parse(bodyText);
   } catch (error) {
     return new Response("Invalid JSON", { status: 400 });
   }
@@ -22,6 +43,22 @@ export async function onRequest(context) {
   }
 }
 
+async function verifySignature(secret, body, signature) {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"]
+  );
+
+  const expectedSignature = await crypto.subtle.sign("HMAC", key, encoder.encode(body));
+  const signatureBuffer = encoder.encode(signature);
+
+  return crypto.subtle.timingSafeEqual(expectedSignature, signatureBuffer);
+}
+
 async function processDeposit(data, env) {
   if (!data || data.status !== "success") {
     return new Response("Transaction not verified", { status: 400 });
@@ -29,7 +66,6 @@ async function processDeposit(data, env) {
 
   const email = data.customer.email;
   const amount = data.amount / 100;
-
   const userUid = await getUserUidByEmail(email, env);
   if (!userUid) return new Response("User not found", { status: 400 });
 
@@ -50,8 +86,7 @@ async function processWithdrawal(data, env) {
   const userUid = await getUserUidByEmail(email, env);
   if (!userUid) return new Response("User not found", { status: 400 });
 
-  const userData = await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`)
-    .then(res => res.json());
+  const userData = await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`).then(res => res.json());
 
   if (userData.userBalance >= totalAmount) {
     await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`, {
@@ -68,9 +103,8 @@ async function processWithdrawal(data, env) {
 }
 
 async function getUserUidByEmail(email, env) {
-  const usersData = await fetch(`${env.FIREBASE_DATABASE_URL}/users.json?auth=${env.FIREBASE_SECRET}`)
-    .then(res => res.json());
-
+  const usersData = await fetch(`${env.FIREBASE_DATABASE_URL}/users.json?auth=${env.FIREBASE_SECRET}`).then(res => res.json());
+  
   for (let userId in usersData) {
     if (usersData[userId].email === email) {
       return userId;
@@ -80,9 +114,8 @@ async function getUserUidByEmail(email, env) {
 }
 
 async function updateInvestment(userUid, amount, env) {
-  const userData = await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`)
-    .then(res => res.json());
-
+  const userData = await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`).then(res => res.json());
+  
   await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -91,14 +124,12 @@ async function updateInvestment(userUid, amount, env) {
 }
 
 async function updateAdminBalance(networkFee, env) {
-  const usersData = await fetch(`${env.FIREBASE_DATABASE_URL}/users.json?auth=${env.FIREBASE_SECRET}`)
-    .then(res => res.json());
+  const usersData = await fetch(`${env.FIREBASE_DATABASE_URL}/users.json?auth=${env.FIREBASE_SECRET}`).then(res => res.json());
 
   let adminUid = Object.keys(usersData).find(userId => usersData[userId].email === "harunalawali5522@gmail.com");
   if (!adminUid) return;
 
-  const adminData = await fetch(`${env.FIREBASE_DATABASE_URL}/users/${adminUid}.json?auth=${env.FIREBASE_SECRET}`)
-    .then(res => res.json());
+  const adminData = await fetch(`${env.FIREBASE_DATABASE_URL}/users/${adminUid}.json?auth=${env.FIREBASE_SECRET}`).then(res => res.json());
 
   await fetch(`${env.FIREBASE_DATABASE_URL}/users/${adminUid}.json?auth=${env.FIREBASE_SECRET}`, {
     method: "PATCH",
