@@ -4,19 +4,27 @@ export async function onRequest(context) {
 
   try {
     if (request.method !== 'POST') {
-      return new Response('Only POST requests are allowed', { status: 405 });
+      return new Response(JSON.stringify({ error: 'Only POST requests are allowed' }), {
+        status: 405,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     let requestData;
     try {
       requestData = await request.json();
-    } catch {
-      return new Response('Invalid JSON data', { status: 400 });
+    } catch (error) {
+      console.error("Invalid JSON format:", error);
+      return new Response(JSON.stringify({ error: 'Invalid JSON data' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     const { fullName, email, phoneNumber, paystackCustomerId } = requestData;
 
     if (!fullName || !email || !phoneNumber || !paystackCustomerId) {
+      console.error("Missing required fields:", { fullName, email, phoneNumber, paystackCustomerId });
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -24,10 +32,14 @@ export async function onRequest(context) {
     }
 
     const paystackData = {
-      customer: paystackCustomerId,  // ID na abokin ciniki a Paystack
-      preferred_bank: "wema-bank",  // Tabbatar da cewa bankin da ake buƙata shine Wema Bank
+      customer: paystackCustomerId,
+      preferred_bank: "wema-bank",
       account_name: fullName,
+      email: email,
+      phone: phoneNumber
     };
+
+    console.log("Sending request to Paystack:", paystackData);
 
     const paystackResponse = await fetch('https://api.paystack.co/dedicated_account', {
       method: 'POST',
@@ -39,19 +51,26 @@ export async function onRequest(context) {
     });
 
     const paystackResult = await paystackResponse.json();
+    console.log("Paystack Response:", paystackResult);
 
     if (paystackResponse.ok && paystackResult.status) {
       return new Response(JSON.stringify({
+        status: "success",
+        message: "Virtual account created successfully",
         accountNumber: paystackResult.data.account_number,
         bankName: paystackResult.data.bank.name,
         accountName: paystackResult.data.account_name,
-        email: email
+        customerId: paystackCustomerId,
+        email: email,
+        phoneNumber: phoneNumber
       }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
       });
     } else {
+      console.error("Paystack API error:", paystackResult);
       return new Response(JSON.stringify({
+        status: "failed",
         error: paystackResult.message || 'Failed to create virtual account'
       }), {
         status: paystackResponse.status || 500,
@@ -59,7 +78,8 @@ export async function onRequest(context) {
       });
     }
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("Unexpected server error:", error);
+    return new Response(JSON.stringify({ status: "error", error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
