@@ -52,8 +52,7 @@ async function handleRequest(request) {
         });
 
     } catch (error) {
-        console.error('Error processing withdrawals:', error);
-        return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+        return new Response(JSON.stringify({ error: 'Internal Server Error', details: error.message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
@@ -61,54 +60,41 @@ async function handleRequest(request) {
 }
 
 async function getFirebaseData() {
-    const firebaseUrl = `${FIREBASE_DATABASE_URL}/users.json?auth=${FIREBASE_SECRET}`;
-    const response = await fetch(firebaseUrl);
-
-    if (!response.ok) throw new Error('Failed to fetch Firebase data');
-
+    const response = await fetch(`${FIREBASE_DATABASE_URL}/users.json?auth=${FIREBASE_SECRET}`);
+    if (!response.ok) return null;
     return response.json();
 }
 
 async function getUserDetails(uid) {
-    const firebaseUrl = `${FIREBASE_DATABASE_URL}/users/${uid}.json?auth=${FIREBASE_SECRET}`;
-    const response = await fetch(firebaseUrl);
-
+    const response = await fetch(`${FIREBASE_DATABASE_URL}/users/${uid}.json?auth=${FIREBASE_SECRET}`);
     if (!response.ok) return null;
-
     return response.json();
 }
 
 async function performPaystackWithdrawal(withdrawal, user) {
     const reference = `withdrawal_${Date.now()}`;
-    const requestBody = {
-        type: "nuban",
-        name: withdrawal.accountName,
-        account_number: withdrawal.accountNumber,
-        bank_code: withdrawal.bankCode,
-        currency: "NGN"
-    };
-
+    
     const transferRecipientResponse = await fetch('https://api.paystack.co/transferrecipient', {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify({
+            type: "nuban",
+            name: withdrawal.accountName,
+            account_number: withdrawal.accountNumber,
+            bank_code: withdrawal.bankCode,
+            currency: "NGN"
+        })
     });
 
     if (!transferRecipientResponse.ok) return { success: false };
-
+    
     const recipientData = await transferRecipientResponse.json();
+    if (!recipientData.data || !recipientData.data.recipient_code) return { success: false };
+    
     const recipientCode = recipientData.data.recipient_code;
-
-    const transferData = {
-        source: "balance",
-        amount: withdrawal.amount * 100, 
-        recipient: recipientCode,
-        reason: "Withdrawal from AgroFruit",
-        reference: reference
-    };
 
     const transferResponse = await fetch('https://api.paystack.co/transfer', {
         method: 'POST',
@@ -116,26 +102,27 @@ async function performPaystackWithdrawal(withdrawal, user) {
             'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(transferData)
+        body: JSON.stringify({
+            source: "balance",
+            amount: withdrawal.amount * 100,
+            recipient: recipientCode,
+            reason: "Withdrawal from AgroFruit",
+            reference: reference
+        })
     });
 
     if (!transferResponse.ok) return { success: false };
-
+    
     const transferResult = await transferResponse.json();
-    return transferResult.data.status === 'success' ? { success: true } : { success: false };
+    return transferResult.data && transferResult.data.status === 'success' ? { success: true } : { success: false };
 }
 
 async function updateFirebase(uid, withdrawal, status) {
-    const firebaseUrl = `${FIREBASE_DATABASE_URL}/users/${uid}/${status}.json?auth=${FIREBASE_SECRET}`;
-    const response = await fetch(firebaseUrl, {
+    await fetch(`${FIREBASE_DATABASE_URL}/users/${uid}/${status}.json?auth=${FIREBASE_SECRET}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(withdrawal)
     });
 
-    if (!response.ok) throw new Error('Failed to update Firebase');
-
-    // Delete old withdrawal entry
-    const deleteUrl = `${FIREBASE_DATABASE_URL}/users/${uid}/approvedWithdrawals.json?auth=${FIREBASE_SECRET}`;
-    await fetch(deleteUrl, { method: 'DELETE' });
+    await fetch(`${FIREBASE_DATABASE_URL}/users/${uid}/approvedWithdrawals.json?auth=${FIREBASE_SECRET}`, { method: 'DELETE' });
 }
