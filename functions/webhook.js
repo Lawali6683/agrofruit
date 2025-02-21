@@ -1,36 +1,51 @@
-export default {
-  async fetch(req, env) {
-    if (req.method !== "POST") {
-      return new Response("Method Not Allowed", { status: 405 });
-    }
+export async function onRequest(context) {
+  const { request, env } = context;
 
-    let body;
-    try {
-      body = await req.json();
-    } catch (error) {
-      return new Response("Invalid JSON", { status: 400 });
-    }
+  if (request.method !== "POST") {
+    return new Response("Method Not Allowed", { status: 405 });
+  }
 
-    const signature = req.headers.get("x-paystack-signature");
-    if (!validatePaystackSignature(req, signature, env.PAYSTACK_SECRET_KEY)) {
-      return new Response("Invalid Signature", { status: 400 });
-    }
+  let body;
+  try {
+    body = await request.json();
+  } catch (error) {
+    return new Response("Invalid JSON", { status: 400 });
+  }
 
-    const { event, data } = body;
-    if (event === "charge.success") {
-      return await processDeposit(data, env);
-    } else if (event === "transfer.success") {
-      return await processWithdrawal(data, env);
-    } else {
-      return new Response("Invalid Event", { status: 400 });
-    }
-  },
-};
+  const signature = request.headers.get("x-paystack-signature");
+  if (!await validatePaystackSignature(body, signature, env.PAYSTACK_SECRET_KEY)) {
+    return new Response("Invalid Signature", { status: 400 });
+  }
 
-function validatePaystackSignature(req, signature, secretKey) {
-  const crypto = require("crypto");
-  const hash = crypto.createHmac("sha512", secretKey).update(JSON.stringify(req.body)).digest("hex");
-  return hash === signature;
+  const { event, data } = body;
+  if (event === "charge.success") {
+    return await processDeposit(data, env);
+  } else if (event === "transfer.success") {
+    return await processWithdrawal(data, env);
+  } else {
+    return new Response("Invalid Event", { status: 400 });
+  }
+}
+
+async function validatePaystackSignature(body, signature, secretKey) {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secretKey),
+    { name: "HMAC", hash: "SHA-512" },
+    false,
+    ["sign"]
+  );
+
+  const signatureBytes = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(JSON.stringify(body))
+  );
+  
+  const hashArray = Array.from(new Uint8Array(signatureBytes));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  
+  return hashHex === signature;
 }
 
 async function processDeposit(data, env) {
@@ -40,7 +55,7 @@ async function processDeposit(data, env) {
 
   const email = data.customer.email;
   const amount = data.amount / 100;
-  
+
   const userUid = await getUserUidByEmail(email, env);
   if (!userUid) return new Response("User not found", { status: 400 });
 
@@ -61,11 +76,11 @@ async function processWithdrawal(data, env) {
   const userUid = await getUserUidByEmail(email, env);
   if (!userUid) return new Response("User not found", { status: 400 });
 
-  const userRef = `${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`;
-  const userData = await fetch(userRef).then(res => res.json());
+  const userData = await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`)
+    .then(res => res.json());
 
   if (userData.userBalance >= totalAmount) {
-    await fetch(userRef, {
+    await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userBalance: userData.userBalance - totalAmount }),
@@ -79,8 +94,8 @@ async function processWithdrawal(data, env) {
 }
 
 async function getUserUidByEmail(email, env) {
-  const usersRef = `${env.FIREBASE_DATABASE_URL}/users.json?auth=${env.FIREBASE_SECRET}`;
-  const usersData = await fetch(usersRef).then(res => res.json());
+  const usersData = await fetch(`${env.FIREBASE_DATABASE_URL}/users.json?auth=${env.FIREBASE_SECRET}`)
+    .then(res => res.json());
 
   for (let userId in usersData) {
     if (usersData[userId].email === email) {
@@ -91,40 +106,29 @@ async function getUserUidByEmail(email, env) {
 }
 
 async function updateInvestment(userUid, amount, env) {
-  const userRef = `${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`;
-  const userData = await fetch(userRef).then(res => res.json());
+  const userData = await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`)
+    .then(res => res.json());
 
-  await fetch(userRef, {
+  await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      investment: (userData.investment || 0) + amount,
-    }),
+    body: JSON.stringify({ investment: (userData.investment || 0) + amount }),
   });
 }
 
 async function updateAdminBalance(networkFee, env) {
-  const usersRef = `${env.FIREBASE_DATABASE_URL}/users.json?auth=${env.FIREBASE_SECRET}`;
-  const usersData = await fetch(usersRef).then(res => res.json());
-  
-  let adminUid = null;
-  for (let userId in usersData) {
-    if (usersData[userId].email === "harunalawali5522@gmail.com") {
-      adminUid = userId;
-      break;
-    }
-  }
+  const usersData = await fetch(`${env.FIREBASE_DATABASE_URL}/users.json?auth=${env.FIREBASE_SECRET}`)
+    .then(res => res.json());
 
+  let adminUid = Object.keys(usersData).find(userId => usersData[userId].email === "harunalawali5522@gmail.com");
   if (!adminUid) return;
 
-  const adminRef = `${env.FIREBASE_DATABASE_URL}/users/${adminUid}.json?auth=${env.FIREBASE_SECRET}`;
-  const adminData = await fetch(adminRef).then(res => res.json());
+  const adminData = await fetch(`${env.FIREBASE_DATABASE_URL}/users/${adminUid}.json?auth=${env.FIREBASE_SECRET}`)
+    .then(res => res.json());
 
-  await fetch(adminRef, {
+  await fetch(`${env.FIREBASE_DATABASE_URL}/users/${adminUid}.json?auth=${env.FIREBASE_SECRET}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      networkFee: (adminData.networkFee || 0) + networkFee,
-    }),
+    body: JSON.stringify({ networkFee: (adminData.networkFee || 0) + networkFee }),
   });
 }
