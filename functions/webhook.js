@@ -47,17 +47,13 @@ async function verifySignature(secret, body, signature) {
     encoder.encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
-    ["verify"]
-  );
-
-  const signatureBuffer = Uint8Array.from(
-    atob(signature.replace(/_/g, "/").replace(/-/g, "+")),
-    c => c.charCodeAt(0)
+    ["sign"]
   );
 
   const expectedSignature = await crypto.subtle.sign("HMAC", key, encoder.encode(body));
+  const expectedSignatureBase64 = btoa(String.fromCharCode(...new Uint8Array(expectedSignature)));
 
-  return crypto.subtle.timingSafeEqual(expectedSignature, signatureBuffer);
+  return expectedSignatureBase64 === signature;
 }
 
 async function processDeposit(data, env) {
