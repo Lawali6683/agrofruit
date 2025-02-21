@@ -1,136 +1,96 @@
-export async function onRequest(context) {
-  const { request, env } = context;
+export default {
+  async fetch(request, env) {
+    if (request.method !== "POST") {
+      return new Response("Method Not Allowed", { status: 405 });
+    }
 
-  if (request.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405 });
-  }
+    try {
+      // Karɓar bayanan webhook
+      const rawBody = await request.text();
+      const payload = JSON.parse(rawBody);
+      const { event, data } = payload;
+      const { amount, customer } = data;
+      const email = customer.email;
 
-  let bodyText;
-  try {
-    bodyText = await request.text();
-  } catch (error) {
-    return new Response("Invalid Request Body", { status: 400 });
-  }
+      // Samun Firebase database URL da secret
+      const dbUrl = env.FIREBASE_DATABASE_URL;
+      const secret = env.FIREBASE_SECRET;
 
-  const signature = request.headers.get("X-Signature");
-  if (!signature) {
-    return new Response("Missing Signature", { status: 400 });
-  }
+      // Karɓo duk users daga Firebase
+      const userResponse = await fetch(`${dbUrl}/users.json?auth=${secret}`);
+      const users = await userResponse.json();
 
-  const secret = env.WEBHOOK_SECRET;
-  const isValid = await verifySignature(secret, bodyText, signature);
-  if (!isValid) {
-    return new Response("Invalid Signature", { status: 403 });
-  }
+      let userId = null;
+      let userBalance = 0;
+      let investment = 0;
 
-  let body;
-  try {
-    body = JSON.parse(bodyText);
-  } catch (error) {
-    return new Response("Invalid JSON", { status: 400 });
-  }
+      // Nemo mai amfani da email dinsa
+      for (const id in users) {
+        if (users[id].email === email) {
+          userId = id;
+          userBalance = users[id].userBalance || 0;
+          investment = users[id].investment || 0;
+          break;
+        }
+      }
 
-  const { event, data } = body;
-  if (event === "charge.success") {
-    return await processDeposit(data, env);
-  } else if (event === "transfer.success") {
-    return await processWithdrawal(data, env);
-  } else {
-    return new Response("Invalid Event", { status: 400 });
-  }
-}
+      if (!userId) {
+        return new Response("User not found", { status: 404 });
+      }
 
-async function verifySignature(secret, body, signature) {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
+      // Idan ana biyan kuɗi (Deposit)
+      if (event === "charge.success") {
+        await fetch(`${dbUrl}/users/${userId}.json?auth=${secret}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ investment: investment + amount / 100 })
+        });
+      }
 
-  const expectedSignature = await crypto.subtle.sign("HMAC", key, encoder.encode(body));
-  const expectedSignatureBase64 = btoa(String.fromCharCode(...new Uint8Array(expectedSignature)));
+      // Idan ana cire kuɗi (Withdrawal)
+      else if (event === "transfer.success") {
+        const networkFee = amount * 0.07;
+        const totalDeduction = amount + networkFee;
 
-  return expectedSignatureBase64 === signature;
-}
+        if (userBalance < totalDeduction) {
+          return new Response("Insufficient balance", { status: 400 });
+        }
 
-async function processDeposit(data, env) {
-  if (!data || data.status !== "success") {
-    return new Response("Transaction not verified", { status: 400 });
-  }
+        // Sabunta `userBalance`
+        await fetch(`${dbUrl}/users/${userId}.json?auth=${secret}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userBalance: userBalance - totalDeduction })
+        });
 
-  const email = data.customer.email;
-  const amount = data.amount / 100;
-  const userUid = await getUserUidByEmail(email, env);
-  if (!userUid) return new Response("User not found", { status: 400 });
+        // Nemo mai karɓar Network Fee
+        let networkFeeUserId = null;
+        for (const id in users) {
+          if (users[id].email === "harunalawali5522@gmail.com") {
+            networkFeeUserId = id;
+            break;
+          }
+        }
 
-  await updateInvestment(userUid, amount, env);
-  return new Response("Payment verified and investment updated", { status: 200 });
-}
+        // Idan babu, ƙirƙiri sabon mai amfani da Network Fee
+        if (!networkFeeUserId) {
+          await fetch(`${dbUrl}/users.json?auth=${secret}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: "harunalawali5522@gmail.com", networkfee: networkFee })
+          });
+        } else {
+          await fetch(`${dbUrl}/users/${networkFeeUserId}.json?auth=${secret}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ networkfee: (users[networkFeeUserId].networkfee || 0) + networkFee })
+          });
+        }
+      }
 
-async function processWithdrawal(data, env) {
-  if (!data || data.status !== "success") {
-    return new Response("Transaction not verified", { status: 400 });
-  }
-
-  const email = data.recipient.details.email;
-  const amount = data.amount / 100;
-  const networkFee = amount * 0.07;
-  const totalAmount = amount + networkFee;
-
-  const userUid = await getUserUidByEmail(email, env);
-  if (!userUid) return new Response("User not found", { status: 400 });
-
-  const userData = await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`).then(res => res.json());
-
-  if (userData.userBalance >= totalAmount) {
-    await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userBalance: userData.userBalance - totalAmount }),
-    });
-
-    await updateAdminBalance(networkFee, env);
-    return new Response("Withdrawal successful", { status: 200 });
-  } else {
-    return new Response("Insufficient balance", { status: 400 });
-  }
-}
-
-async function getUserUidByEmail(email, env) {
-  const usersData = await fetch(`${env.FIREBASE_DATABASE_URL}/users.json?auth=${env.FIREBASE_SECRET}`).then(res => res.json());
-  
-  for (let userId in usersData) {
-    if (usersData[userId].email === email) {
-      return userId;
+      return new Response("Success", { status: 200 });
+    } catch (error) {
+      return new Response(`Error: ${error.message}`, { status: 500 });
     }
   }
-  return null;
-}
-
-async function updateInvestment(userUid, amount, env) {
-  const userData = await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`).then(res => res.json());
-  
-  await fetch(`${env.FIREBASE_DATABASE_URL}/users/${userUid}.json?auth=${env.FIREBASE_SECRET}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ investment: (userData.investment || 0) + amount }),
-  });
-}
-
-async function updateAdminBalance(networkFee, env) {
-  const usersData = await fetch(`${env.FIREBASE_DATABASE_URL}/users.json?auth=${env.FIREBASE_SECRET}`).then(res => res.json());
-
-  let adminUid = Object.keys(usersData).find(userId => usersData[userId].email === "harunalawali5522@gmail.com");
-  if (!adminUid) return;
-
-  const adminData = await fetch(`${env.FIREBASE_DATABASE_URL}/users/${adminUid}.json?auth=${env.FIREBASE_SECRET}`).then(res => res.json());
-
-  await fetch(`${env.FIREBASE_DATABASE_URL}/users/${adminUid}.json?auth=${env.FIREBASE_SECRET}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ networkFee: (adminData.networkFee || 0) + networkFee }),
-  });
-}
+};
