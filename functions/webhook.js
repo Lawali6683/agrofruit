@@ -12,20 +12,17 @@ export async function onRequest(context) {
     return new Response("Invalid Request Body", { status: 400 });
   }
 
-  // Get signature from headers
   const signature = request.headers.get("X-Signature");
   if (!signature) {
     return new Response("Missing Signature", { status: 400 });
   }
 
-  // Verify signature
   const secret = env.WEBHOOK_SECRET;
   const isValid = await verifySignature(secret, bodyText, signature);
   if (!isValid) {
     return new Response("Invalid Signature", { status: 403 });
   }
 
-  // Parse JSON body
   let body;
   try {
     body = JSON.parse(bodyText);
@@ -50,11 +47,15 @@ async function verifySignature(secret, body, signature) {
     encoder.encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
-    ["sign", "verify"]
+    ["verify"]
+  );
+
+  const signatureBuffer = Uint8Array.from(
+    atob(signature.replace(/_/g, "/").replace(/-/g, "+")),
+    c => c.charCodeAt(0)
   );
 
   const expectedSignature = await crypto.subtle.sign("HMAC", key, encoder.encode(body));
-  const signatureBuffer = encoder.encode(signature);
 
   return crypto.subtle.timingSafeEqual(expectedSignature, signatureBuffer);
 }
