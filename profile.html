@@ -267,9 +267,8 @@
 </script>
 
 <script type="module">
-    
-    import { app, analytics, firebaseConfig } from './firebase.js';
-import { getDatabase, ref, get, set, child } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+import { app } from './firebase.js';
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
 const db = getDatabase(app);
@@ -280,61 +279,95 @@ function toggleLoading(show) {
     loadingScreen.style.display = show ? "block" : "none";
 }
 
-function generateUniqueCode(snapshot) {
-    let code;
-    do {
-        code = Math.random().toString(36).substring(2, 10).toUpperCase();
-    } while (snapshot.hasChild(code));
-    return code;
+async function getPaystackSecretKey() {
+    try {
+        const response = await fetch("https://agrofruit.pages.dev/api/virtual");
+        const data = await response.json();
+        if (response.ok && data.PAYSTACK_SECRET_KEY) {
+            return data.PAYSTACK_SECRET_KEY;
+        } else {
+            throw new Error("Failed to fetch Paystack Secret Key");
+        }
+    } catch (error) {
+        console.error("Error fetching Paystack Secret Key:", error);
+        alert("An error occurred while fetching Paystack Key. Please try again.");
+        return null;
+    }
 }
 
 function displayUserData(userData) {
-    const { fullName = "User", email = "example@example.com", accountDetails = {} } = userData;
+    const { fullName = "User", email = "example@example.com", accountDetails = {}, paystackCustomerId = "Not Generated" } = userData;
     const { bankName = "Generating", accountNumber = "Generating", accountName = "Generating" } = accountDetails;
-    
+
     document.getElementById("fullName").innerText = fullName;
     document.getElementById("email").innerText = email;
     document.getElementById("accountNumber").innerText = accountNumber;
     document.getElementById("bankName").innerText = bankName;
     document.getElementById("accountName").innerText = accountName;
+    document.getElementById("paystackCustomerId").innerText = paystackCustomerId;
 }
 
-async function createPaystackCustomer(userData, uid) {
+async function createPaystackVirtualAccount(userData, uid) {
     try {
-        const usersRef = ref(db, 'users');
-        const snapshot = await get(usersRef);
-        const paystackCustomerId = generateUniqueCode(snapshot);
-        
-        userData.paystackCustomerId = paystackCustomerId;
-        
-        const response = await fetch("https://agrofruit.pages.dev/api/virtual", {
+        const PAYSTACK_SECRET_KEY = await getPaystackSecretKey();
+        if (!PAYSTACK_SECRET_KEY) return;
+
+        // **Mataki 1: Ƙirƙirar Abokin Ciniki a Paystack**
+        const customerResponse = await fetch("https://api.paystack.co/customer", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${PAYSTACK_SECRET_KEY}`
+            },
             body: JSON.stringify({
-                fullName: userData.fullName,
+                first_name: userData.fullName.split(" ")[0],
+                last_name: userData.fullName.split(" ")[1] || "",
                 email: userData.email,
-                phoneNumber: userData.phoneNumber,
-                paystackCustomerId: paystackCustomerId
+                phone: userData.phoneNumber
             })
         });
-        
-        const result = await response.json();
-        
-        if (response.ok && result.accountNumber) {
-            userData.accountDetails = {
-                accountNumber: result.accountNumber,
-                bankName: "Wema Bank",
-                accountName: userData.fullName
-            };
-            
-            await set(ref(db, `users/${uid}`), userData);
-            displayUserData(userData);
-        } else {
-            throw new Error(result.error || "Failed to create virtual account");
+
+        const customerResult = await customerResponse.json();
+
+        if (!customerResponse.ok || !customerResult.data) {
+            throw new Error(customerResult.message || "Failed to create Paystack customer");
         }
+
+        const paystackCustomerId = customerResult.data.customer_code;
+
+        // **Mataki 2: Ƙirƙirar Asusun Virtual**
+        const accountResponse = await fetch("https://api.paystack.co/dedicated_account", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${PAYSTACK_SECRET_KEY}`
+            },
+            body: JSON.stringify({
+                customer: paystackCustomerId,
+                preferred_bank: "wema-bank"
+            })
+        });
+
+        const accountResult = await accountResponse.json();
+
+        if (!accountResponse.ok || !accountResult.data) {
+            throw new Error(accountResult.message || "Failed to create virtual account");
+        }
+
+        userData.accountDetails = {
+            accountNumber: accountResult.data.account_number,
+            bankName: accountResult.data.bank.name,
+            accountName: userData.fullName
+        };
+
+        userData.paystackCustomerId = paystackCustomerId;
+
+        // **Ajiyewa a Firebase**
+        await set(ref(db, `users/${uid}`), userData);
+        displayUserData(userData);
     } catch (error) {
-        console.error("Error creating Paystack customer:", error);
-        alert("An error occurred while creating the account. Please try again.");
+        console.error("Error creating Paystack Virtual Account:", error);
+        alert("An error occurred while creating the virtual account. Please try again.");
     } finally {
         toggleLoading(false);
     }
@@ -346,11 +379,11 @@ function fetchUserData(uid) {
         .then((snapshot) => {
             if (snapshot.exists()) {
                 const userData = snapshot.val();
-                if (userData.accountDetails) {
+                if (userData.accountDetails && userData.paystackCustomerId) {
                     displayUserData(userData);
                     toggleLoading(false);
                 } else {
-                    createPaystackCustomer(userData, uid);
+                    createPaystackVirtualAccount(userData, uid);
                 }
             } else {
                 console.log("No user data found");
@@ -372,7 +405,7 @@ onAuthStateChanged(auth, (user) => {
         toggleLoading(false);
     }
 });
-
 </script>
+
 </body>
 </html>
