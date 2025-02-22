@@ -281,12 +281,20 @@ function toggleLoading(show) {
 
 async function getPaystackSecretKey() {
     try {
-        const response = await fetch("https://agrofruit.pages.dev/api/virtual");
+        const response = await fetch("https://your-vercel-app.vercel.app/api/paystack-secret", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-api-key": "@haruna66" 
+            }
+        });
+
         const data = await response.json();
-        if (response.ok && data.PAYSTACK_SECRET_KEY) {
-            return data.PAYSTACK_SECRET_KEY;
+
+        if (response.ok && data.hashedSecretKey) {
+            return data.hashedSecretKey;
         } else {
-            throw new Error("Failed to fetch Paystack Secret Key");
+            throw new Error(data.error || "Failed to fetch Paystack Secret Key");
         }
     } catch (error) {
         console.error("Error fetching Paystack Secret Key:", error);
