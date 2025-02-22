@@ -1,5 +1,7 @@
 export default {
   async fetch(request, env) {
+    console.log(env); 
+
     const url = new URL(request.url);
     
     const allowedOrigins = ["https://agrofruit.pages.dev"];
@@ -10,6 +12,10 @@ export default {
     }
    
     if (url.pathname === "/api/virtual") {
+      if (!env.PAYSTACK_SECRET_KEY) {
+        return new Response("Paystack Secret Key not found", { status: 500 });
+      }
+
       return new Response(env.PAYSTACK_SECRET_KEY, {
         headers: {
           "Content-Type": "text/plain",
