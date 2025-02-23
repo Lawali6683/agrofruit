@@ -213,26 +213,25 @@ button#approveAllBtn:hover {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "x-api-key": "@haruna66" 
+                "x-api-key": "@haruna66"
             }
         });
 
         const data = await response.json();
 
-        if (response.ok && data.hashedSecretKey) {
-            return data.hashedSecretKey;
-        } else {
+        if (!response.ok) {
             throw new Error(data.error || "Failed to fetch Paystack Secret Key");
         }
+        
+        return data.secretKey; 
     } catch (error) {
         console.error("Error fetching Paystack Secret Key:", error);
-        alert("An error occurred while fetching Paystack Key. Please try again.");
+        alert("Error: " + error.message);
         return null;
     }
 }
 
-    
-    
+       
     // *** Admin Login ***
     loginBtn.addEventListener('click', () => {
       const email = emailInput.value.trim();
