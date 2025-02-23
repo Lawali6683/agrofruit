@@ -285,34 +285,31 @@ async function getPaystackSecretKey() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "x-api-key": "@haruna66" 
+                "x-api-key": "@haruna66"
             }
         });
 
         const data = await response.json();
 
-        if (response.ok && data.hashedSecretKey) {
-            return data.hashedSecretKey;
-        } else {
+        if (!response.ok) {
             throw new Error(data.error || "Failed to fetch Paystack Secret Key");
         }
+        
+        return data.hashedSecretKey;
     } catch (error) {
         console.error("Error fetching Paystack Secret Key:", error);
-        alert("An error occurred while fetching Paystack Key. Please try again.");
+        alert("Error: " + error.message);
         return null;
     }
 }
 
 function displayUserData(userData) {
-    const { fullName = "User", email = "example@example.com", accountDetails = {}, paystackCustomerId = "Not Generated" } = userData;
-    const { bankName = "Generating", accountNumber = "Generating", accountName = "Generating" } = accountDetails;
-
-    document.getElementById("fullName").innerText = fullName;
-    document.getElementById("email").innerText = email;
-    document.getElementById("accountNumber").innerText = accountNumber;
-    document.getElementById("bankName").innerText = bankName;
-    document.getElementById("accountName").innerText = accountName;
-    document.getElementById("paystackCustomerId").innerText = paystackCustomerId;
+    document.getElementById("fullName").innerText = userData.fullName || "User";
+    document.getElementById("email").innerText = userData.email || "example@example.com";
+    document.getElementById("accountNumber").innerText = userData.accountDetails?.accountNumber || "Generating";
+    document.getElementById("bankName").innerText = userData.accountDetails?.bankName || "Generating";
+    document.getElementById("accountName").innerText = userData.accountDetails?.accountName || "Generating";
+    document.getElementById("paystackCustomerId").innerText = userData.paystackCustomerId || "Not Generated";
 }
 
 async function createPaystackVirtualAccount(userData, uid) {
@@ -320,7 +317,6 @@ async function createPaystackVirtualAccount(userData, uid) {
         const PAYSTACK_SECRET_KEY = await getPaystackSecretKey();
         if (!PAYSTACK_SECRET_KEY) return;
 
-        // **Mataki 1: Ƙirƙirar Abokin Ciniki a Paystack**
         const customerResponse = await fetch("https://api.paystack.co/customer", {
             method: "POST",
             headers: {
@@ -336,14 +332,12 @@ async function createPaystackVirtualAccount(userData, uid) {
         });
 
         const customerResult = await customerResponse.json();
-
-        if (!customerResponse.ok || !customerResult.data) {
+        if (!customerResponse.ok) {
             throw new Error(customerResult.message || "Failed to create Paystack customer");
         }
 
         const paystackCustomerId = customerResult.data.customer_code;
 
-        // **Mataki 2: Ƙirƙirar Asusun Virtual**
         const accountResponse = await fetch("https://api.paystack.co/dedicated_account", {
             method: "POST",
             headers: {
@@ -357,8 +351,7 @@ async function createPaystackVirtualAccount(userData, uid) {
         });
 
         const accountResult = await accountResponse.json();
-
-        if (!accountResponse.ok || !accountResult.data) {
+        if (!accountResponse.ok) {
             throw new Error(accountResult.message || "Failed to create virtual account");
         }
 
@@ -370,12 +363,11 @@ async function createPaystackVirtualAccount(userData, uid) {
 
         userData.paystackCustomerId = paystackCustomerId;
 
-        // **Ajiyewa a Firebase**
         await set(ref(db, `users/${uid}`), userData);
         displayUserData(userData);
     } catch (error) {
         console.error("Error creating Paystack Virtual Account:", error);
-        alert("An error occurred while creating the virtual account. Please try again.");
+        alert("Error: " + error.message);
     } finally {
         toggleLoading(false);
     }
@@ -414,6 +406,5 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 </script>
-
 </body>
 </html>
