@@ -186,7 +186,7 @@ button#approveAllBtn:hover {
 
     const auth = getAuth();
     const database = getDatabase(app);
- 
+
     const loginBtn = document.getElementById('loginBtn');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
@@ -208,51 +208,50 @@ button#approveAllBtn:hover {
     let currentUserUID = "";
 
     async function getPaystackSecretKey() {
-    try {
-        const response = await fetch("https://fruit-ruddy.vercel.app/api/massage", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-api-key": "@haruna66"
+        try {
+            const response = await fetch("https://fruit-ruddy.vercel.app/api/massage", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": "@haruna66"
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Failed to fetch Paystack Secret Key");
             }
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.error || "Failed to fetch Paystack Secret Key");
+            
+            return data.secretKey; 
+        } catch (error) {
+            console.error("Error fetching Paystack Secret Key:", error);
+            alert("Error: " + error.message);
+            return null;
         }
-        
-        return data.secretKey; 
-    } catch (error) {
-        console.error("Error fetching Paystack Secret Key:", error);
-        alert("Error: " + error.message);
-        return null;
     }
-}
 
-       
     // *** Admin Login ***
     loginBtn.addEventListener('click', () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
 
-      if (allowedEmails.includes(email)) {
-        signInWithEmailAndPassword(auth, email, password)
-          .then(userCredential => {
-            currentUserUID = userCredential.user.uid;
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('secondaryPasswordSection').style.display = 'block';
-          })
-          .catch(() => {
-            alert("Invalid email or password");
-          });
-      } else {
-        alert("Unauthorized email");
-      }
+        if (allowedEmails.includes(email)) {
+            signInWithEmailAndPassword(auth, email, password)
+                .then(userCredential => {
+                    currentUserUID = userCredential.user.uid;
+                    document.getElementById('loginSection').style.display = 'none';
+                    document.getElementById('secondaryPasswordSection').style.display = 'block';
+                })
+                .catch(() => {
+                    alert("Invalid email or password");
+                });
+        } else {
+            alert("Unauthorized email");
+        }
     });
 
-    // *** Verify Secondary Password ***
+ // *** Verify Secondary Password ***
     verifySecondaryPasswordBtn.addEventListener('click', () => {
       const secondaryPassword = secondaryPasswordInput.value.trim();
       if (!secondaryPassword) return;
@@ -271,7 +270,7 @@ button#approveAllBtn:hover {
       });
     });
 
-    // *** Fetch Withdrawal Stats ***
+// *** Fetch Withdrawal Stats ***
     function fetchWithdrawalStats() {
       const usersRef = ref(database, 'users');
       get(usersRef).then(snapshot => {
@@ -298,159 +297,184 @@ button#approveAllBtn:hover {
       });
     }
 
+
     // *** Load Pending Withdrawals ***
     function loadWithdrawalPending() {
-      const usersRef = ref(database, 'users');
-      get(usersRef).then(snapshot => {
-        const users = snapshot.val();
-        withdrawalListElem.innerHTML = "";
+        const usersRef = ref(database, 'users');
+        get(usersRef).then(snapshot => {
+            const users = snapshot.val();
+            withdrawalListElem.innerHTML = "";
 
-        if (users) {
-          Object.entries(users).forEach(([userId, user]) => {
-            if (user.withdrawalPending) {
-              createWithdrawalRow(userId, user);
+            if (users) {
+                Object.entries(users).forEach(([userId, user]) => {
+                    if (user.withdrawalPending) {
+                        createWithdrawalRow(userId, user);
+                    }
+                });
             }
-          });
-        }
-      });
+        });
     }
 
     // *** Create Withdrawal Row ***
     function createWithdrawalRow(userId, user) {
-      const withdrawalData = user.withdrawalPending;
-      const row = document.createElement('tr');
+        const withdrawalData = user.withdrawalPending;
+        const row = document.createElement('div');
 
-      row.innerHTML = `
-      <div class="withdrawal-row">
-        <p><strong>Account Name:</strong> ${withdrawalData.accountName}</p>
-        <p><strong>Amount:</strong> ₦${parseFloat(withdrawalData.amount).toLocaleString()}</p>
-        <p><strong>Email:</strong> ${user.email}</p>
-        <p><strong>Bank Name:</strong> ${withdrawalData.bankName}</p>
-        <p><strong>Account Number:</strong> ${withdrawalData.accountNumber}</p>
-        <div class="action-buttons">
-          <button class="approveBtn" data-user-id="${userId}">✔️</button>
-          <button class="rejectBtn" data-user-id="${userId}">✖️</button>
+        row.innerHTML = `
+        <div class="withdrawal-row">
+            <p><strong>Account Name:</strong> ${withdrawalData.accountName}</p>
+            <p><strong>Amount:</strong> ₦${parseFloat(withdrawalData.amount).toLocaleString()}</p>
+            <p><strong>Email:</strong> ${user.email}</p>
+            <p><strong>Bank Name:</strong> ${withdrawalData.bankName}</p>
+            <p><strong>Account Number:</strong> ${withdrawalData.accountNumber}</p>
+            <div class="action-buttons">
+                <button class="approveBtn" data-user-id="${userId}">✔️</button>
+                <button class="rejectBtn" data-user-id="${userId}">✖️</button>
+            </div>
         </div>
-      </div>
-    `;
+        `;
 
-      withdrawalListElem.appendChild(row);
+        withdrawalListElem.appendChild(row);
 
-      row.querySelector('.approveBtn').addEventListener('click', () => approveWithdrawal(userId));
-      row.querySelector('.rejectBtn').addEventListener('click', () => rejectWithdrawal(userId));
+        row.querySelector('.approveBtn').addEventListener('click', () => approveWithdrawal(userId, user.email));
+        row.querySelector('.rejectBtn').addEventListener('click', () => rejectWithdrawal(userId));
     }
 
     // *** Approve a Single Withdrawal ***
-    async function approveWithdrawal(userId) {
-      const userRef = ref(database, `users/${userId}/withdrawalPending`);
+    async function approveWithdrawal(userId, email) {
+        const userRef = ref(database, `users/${userId}/withdrawalPending`);
 
-      try {
-        const snapshot = await get(userRef);
-        const withdrawalData = snapshot.val();
+        try {
+            const snapshot = await get(userRef);
+            const withdrawalData = snapshot.val();
 
-        if (!withdrawalData) {
-          alert("No withdrawal data found.");
-          return;
+            if (!withdrawalData) {
+                alert("No withdrawal data found.");
+                return;
+            }
+
+            const paystackKey = await getPaystackSecretKey();
+            if (!paystackKey) return;
+
+            const recipientResponse = await fetch("https://api.paystack.co/transferrecipient", {
+                method: "POST",
+                headers: {
+                    'Authorization': `Bearer ${paystackKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    type: "nuban",
+                    name: withdrawalData.accountName,
+                    account_number: withdrawalData.accountNumber,
+                    bank_code: withdrawalData.bankCode,
+                    currency: "NGN"
+                })
+            });
+
+            const recipientData = await recipientResponse.json();
+
+            if (!recipientResponse.ok) {
+                alert(`Error creating Paystack recipient: ${recipientData.message}`);
+                return;
+            }
+
+            const transferResponse = await fetch("https://api.paystack.co/transfer", {
+                method: "POST",
+                headers: {
+                    'Authorization': `Bearer ${paystackKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    source: "balance",
+                    amount: parseFloat(withdrawalData.amount) * 100,
+                    recipient: recipientData.data.recipient_code,
+                    reason: "Withdrawal from AgroFruit"
+                })
+            });
+
+            const transferData = await transferResponse.json();
+
+            if (transferResponse.ok) {
+                await set(ref(database, `users/${userId}/approvedWithdrawals`), withdrawalData);
+                await remove(userRef);
+                alert("Withdrawal approved and payment successful!");
+                loadWithdrawalPending();
+            } else {
+                alert(`Error processing payment: ${transferData.message}`);
+            }
+        } catch (error) {
+            console.error("Error approving withdrawal:", error);
+            alert("Error approving withdrawal. Please try again.");
         }
-
-        const paystackKey = await getPaystackSecretKey();
-        if (!paystackKey) return;
-
-        const recipientResponse = await fetch("https://api.paystack.co/transferrecipient", {
-          method: "POST",
-          headers: {
-            'Authorization': `Bearer ${paystackKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            type: "nuban",
-            name: withdrawalData.accountName,
-            account_number: withdrawalData.accountNumber,
-            bank_code: withdrawalData.bankCode,
-            currency: "NGN"
-          })
-        });
-
-        const recipientData = await recipientResponse.json();
-
-        if (!recipientResponse.ok) {
-          alert(`Error creating Paystack recipient: ${recipientData.message}`);
-          return;
-        }
-
-        const transferResponse = await fetch("https://api.paystack.co/transfer", {
-          method: "POST",
-          headers: {
-            'Authorization': `Bearer ${paystackKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            source: "balance",
-            amount: parseFloat(withdrawalData.amount) * 100,
-            recipient: recipientData.data.recipient_code,
-            reason: "Withdrawal from AgroFruit"
-          })
-        });
-
-        const transferData = await transferResponse.json();
-
-        if (transferResponse.ok) {
-          const withdrawalSuccessfulRef = ref(database, `users/${userId}/withdrawalSuccessful`);
-          await set(withdrawalSuccessfulRef, {
-            ...withdrawalData,
-            paystackCustomerId: recipientData.data.recipient_code,
-            date: new Date().toISOString()
-          });
-
-          const approvedRef = ref(database, `users/${userId}/approvedWithdrawals`);
-          await set(approvedRef, withdrawalData);
-          await remove(userRef); 
-          alert("Withdrawal approved and payment successful!");
-          loadWithdrawalPending();
-        } else {
-          alert(`Error processing payment: ${transferData.message}`);
-        }
-      } catch (error) {
-        console.error("Error approving withdrawal:", error);
-        alert("Error approving withdrawal. Please try again.");
-      }
     }
 
     // *** Reject a Withdrawal ***
-    function rejectWithdrawal(userId) {
-      const userRef = ref(database, `users/${userId}/withdrawalPending`);
+function rejectWithdrawal(userId) {
+    const userRef = ref(database, `users/${userId}/withdrawalPending`);
+    const successfulRef = ref(database, `users/${userId}/withdrawalSuccessful`);
 
-      remove(userRef)
-        .then(() => {
-          alert("Withdrawal request rejected.");
-          loadWithdrawalPending();
-        })
-        .catch(error => {
-          console.error("Error rejecting withdrawal:", error);
-        });
-    }
+    get(userRef).then(snapshot => {
+        const withdrawalData = snapshot.val();
+        if (!withdrawalData) {
+            alert("No pending withdrawal found.");
+            return;
+        }
 
-   
+        // Cire withdrawal daga pending
+        remove(userRef)
+            .then(() => {
+               
+                get(successfulRef).then(successSnapshot => {
+                    let successfulWithdrawals = successSnapshot.val() || [];
+
+                    // Ƙara sabon withdrawal da lokacin biya
+                    successfulWithdrawals.push({
+                        ...withdrawalData,
+                        paidAt: new Date().toISOString() // Ranar biya
+                    });
+
+                    // Ajiye a database
+                    set(successfulRef, successfulWithdrawals)
+                        .then(() => {
+                            alert("Withdrawal successfully rejected and recorded.");
+                            loadWithdrawalPending();
+                        })
+                        .catch(error => {
+                            console.error("Error saving withdrawalSuccessful:", error);
+                        });
+                });
+            })
+            .catch(error => {
+                console.error("Error rejecting withdrawal:", error);
+            });
+    }).catch(error => {
+        console.error("Error fetching withdrawal data:", error);
+    });
+}
+    
     // *** Approve All Withdrawals ***
     approveAllBtn.addEventListener("click", () => {
-      const usersRef = ref(database, "users");
+        const usersRef = ref(database, "users");
 
-      get(usersRef)
-        .then(snapshot => {
-          const users = snapshot.val();
+        get(usersRef)
+            .then(snapshot => {
+                const users = snapshot.val();
 
-          if (users) {
-            Object.keys(users).forEach(userId => {
-              if (users[userId].withdrawalPending) {
-                approveWithdrawal(userId);
-              }
+                if (users) {
+                    Object.keys(users).forEach(userId => {
+                        if (users[userId].withdrawalPending) {
+                            approveWithdrawal(userId, users[userId].email);
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error getting users:", error);
             });
-          }
-        })
-        .catch(error => {
-          console.error("Error getting users:", error);
-        });
     });
-  </script>
+
+</script>
+  
 </body>
 </html>
