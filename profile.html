@@ -311,7 +311,7 @@ function displayUserData(userData) {
     document.getElementById("email").innerText = userData.email || "example@example.com";
     document.getElementById("accountNumber").innerText = userData.accountDetails?.accountNumber || "Generating";
     document.getElementById("bankName").innerText = userData.accountDetails?.bankName || "Generating";
-    document.getElementById("accountName").innerText = userData.fullName; // An tabbatar da cewa accountName == fullName
+    document.getElementById("accountName").innerText = userData.fullName; 
     document.getElementById("paystackCustomerId").innerText = userData.paystackCustomerId || "Not Generated";
 }
 
@@ -328,8 +328,7 @@ async function createPaystackVirtualAccount(userData, uid) {
                 "Authorization": `Bearer ${PAYSTACK_SECRET_KEY}`
             },
             body: JSON.stringify({
-                first_name: userData.fullName.split(" ")[0],
-                last_name: userData.fullName.split(" ")[1] || "",
+                first_name: userData.fullName, // Ba a raba suna ba, an aika full name
                 email: userData.email,
                 phone: userData.phoneNumber
             })
@@ -351,7 +350,8 @@ async function createPaystackVirtualAccount(userData, uid) {
             },
             body: JSON.stringify({
                 customer: paystackCustomerId,
-                preferred_bank: "wema-bank"
+                preferred_bank: "wema-bank",
+                account_name: userData.fullName // An tabbatar da cewa accountName == fullName
             })
         });
 
@@ -363,7 +363,7 @@ async function createPaystackVirtualAccount(userData, uid) {
         userData.accountDetails = {
             accountNumber: accountResult.data.account_number,
             bankName: accountResult.data.bank.name,
-            accountName: userData.fullName // An tabbatar da cewa accountName == fullName
+            accountName: userData.fullName 
         };
 
         userData.paystackCustomerId = paystackCustomerId;
