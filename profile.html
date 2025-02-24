@@ -329,7 +329,7 @@ async function createPaystackVirtualAccount(userData, uid) {
             },
             body: JSON.stringify({
                 first_name: userData.fullName.split(" ")[0],
-                last_name: userData.fullName.split(" ")[1] || "",
+                last_name: userData.fullName.split(" ").slice(1).join(" ") || "",
                 email: userData.email,
                 phone: userData.phoneNumber
             })
@@ -351,7 +351,10 @@ async function createPaystackVirtualAccount(userData, uid) {
             },
             body: JSON.stringify({
                 customer: paystackCustomerId,
-                preferred_bank: "wema-bank"
+                preferred_bank: "wema-bank",
+                first_name: userData.fullName.split(" ")[0],
+                last_name: userData.fullName.split(" ").slice(1).join(" ") || "",
+                phone: userData.phoneNumber
             })
         });
 
@@ -363,7 +366,7 @@ async function createPaystackVirtualAccount(userData, uid) {
         userData.accountDetails = {
             accountNumber: accountResult.data.account_number,
             bankName: accountResult.data.bank.name,
-            accountName: userData.fullName
+            accountName: accountResult.data.account_name // Amfani da sunan asusun da Paystack ya dawo da shi
         };
 
         userData.paystackCustomerId = paystackCustomerId;
@@ -374,7 +377,7 @@ async function createPaystackVirtualAccount(userData, uid) {
     } catch (error) {
         console.error("Error creating Paystack Virtual Account:", error);
         alert("Error: " + error.message);
-        throw error; 
+        throw error; // Don hana buɗe shafin idan an samu kuskure
     } finally {
         toggleLoading(false);
     }
@@ -410,7 +413,7 @@ onAuthStateChanged(auth, async (user) => {
         try {
             await fetchUserData(user.uid);
         } catch (error) {
-            
+           
         }
     } else {
         console.log("No user is signed in");
@@ -418,6 +421,6 @@ onAuthStateChanged(auth, async (user) => {
         
     }
 });
-</script> 
+</script>
 </body>
 </html>
