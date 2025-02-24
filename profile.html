@@ -329,7 +329,7 @@ async function createPaystackVirtualAccount(userData, uid) {
             },
             body: JSON.stringify({
                 first_name: userData.fullName.split(" ")[0],
-                last_name: userData.fullName.split(" ").slice(1).join(" ") || "",
+                last_name: userData.fullName.split(" ")[1] || "",
                 email: userData.email,
                 phone: userData.phoneNumber
             })
@@ -351,10 +351,7 @@ async function createPaystackVirtualAccount(userData, uid) {
             },
             body: JSON.stringify({
                 customer: paystackCustomerId,
-                preferred_bank: "wema-bank",
-                first_name: userData.fullName.split(" ")[0],
-                last_name: userData.fullName.split(" ").slice(1).join(" ") || "",
-                phone: userData.phoneNumber
+                preferred_bank: "wema-bank"
             })
         });
 
@@ -366,7 +363,7 @@ async function createPaystackVirtualAccount(userData, uid) {
         userData.accountDetails = {
             accountNumber: accountResult.data.account_number,
             bankName: accountResult.data.bank.name,
-            accountName: accountResult.data.account_name // Amfani da sunan asusun da Paystack ya dawo da shi
+            accountName: userData.fullName
         };
 
         userData.paystackCustomerId = paystackCustomerId;
@@ -377,7 +374,7 @@ async function createPaystackVirtualAccount(userData, uid) {
     } catch (error) {
         console.error("Error creating Paystack Virtual Account:", error);
         alert("Error: " + error.message);
-        throw error; // Don hana buɗe shafin idan an samu kuskure
+        throw error; 
     } finally {
         toggleLoading(false);
     }
@@ -421,6 +418,6 @@ onAuthStateChanged(auth, async (user) => {
         
     }
 });
-</script>  
+</script> 
 </body>
 </html>
