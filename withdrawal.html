@@ -611,7 +611,7 @@ withdrawalForm.addEventListener("submit", async (e) => {
     const bankCode = bankSelect.value;
     const bankName = bankSelect.options[bankSelect.selectedIndex].text;
 
-    if (amount < 50 || amount > 100000) {
+    if (amount < 500 || amount > 100000) {
         alert("The minimum withdrawal amount is ₦500, while the maximum is ₦100,000 per day.");
         hideLoading();
         return;
