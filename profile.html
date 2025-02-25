@@ -306,12 +306,19 @@ async function getPaystackSecretKey() {
     }
 }
 
+function splitFullName(fullName) {
+    const nameParts = fullName.trim().split(" ");
+    const first_name = nameParts.shift(); 
+    const last_name = nameParts.join(" ") || "N/A"; 
+    return { first_name, last_name };
+}
+
 function displayUserData(userData) {
     document.getElementById("fullName").innerText = userData.fullName || "User";
     document.getElementById("email").innerText = userData.email || "example@example.com";
     document.getElementById("accountNumber").innerText = userData.accountDetails?.accountNumber || "Generating";
     document.getElementById("bankName").innerText = userData.accountDetails?.bankName || "Generating";
-    document.getElementById("accountName").innerText = userData.fullName; 
+    document.getElementById("accountName").innerText = userData.accountDetails?.accountName || "Generating"; 
     document.getElementById("paystackCustomerId").innerText = userData.paystackCustomerId || "Not Generated";
 }
 
@@ -319,6 +326,8 @@ async function createPaystackVirtualAccount(userData, uid) {
     try {
         const PAYSTACK_SECRET_KEY = await getPaystackSecretKey();
         if (!PAYSTACK_SECRET_KEY) throw new Error("Missing Paystack Secret Key");
+
+        const { first_name, last_name } = splitFullName(userData.fullName);
 
         // Mataki na 1: Ƙirƙirar Abokin Ciniki a Paystack
         const customerResponse = await fetch("https://api.paystack.co/customer", {
@@ -328,7 +337,8 @@ async function createPaystackVirtualAccount(userData, uid) {
                 "Authorization": `Bearer ${PAYSTACK_SECRET_KEY}`
             },
             body: JSON.stringify({
-                first_name: userData.fullName, // Ba a raba suna ba, an aika full name
+                first_name: first_name,
+                last_name: last_name,
                 email: userData.email,
                 phone: userData.phoneNumber
             })
@@ -351,7 +361,7 @@ async function createPaystackVirtualAccount(userData, uid) {
             body: JSON.stringify({
                 customer: paystackCustomerId,
                 preferred_bank: "wema-bank",
-                account_name: userData.fullName // An tabbatar da cewa accountName == fullName
+                account_name: `${first_name} ${last_name}`
             })
         });
 
@@ -363,7 +373,7 @@ async function createPaystackVirtualAccount(userData, uid) {
         userData.accountDetails = {
             accountNumber: accountResult.data.account_number,
             bankName: accountResult.data.bank.name,
-            accountName: userData.fullName 
+            accountName: accountResult.data.account_name 
         };
 
         userData.paystackCustomerId = paystackCustomerId;
@@ -417,5 +427,6 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 </script>
+
 </body>
 </html>
