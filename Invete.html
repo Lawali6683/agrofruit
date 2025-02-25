@@ -213,10 +213,10 @@ main {
             <li>Level 2: 30 Referrals = ₦15,000 Bonus</li>
             <li>Level 3: 70 Referrals = ₦18,000 Bonus</li>
             <li>Level 4: 100 Referrals = ₦22,000 Bonus</li>
-            <li>Level 5: 150 Referrals = ₦40,000 Bonus + ₦20,000 every Monthly</li>
+            <li>Level 5: 150 Referrals = ₦40,000 Bonus + More</li>
         </ul>
         <h2>
-            Total Earnings: ₦105,000 and + ₦20,000 Monthly Bonus! Every month, if you have 150 investment referrals, 
+            Total Earnings: ₦105,000 and + More Bonus!, if you have 150 investment referrals, 
 </h2>
 <p>Don't miss this opportunity—start now and share your referral link on social media to win in 7 days ally. 
         </p>
@@ -247,7 +247,8 @@ main {
     </table>
         
              <div id="congratulations" style="display:none;">
-            <p>Congratulations! You are now a professional admin member of Fruit Farming , and you get ₦20,000 bonus every 30 days. Continue to invite referrals and earn bonuses!</p>
+            <p>Congratulations! You receive ₦1500,000
+            You are now a professional admin member of AgroFruit, </p>
         </section>
     </main>
     </div>
@@ -431,7 +432,7 @@ main {
     </table>
 
     <div class="note">
-      <strong>Note:</strong> Achieve higher referral 150 levels 5 to earn additional ₦40,000 bonuses and an official bonus from Global Fruit Industries. You also receive ₦20,000 every monthly in your Balance. 
+      <strong>Note:</strong> Achieve higher referral 150, levels 5 to earn additional ₦40,000 bonuses and an official bonus from Global Fruit Industries. 
     </div>
 
     <div class="cta">
@@ -603,7 +604,7 @@ main {
                 let recurringCount = userData.recurringBonusCount || 0;
 
                 if (recurringCount < 12) {
-                    const newBalance = currentBalance + 20000;
+                    const newBalance = currentBalance + 20;
                     const newCount = recurringCount + 1;
 
                     update(userRef, {
@@ -611,7 +612,7 @@ main {
                         recurringBonusCount: newCount,
                     });
 
-                    console.log(`₦20,000 bonus added. Count: ${newCount}/12`);
+                    console.log(`₦20 bonus added. Count: ${newCount}/12`);
                 } else {
                     console.log("Recurring bonus limit reached (12 months).");
                 }
@@ -620,7 +621,7 @@ main {
 
         setTimeout(() => {
             startRecurringBonus(uid, currentBalance);
-        }, 2592000000); 
+        }, 25); 
     }
     copyLinkBtn.addEventListener("click", () => {
     navigator.clipboard.writeText(referralLinkEl.value).then(() => {
