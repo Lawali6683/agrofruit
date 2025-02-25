@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Search - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        #login-container, #admin-password-container {
+            margin: 50px auto;
+            padding: 2px;
+            width: 300px;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #admin-panel {
+            margin: 20px auto;
+            width: 80%;
+            display: none;
+        }
+
+        .search-container {
+            margin-top: 20px;
+        }
+
+        #user-details {
+            margin-top: 20px;
+            padding: 10px;
+            background: white;
+            text-align: left;
+        }
+        h1{
+            font-size: 20px;
+            Color: blue;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-container">
+        <h2>Login to Access Admin Panel</h2>
+        <input type="email" id="email" placeholder="Enter Email">
+        <input type="password" id="password" placeholder="Enter Password">
+        <button id="login-btn">Submit</button>
+    </div>
+
+    <div id="admin-password-container" style="display: none;">
+        <h2>Enter Admin Password</h2>
+        <input type="password" id="admin-password" placeholder="Enter Admin Password">
+        <button id="verify-admin-btn">Submit</button>
+    </div>
+
+    <div id="admin-panel" style="display: none;">
+        <header>
+            <h1>Welcome Admin, <span id="admin-name"></span></h1>
+        </header>
+        
+        <div class="search-container">
+            <input type="text" id="costume-id" placeholder="Enter Costumes ID">
+            <button id="search-btn">Search</button>
+        </div>
+
+        <div id="user-details">
+            <h3>User Details</h3>
+            <div id="user-info"></div>
+        </div>
+    </div>
+
+    <script type="module">
+    import { app, analytics, db } from './fag.js';
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+    const auth = getAuth(app);
+
+    // ** Login Handling **
+    document.getElementById('login-btn').addEventListener('click', () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        signInWithEmailAndPassword(auth, email, password)
+        .then(userCredential => {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('admin-password-container').style.display = 'block';
+        })
+        .catch(error => alert(error.message));
+    });
+
+    // ** Admin Password Verification **
+    document.getElementById('verify-admin-btn').addEventListener('click', () => {
+        const adminPassword = document.getElementById('admin-password').value;
+        if (adminPassword === "AgroFruit") {
+            document.getElementById('admin-password-container').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+
+            // Display Admin Name
+            const user = auth.currentUser;
+            if (user) {
+                const userRef = ref(db, `users/${user.uid}`);
+                get(userRef).then(snapshot => {
+                    if (snapshot.exists()) {
+                        document.getElementById('admin-name').textContent = snapshot.val().fullName || "Empty";
+                    }
+                }).catch(error => console.error(error));
+            }
+        } else {
+            alert("Incorrect Admin Password!");
+        }
+    });
+
+    // ** Searching Users via Costumes ID **
+    document.getElementById('search-btn').addEventListener('click', () => {
+        const costumeId = document.getElementById('costume-id').value.trim();
+        if (costumeId === "") {
+            alert("Please enter a valid Costumes ID!");
+            return;
+        }
+
+        const usersRef = ref(db, 'users');
+        get(usersRef).then(snapshot => {
+            if (snapshot.exists()) {
+                let foundUser = null;
+                snapshot.forEach(userSnapshot => {
+                    if (userSnapshot.val().paystackCustomerId === costumeId) {
+                        foundUser = userSnapshot.val();
+                    }
+                });
+
+                if (foundUser) {
+                    displayUserInfo(foundUser);
+                } else {
+                    alert("User not found!");
+                }
+            }
+        }).catch(error => console.error(error));
+    });
+
+    // ** Function to Display User Info **
+    function displayUserInfo(user) {
+        const userInfoDiv = document.getElementById('user-info');
+        userInfoDiv.innerHTML = `
+            <p><strong>Full Name:</strong> ${user.fullName || "Empty"}</p>
+            <p><strong>Gender:</strong> ${user.gender || "Empty"}</p>
+            <p><strong>County:</strong> ${user.county || "Empty"}</p>
+            <p><strong>Address:</strong> ${user.address || "Empty"}</p>
+            <p><strong>Username:</strong> ${user.username || "Empty"}</p>
+            <p><strong>Phone Number:</strong> ${user.phoneNumber || "Empty"}</p>
+            <p><strong>Email:</strong> ${user.email || "Empty"}</p>
+            <p><strong>Referral Code:</strong> ${user.referralCode || "Empty"}</p>
+            <p><strong>User Balance:</strong> ${user.userBalance || "Empty"}</p>
+            <p><strong>Registration Date:</strong> ${user.registrationDate || "Empty"}</p>
+            <p><strong>Active Status:</strong> ${user.activeStatus || "Empty"}</p>
+            <p><strong>Referral Count:</strong> ${user.referralCount || "Empty"}</p>
+            <p><strong>Daily Upgrade:</strong> ${user.dailyUpgrade || "Empty"}</p>
+            <p><strong>Investment:</strong> ${user.investment || "Empty"}</p>
+            
+            <h3>Withdrawal Successful:</h3>
+            <p><strong>Account Number:</strong> ${user.withdrawalSuccessful?.accountNumber || "Empty"}</p>
+            <p><strong>Bank Code:</strong> ${user.withdrawalSuccessful?.bankCode || "Empty"}</p>
+            <p><strong>Amount:</strong> ${user.withdrawalSuccessful?.amount || "Empty"}</p>
+            <p><strong>Bank Name:</strong> ${user.withdrawalSuccessful?.bankName || "Empty"}</p>
+            <p><strong>Account Name:</strong> ${user.withdrawalSuccessful?.accountName || "Empty"}</p>
+
+            <h3>Withdrawal Pending:</h3>
+            <p><strong>Account Number:</strong> ${user.withdrawalPending?.accountNumber || "Empty"}</p>
+            <p><strong>Bank Code:</strong> ${user.withdrawalPending?.bankCode || "Empty"}</p>
+            <p><strong>Amount:</strong> ${user.withdrawalPending?.amount || "Empty"}</p>
+            <p><strong>Bank Name:</strong> ${user.withdrawalPending?.bankName || "Empty"}</p>
+            <p><strong>Account Name:</strong> ${user.withdrawalPending?.accountName || "Empty"}</p>
+        `;
+    }
+</script>
+
+</body>
+</html>
