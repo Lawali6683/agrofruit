@@ -307,9 +307,9 @@ async function getPaystackSecretKey() {
 }
 
 function splitFullName(fullName) {
-    const nameParts = fullName.trim().split(" ");
-    const first_name = nameParts.shift(); 
-    const last_name = nameParts.join(" ") || "N/A"; 
+    const nameParts = fullName.trim().split(/\s+/);
+    let first_name = nameParts[0] || "";
+    let last_name = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "N/A"; 
     return { first_name, last_name };
 }
 
@@ -373,7 +373,7 @@ async function createPaystackVirtualAccount(userData, uid) {
         userData.accountDetails = {
             accountNumber: accountResult.data.account_number,
             bankName: accountResult.data.bank.name,
-            accountName: accountResult.data.account_name 
+            accountName: `${first_name} ${last_name}`
         };
 
         userData.paystackCustomerId = paystackCustomerId;
@@ -427,6 +427,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 </script>
+
 
 </body>
 </html>
