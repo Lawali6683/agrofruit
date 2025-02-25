@@ -339,76 +339,86 @@ button#approveAllBtn:hover {
         row.querySelector('.approveBtn').addEventListener('click', () => approveWithdrawal(userId, user.email));
         row.querySelector('.rejectBtn').addEventListener('click', () => rejectWithdrawal(userId));
     }
+    
+    
 
     // *** Approve a Single Withdrawal ***
     async function approveWithdrawal(userId, email) {
-        const userRef = ref(database, `users/${userId}/withdrawalPending`);
+    const userRef = ref(database, `users/${userId}/withdrawalPending`);
 
-        try {
-            const snapshot = await get(userRef);
-            const withdrawalData = snapshot.val();
+    try {
+        const snapshot = await get(userRef);
+        const withdrawalData = snapshot.val();
 
-            if (!withdrawalData) {
-                alert("No withdrawal data found.");
-                return;
-            }
-
-            const paystackKey = await getPaystackSecretKey();
-            if (!paystackKey) return;
-
-            const recipientResponse = await fetch("https://api.paystack.co/transferrecipient", {
-                method: "POST",
-                headers: {
-                    'Authorization': `Bearer ${paystackKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: email,
-                    type: "nuban",
-                    name: withdrawalData.accountName,
-                    account_number: withdrawalData.accountNumber,
-                    bank_code: withdrawalData.bankCode,
-                    currency: "NGN"
-                })
-            });
-
-            const recipientData = await recipientResponse.json();
-
-            if (!recipientResponse.ok) {
-                alert(`Error creating Paystack recipient: ${recipientData.message}`);
-                return;
-            }
-
-            const transferResponse = await fetch("https://api.paystack.co/transfer", {
-                method: "POST",
-                headers: {
-                    'Authorization': `Bearer ${paystackKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    source: "balance",
-                    amount: parseFloat(withdrawalData.amount) * 100,
-                    recipient: recipientData.data.recipient_code,
-                    reason: "Withdrawal from AgroFruit"
-                })
-            });
-
-            const transferData = await transferResponse.json();
-
-            if (transferResponse.ok) {
-                await set(ref(database, `users/${userId}/approvedWithdrawals`), withdrawalData);
-                await remove(userRef);
-                alert("Withdrawal approved and payment successful!");
-                loadWithdrawalPending();
-            } else {
-                alert(`Error processing payment: ${transferData.message}`);
-            }
-        } catch (error) {
-            console.error("Error approving withdrawal:", error);
-            alert("Error approving withdrawal. Please try again.");
+        if (!withdrawalData) {
+            alert("No withdrawal data found.");
+            return;
         }
-    }
 
+        const paystackKey = await getPaystackSecretKey();
+        if (!paystackKey) return;
+       
+        const mobileMoneyBanks = ["100004", "50515", "999991"]; // Opay, Moniepoint, PalmPay
+
+        let recipientType = "nuban";
+        if (mobileMoneyBanks.includes(withdrawalData.bankCode)) {
+            recipientType = "mobile_money";
+        }
+
+        const recipientResponse = await fetch("https://api.paystack.co/transferrecipient", {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${paystackKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                type: recipientType,
+                name: withdrawalData.accountName,
+                account_number: withdrawalData.accountNumber,
+                bank_code: withdrawalData.bankCode,
+                currency: "NGN"
+            })
+        });
+
+        const recipientData = await recipientResponse.json();
+
+        if (!recipientResponse.ok) {
+            alert(`Error creating Paystack recipient: ${recipientData.message}`);
+            return;
+        }
+
+        const transferResponse = await fetch("https://api.paystack.co/transfer", {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${paystackKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                source: "balance",
+                amount: parseFloat(withdrawalData.amount) * 100,
+                recipient: recipientData.data.recipient_code,
+                reason: "Withdrawal from AgroFruit"
+            })
+        });
+
+        const transferData = await transferResponse.json();
+
+        if (transferResponse.ok) {
+            await set(ref(database, `users/${userId}/approvedWithdrawals`), withdrawalData);
+            await remove(userRef);
+            alert("Withdrawal approved and payment successful!");
+            loadWithdrawalPending();
+        } else {
+            alert(`Error processing payment: ${transferData.message}`);
+        }
+    } catch (error) {
+        console.error("Error approving withdrawal:", error);
+        alert("Error approving withdrawal. Please try again.");
+    }
+}
+
+          
     // *** Reject a Withdrawal ***
 function rejectWithdrawal(userId) {
     const userRef = ref(database, `users/${userId}/withdrawalPending`);
