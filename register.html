@@ -288,22 +288,21 @@ function togglePassword(fieldId) {
 </script>
 
    <script type="module">
- import { app, analytics, firebaseConfig } from './firebase.js';
+import { app, analytics, firebaseConfig } from './firebase.js';
 import { 
     getAuth, 
     createUserWithEmailAndPassword, 
-    sendEmailVerification, 
-    deleteUser 
+    sendEmailVerification
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { 
     getDatabase, 
     ref, 
     set, 
     update, 
-    remove, 
     get 
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
+// Initialize Firebase Auth and Database
 const auth = getAuth(app);
 const db = getDatabase(app);
 
@@ -312,8 +311,7 @@ const defaultReferralCode = "nopp0z";
 
 // Function to retrieve referral code
 function getReferralCode() {
-    const storedCode = localStorage.getItem("referralCode");
-    return storedCode || defaultReferralCode;
+    return localStorage.getItem("referralCode") || defaultReferralCode;
 }
 
 // Store referral code from URL on page load
@@ -325,7 +323,7 @@ function storeReferralCode() {
     }
 }
 
-// Handle referral code
+// Handle referral code validation
 async function handleReferralCode() {
     document.getElementById("loadingScreen").style.display = "flex";
     const referralCode = getReferralCode();
@@ -354,12 +352,14 @@ async function handleReferralCode() {
     }
 }
 
+// Handle form submission
 document.getElementById("registrationForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const referralCode = getReferralCode();
     await registerUser(referralCode);
 });
 
+// User registration function
 async function registerUser(referralCode) {
     document.getElementById("loadingScreen").style.display = "flex";
 
@@ -383,9 +383,11 @@ async function registerUser(referralCode) {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
+        // Generate referral code
         const generatedReferralCode = Math.random().toString(36).substring(2, 8);
         const referralLink = `https://agrofruit.pages.dev/?user=${encodeURIComponent(username)}&ref=${generatedReferralCode}`;
 
+        // Store user data in database
         await set(ref(db, `users/${user.uid}`), {
             fullName,
             gender,
@@ -400,33 +402,34 @@ async function registerUser(referralCode) {
             referralLink,
             dailyUpgrade: 0.00,
             investment: 0.00,
-            tsohonUser: no, 
+            tsohonUser: false,  
             userBalance: 0.00,
             accountNumber: [],
             withdrawalPending: [],
             withdrawalHistory: [],
-           
             registrationDate: new Date().toISOString(),            
             activeStatus: true
         });
-        
-    await sendEmailVerification(user);
 
-    alert("Your registration was successful. Please verify your email...");
-    window.location.href = "whaitVerified.html"; 
+        // Send email verification
+        await sendEmailVerification(user);
 
-} catch (error) {
-    if (error.code === "auth/email-already-in-use") {
-        alert("This email is already registered. Redirecting to login...");
-        window.location.href = "login.html";
-    } else {
-        console.error("Registration error:", error);
-        alert("Error: " + error.message);
+        alert("Your registration was successful. Please verify your email...");
+        window.location.href = "whaitVerified.html"; 
+
+    } catch (error) {
+        if (error.code === "auth/email-already-in-use") {
+            alert("This email is already registered. Redirecting to login...");
+            window.location.href = "login.html";
+        } else {
+            console.error("Registration error:", error);
+            alert("Error: " + error.message);
+        }
+    } finally {
+        document.getElementById("loadingScreen").style.display = "none";
     }
-} finally {
-    document.getElementById("loadingScreen").style.display = "none";
 }
-}
+
 // Run referral code handling on load
 storeReferralCode();
 handleReferralCode();
