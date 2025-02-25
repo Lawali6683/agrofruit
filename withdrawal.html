@@ -443,7 +443,6 @@ footer {
 <option value="50211">Kuda Bank</option>
 <option value="082">Keystone Bank</option>
 <option value="303">Lotus Bank</option>
-<option value="100004">OPay</option>
 <option value="50515">Moniepoint MFB</option>
 <option value="526">Parallex Bank</option>
 <option value="999991">PalmPay</option>
@@ -612,7 +611,7 @@ withdrawalForm.addEventListener("submit", async (e) => {
     const bankCode = bankSelect.value;
     const bankName = bankSelect.options[bankSelect.selectedIndex].text;
 
-    if (amount < 500 || amount > 100000) {
+    if (amount < 50 || amount > 100000) {
         alert("The minimum withdrawal amount is ₦500, while the maximum is ₦100,000 per day.");
         hideLoading();
         return;
