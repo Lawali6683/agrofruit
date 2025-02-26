@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Payment Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        header button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        header button:hover {
+            background-color: #c82333;
+        }
+
+        .admin-section, .user-section, .withdrawal-section {
+            background-color: #ffffff;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-section, .withdrawal-section {
+            display: none; /* Initially hide these sections */
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 22px;
+            color: #007bff;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        input[type="email"], input[type="password"] {
+            width: 95%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .withdrawal-row {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+
+        .withdrawal-row p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .action-buttons button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .action-buttons button.rejectBtn {
+            background-color: #dc3545;
+        }
+
+        .action-buttons button:hover {
+            opacity: 0.8;
+            background: #5bff15;
+        }
+        
+       button{
+       background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 6px;          
+       }   
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 id="welcomeMessage">Welcome, Admin</h1>
+            <button id="logoutBtn">Logout</button>
+        </header>
+        
+        <div class="admin-section">
+            <h2>Admin Login</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminEmail">Email:</label>
+                    <input type="email" id="adminEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Password:</label>
+                    <input type="password" id="adminPassword" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+
+        <div class="user-section">
+            <h2>User Authentication</h2>
+            <form id="userAuthForm">
+                <div class="form-group">
+                    <label for="userPassword">Enter Admin Password:</label>
+                    <input type="password" id="userPassword" required>
+                </div>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+        <div class="withdrawal-section">
+            <h2>Pending Withdrawals</h2>
+            <div id="withdrawalList">
+               
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { app, analytics, firebaseConfig } from './firebase.js';
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+        const auth = getAuth();
+        const database = getDatabase(app);
+
+        document.getElementById('adminLoginForm').addEventListener('submit', adminLogin);
+        document.getElementById('userAuthForm').addEventListener('submit', userAuth);
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+
+        let currentUserUid = null;
+        let currentUserFullName = null;
+
+        function adminLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then(userCredential => {
+                    const user = userCredential.user;
+                    currentUserUid = user.uid;
+                    get(ref(database, `users/${currentUserUid}`)).then(snapshot => {
+                        const userData = snapshot.val();
+                        currentUserFullName = userData.fullName;
+                        document.getElementById("welcomeMessage").innerText = `Welcome Admin, ${currentUserFullName}`;
+                        alert("Admin login successful");
+                        loadWithdrawalPending();
+                        document.querySelector('.admin-section').style.display = 'none';
+                        document.querySelector('.user-section').style.display = 'block';
+                    });
+                })
+                .catch(error => {
+                    console.error("Error logging in:", error);
+                    alert("Error logging in: " + error.message);
+                });
+        }
+
+        function userAuth(event) {
+            event.preventDefault();
+            const userPassword = document.getElementById('userPassword').value;
+
+            const userRef = ref(database, `users/${currentUserUid}/secondaryPassword`);
+            get(userRef).then(snapshot => {
+                const secondaryPassword = snapshot.val();
+                if (userPassword === secondaryPassword) {
+                    alert("User Open Dashboard successful");
+                    document.querySelector('.user-section').style.display = 'none';
+                    document.querySelector('.withdrawal-section').style.display = 'block';
+                } else {
+                    alert("Incorrect password");
+                }
+            }).catch(error => {
+                console.error("Error verifying password:", error);
+                alert("Error verifying password: " + error.message);
+            });
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                alert("Logged out successfully");
+                document.querySelector('.admin-section').style.display = 'block';
+                document.querySelector('.user-section').style.display = 'none';
+                document.querySelector('.withdrawal-section').style.display = 'none';
+            }).catch(error => {
+                console.error("Error logging out:", error);
+                alert("Error logging out: " + error.message);
+            });
+        }
+
+        // *** Load Pending Withdrawals ***
+        function loadWithdrawalPending() {
+            const usersRef = ref(database, 'users');
+            get(usersRef).then(snapshot => {
+                const users = snapshot.val();
+                const withdrawalListElem = document.getElementById('withdrawalList');
+                withdrawalListElem.innerHTML = "";
+
+                if (users) {
+                    Object.entries(users).forEach(([userId, user]) => {
+                        if (user.withdrawalPending) {
+                            createWithdrawalRow(userId, user);
+                        }
+                    });
+                }
+            }).catch(error => {
+                console.error("Error loading withdrawals:", error);
+            });
+        }
+
+        // *** Create Withdrawal Row ***
+        function createWithdrawalRow(userId, user) {
+            const withdrawalData = user.withdrawalPending;
+            const row = document.createElement('div');
+
+            row.innerHTML = `
+            <div class="withdrawal-row">
+                <p><strong>Account Name:</strong> ${withdrawalData.accountName}</p>
+                <p><strong>Amount:</strong> ₦${parseFloat(withdrawalData.amount).toLocaleString()}</p>
+                <p><strong>Email:</strong> ${user.email}</p>
+                <p><strong>Bank Name:</strong> ${withdrawalData.bankName}</p>
+                <p><strong>Bank Code:</strong> ${withdrawalData.bankCode}</p>
+                <p><strong>Account Number:</strong> ${withdrawalData.accountNumber}</p>
+                <button class="copyAmountBtn" data-amount="${withdrawalData.amount}">Copy Amount</button>
+                <button class="copyAccountNumberBtn" data-account-number="${withdrawalData.accountNumber}">Copy Account Number</button>
+                <div class="action-buttons">
+                    <button class="approveBtn" data-user-id="${userId}">✔️</button>
+                    <button class="rejectBtn" data-user-id="${userId}">✖️</button>
+                </div>
+            </div>
+            `;
+
+            document.getElementById('withdrawalList').appendChild(row);
+
+            row.querySelector('.approveBtn').addEventListener('click', () => approveWithdrawal(userId, user));
+            row.querySelector('.rejectBtn').addEventListener('click', () => rejectWithdrawal(userId));
+            row.querySelector('.copyAmountBtn').addEventListener('click', (event) => {
+                copyToClipboard(event.target.dataset.amount);
+            });
+            row.querySelector('.copyAccountNumberBtn').addEventListener('click', (event) => {
+                copyToClipboard(event.target.dataset.accountNumber);
+            });
+        }
+
+        // *** Approve a Withdrawal ***
+        function approveWithdrawal(userId, user) {
+            if (confirm(`Are you sure ${user.fullName} you want to approve this payment?`)) {
+                const userRef = ref(database, `users/${userId}`);
+                const withdrawalRef = ref(database, `users/${userId}/withdrawalPending`);
+
+                get(userRef).then(snapshot => {
+                    const userData = snapshot.val();
+                    const withdrawalData = userData.withdrawalPending;
+                    const amountWithFee = parseFloat(withdrawalData.amount) * 1.07;
+                    const newBalance = parseFloat(userData.userBalance) - amountWithFee;
+
+                    if (newBalance < 0) {
+                        alert("Insufficient balance to approve withdrawal");
+                        return;
+                    }
+
+                    const harunaEmail = 'harunalawali5522@gmail.com';
+                    const harunaRef = ref(database, 'users');
+                    get(harunaRef).then(harunaSnapshot => {
+                        let harunaUser = null;
+                        Object.entries(harunaSnapshot.val()).forEach(([key, user]) => {
+                            if (user.email === harunaEmail) {
+                                harunaUser = { ...user, uid: key };
+                            }
+                        });
+
+                        if (harunaUser) {
+                            const networkFeeRef = ref(database, `users/${harunaUser.uid}/networkfee`);
+                            get(networkFeeRef).then(networkFeeSnapshot => {
+                                let networkFee = networkFeeSnapshot.val() || 0;
+                                networkFee += parseFloat(withdrawalData.amount) * 0.07;
+
+                                const successfulWithdrawalRef = ref(database, `users/${userId}/withdrawalSuccessful`);
+                                get(successfulWithdrawalRef).then(successSnapshot => {
+                                    let successfulWithdrawals = successSnapshot.val();
+                                    if (!Array.isArray(successfulWithdrawals)) {
+                                        successfulWithdrawals = [];
+                                    }
+                                    successfulWithdrawals.push({
+                                        ...withdrawalData,
+                                        paidAt: new Date().toISOString()
+                                    });
+
+                                    set(ref(database, `users/${userId}`), {
+                                        ...userData,
+                                        userBalance: newBalance.toFixed(2),
+                                        withdrawalPending: null,
+                                        withdrawalSuccessful: successfulWithdrawals
+                                    }).then(() => {
+                                        set(networkFeeRef, networkFee).then(() => {
+                                            alert("Withdrawal approved and recorded successfully");
+                                            loadWithdrawalPending();
+                                        }).catch(error => {
+                                            console.error("Error updating network fee:", error);
+                                        });
+                                    }).catch(error => {
+                                        console.error("Error approving withdrawal:", error);
+                                    });
+                                }).catch(error => {
+                                    console.error("Error fetching successful withdrawals:", error);
+                                });
+                            }).catch(error => {
+                                console.error("Error fetching network fee:", error);
+                            });
+                        } else {
+                            console.error("Admin user not found");
+                        }
+                    }).catch(error => {
+                        console.error("Error fetching admin user data:", error);
+                    });
+                }).catch(error => {
+                    console.error("Error fetching user data:", error);
+                });
+            }
+        }
+
+        // *** Reject a Withdrawal ***
+        function rejectWithdrawal(userId) {
+            if (confirm(`Are you sure you want to delete this request?`)) {
+                const userRef = ref(database, `users/${userId}/withdrawalPending`);
+                const successfulRef = ref(database, `users/${userId}/withdrawalSuccessful`);
+
+                get(userRef).then(snapshot => {
+                    const withdrawalData = snapshot.val();
+                    if (!withdrawalData) {
+                        alert("No pending withdrawal found.");
+                        return;
+                    }
+
+                    // Cire withdrawal daga pending
+                    remove(userRef)
+                        .then(() => {
+                            get(successfulRef).then(successSnapshot => {
+                                let successfulWithdrawals = successSnapshot.val();
+                                if (!Array.isArray(successfulWithdrawals)) {
+                                    successfulWithdrawals = [];
+                                }
+
+                                // Ƙara sabon withdrawal da lokacin biya
+                                successfulWithdrawals.push({
+                                    ...withdrawalData,
+                                    paidAt: new Date().toISOString() // Ranar biya
+                                });
+
+                                // Ajiye a database
+                                set(successfulRef, successfulWithdrawals)
+                                    .then(() => {
+                                        alert("Withdrawal successfully rejected and recorded.");
+                                        loadWithdrawalPending();
+                                    })
+                                    .catch(error => {
+                                        console.error("Error saving withdrawalSuccessful:", error);
+                                    });
+                            });
+                        })
+                        .catch(error => {
+                            console.error("Error rejecting withdrawal:", error);
+                        });
+                }).catch(error => {
+                    console.error("Error fetching withdrawal data:", error);
+                });
+            }
+        }
+
+        function copyToClipboard(text) {
+            const tempInput = document.createElement('input');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            alert("Copied to clipboard");
+        }
+
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('copyAmountBtn')) {
+                const amount = event.target.dataset.amount;
+                copyToClipboard(amount);
+            }
+
+            if (event.target.classList.contains('copyAccountNumberBtn')) {
+                const accountNumber = event.target.dataset.accountNumber;
+                copyToClipboard(accountNumber);
+            }
+        });
+    </script>
+</body>
+</html>
