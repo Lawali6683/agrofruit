@@ -162,7 +162,7 @@ function handleInvestmentLogic(userId, userData) {
     }
 
     // Check if the user is new and give a welcome bonus
-    if (tsohonUser === "false" && investmentData >= 3500) {
+    if (tsohonUser === "no" && investmentData >= 3500) {
       updates.userBalance = (userData.userBalance || 0) + 500; 
       updates.tsohonUser = "yes"; 
     }
