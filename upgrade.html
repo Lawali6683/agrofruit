@@ -380,16 +380,14 @@ document.getElementById("collectIncomeBtn").addEventListener("click", () => {
 });
 
 </script>
+    
     <script type="module">
 import { app, analytics, firebaseConfig } from './firebase.js';
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-import { getDatabase, ref, onValue, update, get, } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
-
+import { getDatabase, ref, onValue, update, get } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
 const db = getDatabase(app);
 const auth = getAuth(app);
-
-
 
 // DOM Elements
 const timerElement = document.getElementById("timer");
@@ -399,145 +397,123 @@ const investmentMessage = document.getElementById("investmentMessage");
 const progressBar = document.querySelector(".progress-circle");
 const userFullNameElement = document.getElementById('userfullName');
 
-
 // Global Variables
 let countdownInterval;
 let dailyUpgrade = 0;
 let timeLeft = 0;
 
-// Utility Functions
+// Format Time Function
 const formatTime = (seconds) => {
-  const hrs = Math.floor(seconds / 3600);
-  const mins = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-  return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 };
 
+// Update Progress Bar
 const updateProgressBar = () => {
-  const progress = ((24 * 60 * 60 - timeLeft) / (24 * 60 * 60)) * 100;
-  progressBar.style.background = `conic-gradient(#4caf50 ${progress}%, #ddd ${progress}%)`;
+    const progress = ((24 * 60 * 60 - timeLeft) / (24 * 60 * 60)) * 100;
+    progressBar.style.background = `conic-gradient(#4caf50 ${progress}%, #ddd ${progress}%)`;
 };
 
-// Start Countdown
+// Start Countdown Timer
 const startCountdown = () => {
-  clearInterval(countdownInterval);
-  countdownInterval = setInterval(() => {
-    if (timeLeft > 0) {
-      timeLeft--;
-      timerElement.textContent = formatTime(timeLeft);
-      updateProgressBar();
-    } else {
-      clearInterval(countdownInterval);
-      timerElement.textContent = "00:00:00";
-      collectIncomeBtn.classList.remove("hidden");
-    }
-  }, 1000);
+    clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+        if (timeLeft > 0) {
+            timeLeft--;
+            timerElement.textContent = formatTime(timeLeft);
+            updateProgressBar();
+        } else {
+            clearInterval(countdownInterval);
+            timerElement.textContent = "00:00:00";
+            collectIncomeBtn.classList.remove("hidden");
+        }
+    }, 1000);
 };
-   
 
 // Collect Daily Income
 const collectDailyIncome = async (userId) => {
-  const userRef = ref(db, `users/${userId}`);
-  const userSnapshot = await get(userRef);
-  const userData = userSnapshot.val();
+    const userRef = ref(db, `users/${userId}`);
+    const userSnapshot = await get(userRef);
+    const userData = userSnapshot.val();
 
-  if (userData && dailyUpgrade > 0) {
-    const newBalance = (userData.userBalance || 0) + dailyUpgrade;
-    const currentTime = Date.now();
+    if (userData && userData.dailyUpgrade > 0) {
+        const newBalance = (userData.userBalance || 0) + userData.dailyUpgrade;
+        const currentTime = Date.now();
 
-    await update(userRef, {
-      userBalance: newBalance,
-      "24hours": currentTime + 24 * 60 * 60 * 1000 
-    });
-    
-    timeLeft = 24 * 60 * 60;
-    collectIncomeBtn.classList.add("hidden");
-    startCountdown();
-  }
+        await update(userRef, {
+            userBalance: newBalance,
+            nextClaim: currentTime + (24 * 60 * 60 * 1000) // Sake sabunta lokacin
+        });
+
+        timeLeft = 24 * 60 * 60;
+        collectIncomeBtn.classList.add("hidden");
+        startCountdown();
+    } else {
+        console.warn("Ba a ƙara kudi ba saboda dailyUpgrade == 0");
+    }
 };
-    
-
-// Start Mining Process
-const startMining = () => {
-  if (miningActive) {
-    console.error("correct.");
-    return;
-  }
-
-  miningActive = true;
-  console.log("Mining started...");
-
-  
-  miningTimeout = setTimeout(() => {
-    console.log("Mining complete!");
-    miningActive = false;
-  }, 20 * 60 * 1000);  
-};
-
-// Initialize App
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    loadUserData(user.uid);
-  }
-});
 
 // Load User Data
 const loadUserData = async (userId) => {
-  const userRef = ref(db, `users/${userId}`);
-  onValue(userRef, (snapshot) => {
-    const userData = snapshot.val();
+    const userRef = ref(db, `users/${userId}`);
+    onValue(userRef, (snapshot) => {
+        const userData = snapshot.val();
 
-    if (userData) {
-      dailyUpgrade = userData.dailyUpgrade || 0;
-      timeLeft = Math.max(0, Math.floor((userData["24hours"] - Date.now()) / 1000));
-         const fullName = userData.fullName || "User"; 
-      userFullNameElement.textContent = fullName; 
-       
-      if (dailyUpgrade > 0 && timeLeft === 0) {
-        collectIncomeBtn.classList.remove("hidden");
-        investmentMessage.classList.add("hidden");
-      } else {
-        collectIncomeBtn.classList.add("hidden");
-        investmentMessage.classList.toggle("hidden", dailyUpgrade > 0);
-        startCountdown();
-      }
+        if (userData) {
+            dailyUpgrade = userData.dailyUpgrade || 0;
+            timeLeft = Math.max(0, Math.floor((userData.nextClaim - Date.now()) / 1000));
+            const fullName = userData.fullName || "User";
+            userFullNameElement.textContent = fullName;
 
-      const investmentAmount = userData.investment || 0;
-      const levelImageSrc = 
-        investmentAmount >= 280000 ? "gu.png" :
-        investmentAmount >= 140000 ? "man.png" :
-        investmentAmount >= 70000 ? "be.png" :
-        investmentAmount >= 35000 ? "av.png" :
-        investmentAmount >= 15000 ? "ap.png" :
-        investmentAmount >= 8000 ? "or.png" :
-        investmentAmount >= 3500 ? "ba.png" : "avatar.png";
+            if (dailyUpgrade > 0 && timeLeft <= 0) {
+                collectIncomeBtn.classList.remove("hidden");
+                investmentMessage.classList.add("hidden");
+            } else {
+                collectIncomeBtn.classList.add("hidden");
+                investmentMessage.classList.toggle("hidden", dailyUpgrade > 0);
+                startCountdown();
+            }
 
-      levelImage.src = levelImageSrc;
-      
-      if (investmentAmount >= 10000) {
-        startMining();
-      }
-    }
-  });
+            // Handle Level Image
+            const investmentAmount = userData.investment || 0;
+            const levelImageSrc =
+                investmentAmount >= 280000 ? "gu.png" :
+                investmentAmount >= 140000 ? "man.png" :
+                investmentAmount >= 70000 ? "be.png" :
+                investmentAmount >= 35000 ? "av.png" :
+                investmentAmount >= 15000 ? "ap.png" :
+                investmentAmount >= 8000 ? "or.png" :
+                investmentAmount >= 3500 ? "ba.png" : "avatar.png";
+
+            levelImage.src = levelImageSrc;
+        }
+    });
 };
 
 // Event Listeners
 collectIncomeBtn.addEventListener("click", async () => {
-  const user = auth.currentUser;
-  if (user) {
-    await collectDailyIncome(user.uid);
-  }
+    const user = auth.currentUser;
+    if (user) {
+        await collectDailyIncome(user.uid);
+    }
 });
 
 document.addEventListener("DOMContentLoaded", () => {
     const loadingScreen = document.getElementById("loadingScreen");
-    loadingScreen.style.display = "flex"; 
+    loadingScreen.style.display = "flex";
     setTimeout(() => {
-        loadingScreen.style.display = "none"; 
-    }, 4000); 
-    
+        loadingScreen.style.display = "none";
+    }, 4000);
 });
 
-</script>         
-</body>
+// Initialize App
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        loadUserData(user.uid);
+    }
+});
+</script>
+    </body>
 </html>
