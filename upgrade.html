@@ -432,30 +432,41 @@ const startCountdown = () => {
     }, 1000);
 };
 
-// Collect Daily Income
+// **Collect Daily Income Function (An gyara)**
 const collectDailyIncome = async (userId) => {
     const userRef = ref(db, `users/${userId}`);
     const userSnapshot = await get(userRef);
     const userData = userSnapshot.val();
 
     if (userData && userData.dailyUpgrade > 0) {
-        const newBalance = (userData.userBalance || 0) + userData.dailyUpgrade;
         const currentTime = Date.now();
+        const nextClaimTime = userData.nextClaim || 0;
+
+        // Bincika idan lokacin `nextClaim` ya wuce
+        if (currentTime < nextClaimTime) {
+            console.warn("Ba za a kara kudin ba, lokaci bai cika ba!");
+            return;
+        }
+
+        // Sabunta kuɗin mai amfani
+        const newBalance = parseFloat((parseFloat(userData.userBalance || 0) + parseFloat(userData.dailyUpgrade)).toFixed(2));
 
         await update(userRef, {
             userBalance: newBalance,
-            nextClaim: currentTime + (24 * 60 * 60 * 1000) // Sake sabunta lokacin
+            nextClaim: currentTime + (24 * 60 * 60 * 1000) // Sake saita lokacin gaba
         });
 
+        console.log(`An ƙara kudi! Sabon balance: ${newBalance}`);
+        
         timeLeft = 24 * 60 * 60;
         collectIncomeBtn.classList.add("hidden");
         startCountdown();
     } else {
-        console.warn("Ba a ƙara kudi ba saboda dailyUpgrade == 0");
+        console.warn("Ba a ƙara kudi ba saboda dailyUpgrade == 0 ko wani matsala!");
     }
 };
 
-// Load User Data
+// **Load User Data Function**
 const loadUserData = async (userId) => {
     const userRef = ref(db, `users/${userId}`);
     onValue(userRef, (snapshot) => {
@@ -492,7 +503,7 @@ const loadUserData = async (userId) => {
     });
 };
 
-// Event Listeners
+// **Event Listeners**
 collectIncomeBtn.addEventListener("click", async () => {
     const user = auth.currentUser;
     if (user) {
@@ -508,12 +519,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 4000);
 });
 
-// Initialize App
+// **Initialize App**
 onAuthStateChanged(auth, (user) => {
     if (user) {
         loadUserData(user.uid);
     }
 });
 </script>
+
     </body>
 </html>
