@@ -71,8 +71,8 @@ h2 {
   <div>
     <h2>"Please wait while we verify you're human."</h2>
   </div>
-    <script type="module">
-import { app } from './firebase.js';
+  <script type="module">
+import { app, analytics, firebaseConfig } from './firebase.js';
 import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
@@ -113,13 +113,7 @@ async function handleInvestmentLogic(userId, userData) {
     const investmentData = parseFloat(userData.investment) || 0;
     const currentTime = new Date();
     const tsohonUser = userData.tsohonUser || "false";
-    const lastUpdateTime = new Date(userData.lastUpdate || 0);
     const daysElapsed = Math.floor((currentTime - new Date(userData.investmentTime || new Date().toISOString())) / (1000 * 60 * 60 * 24));
-
-    // Duba idan an rigaya an sabunta yau
-    if (lastUpdateTime.toDateString() === currentTime.toDateString()) {
-        return; // Kada a sake aiwatarwa
-    }
 
     const investmentMap = [
         { amount: 3500, dailyUpgrade: 160, referralBonus: 250, referralUpgrade: 12.8, days: 35 },
@@ -140,13 +134,16 @@ async function handleInvestmentLogic(userId, userData) {
 
     const updates = {
         lastUpdate: currentTime.toISOString(),
-        tsohonUser: tsohonUser === "false" ? "yes" : tsohonUser,
-        dailyUpgrade: matchedPlan.dailyUpgrade,
+        tsohonUser: tsohonUser === "false" ? "yes" : tsohonUser
     };
 
     if (daysElapsed >= matchedPlan.days) {
         updates.investment = 0;
         updates.dailyUpgrade = 0;
+    }
+
+    if (!userData.dailyUpgrade || userData.dailyUpgrade !== matchedPlan.dailyUpgrade) {
+        updates.dailyUpgrade = matchedPlan.dailyUpgrade;
     }
 
     if (!userData.investmentTime) {
@@ -193,19 +190,13 @@ async function processReferralBonus(referralCode, matchedPlan) {
 
             if (referrerSnapshot.exists()) {
                 const referrerData = referrerSnapshot.val();
-                const lastReferralUpdate = new Date(referrerData.lastReferralUpdate || 0);
-                const currentTime = new Date();
+                const referrerUpdates = {
+                    userBalance: (referrerData.userBalance || 0) + matchedPlan.referralBonus,
+                    dailyUpgrade: (referrerData.dailyUpgrade || 0) + matchedPlan.referralUpgrade,
+                    investmentReferral: (referrerData.investmentReferral || 0) + 1,
+                };
 
-                if (lastReferralUpdate.toDateString() !== currentTime.toDateString()) {
-                    const referrerUpdates = {
-                        userBalance: (referrerData.userBalance || 0) + matchedPlan.referralBonus,
-                        dailyUpgrade: (referrerData.dailyUpgrade || 0) + matchedPlan.referralUpgrade,
-                        investmentReferral: (referrerData.investmentReferral || 0) + 1,
-                        lastReferralUpdate: currentTime.toISOString(),
-                    };
-
-                    await update(referrerRef, referrerUpdates);
-                }
+                await update(referrerRef, referrerUpdates);
             }
         }
     } catch (error) {
@@ -213,6 +204,5 @@ async function processReferralBonus(referralCode, matchedPlan) {
     }
 }
 </script>
-
 </body>
 </html>
