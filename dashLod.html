@@ -71,7 +71,7 @@ h2 {
   <div>
     <h2>"Please wait while we verify you're human."</h2>
   </div>
-  <script type="module">
+ <script type="module">
 import { app, analytics, firebaseConfig } from './firebase.js';
 import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
@@ -113,13 +113,14 @@ async function handleInvestmentLogic(userId, userData) {
     const investmentData = parseFloat(userData.investment) || 0;
     const currentTime = new Date();
     const tsohonUser = userData.tsohonUser || "false";
-    const daysElapsed = Math.floor((currentTime - new Date(userData.investmentTime || new Date().toISOString())) / (1000 * 60 * 60 * 24));
+    const investmentTime = new Date(userData.investmentTime || currentTime.toISOString());
+    const daysElapsed = Math.floor((currentTime - investmentTime) / (1000 * 60 * 60 * 24));
 
     const investmentMap = [
         { amount: 3500, dailyUpgrade: 160, referralBonus: 250, referralUpgrade: 12.8, days: 35 },
         { amount: 8000, dailyUpgrade: 300, referralBonus: 600, referralUpgrade: 28, days: 35 },
         { amount: 15000, dailyUpgrade: 700, referralBonus: 950, referralUpgrade: 124.8, days: 36 },
-        { amount: 35000, dailyUpgrade: 1,100, referralBonus: 2100, referralUpgrade: 124.8, days: 37 },
+        { amount: 35000, dailyUpgrade: 1100, referralBonus: 2100, referralUpgrade: 124.8, days: 37 },
         { amount: 70000, dailyUpgrade: 2800, referralBonus: 4300, referralUpgrade: 245.6, days: 39 },
         { amount: 140000, dailyUpgrade: 5240, referralBonus: 9200, referralUpgrade: 499.2, days: 40 },
         { amount: 280000, dailyUpgrade: 11300, referralBonus: 20400, referralUpgrade: 998.4, days: 42 },
@@ -140,6 +141,7 @@ async function handleInvestmentLogic(userId, userData) {
     if (daysElapsed >= matchedPlan.days) {
         updates.investment = 0;
         updates.dailyUpgrade = 0;
+        updates.investmentTime = null;
     }
 
     if (!userData.dailyUpgrade || userData.dailyUpgrade !== matchedPlan.dailyUpgrade) {
@@ -203,6 +205,6 @@ async function processReferralBonus(referralCode, matchedPlan) {
         console.error("Error processing referral bonus:", error);
     }
 }
-</script>
+</script>      
 </body>
 </html>
