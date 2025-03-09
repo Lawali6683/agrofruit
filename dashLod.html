@@ -50,31 +50,28 @@
     const auth = getAuth();
     const loadingScreen = document.getElementById("loadingScreen");
 
-    // Sabunta bayanan user daga Firebase idan localStorage bai da cikakken bayani
+    // Function to fetch user data
     async function getUserData(userId) {
-        console.log("Checking localStorage...");
         let localData = localStorage.getItem(`user_${userId}`);
-        let userData;
 
         if (localData) {
-            userData = JSON.parse(localData);
-            console.log("User data loaded from localStorage:", userData);
+            console.log("Loading data from localStorage...");
+            return JSON.parse(localData);
+        } else {
+            console.log("Fetching data from Firebase...");
+            const userRef = ref(db, `users/${userId}`);
+            const snapshot = await get(userRef);
+
+            if (snapshot.exists()) {
+                localStorage.setItem(`user_${userId}`, JSON.stringify(snapshot.val())); // Store data in localStorage
+                return snapshot.val();
+            } else {
+                return null;
+            }
         }
-
-        console.log("Fetching latest data from Firebase...");
-        const userRef = ref(db, `users/${userId}`);
-        const snapshot = await get(userRef);
-
-        if (snapshot.exists()) {
-            console.log("User data updated from Firebase.");
-            userData = snapshot.val();
-            localStorage.setItem(`user_${userId}`, JSON.stringify(userData));
-        }
-
-        return userData;
     }
 
-    // Gyaran handleInvestmentLogic
+    // Function to handle user investment logic
     async function handleInvestmentLogic(userId, userData) {
         if (!userData) {
             alert("User data not found.");
@@ -83,12 +80,6 @@
         }
 
         const investmentData = parseFloat(userData.investment) || 0;
-        if (investmentData < 3500) {
-            alert("You need to make a valid investment to proceed.");
-            window.location.href = "dashboard.html";
-            return;
-        }
-
         const currentTime = new Date();
         const tsohonUser = userData.tsohonUser || "false";
         const investmentTime = new Date(userData.investmentTime || currentTime.toISOString());
@@ -104,9 +95,9 @@
             { amount: 280000, dailyUpgrade: 11300, referralBonus: 20400, referralUpgrade: 998.4, days: 42 },
         ];
 
-        const matchedPlan = investmentMap.find(plan => investmentData >= plan.amount);
+        const matchedPlan = investmentMap.find(plan => plan.amount === investmentData);
         if (!matchedPlan) {
-            alert("You need to make a valid investment to proceed.");
+            
             window.location.href = "dashboard.html";
             return;
         }
@@ -134,8 +125,12 @@
             updates.userBalance = (userData.userBalance || 0) + 500;
         }
 
+        if (userData.referralBy) {
+            await processReferralBonus(userData.referralBy, matchedPlan);
+        }
+
         await update(ref(db, `users/${userId}`), updates);
-        localStorage.setItem(`user_${userId}`, JSON.stringify(updates)); // Sabunta localStorage
+        localStorage.setItem(`user_${userId}`, JSON.stringify(updates)); // Update localStorage
 
         if (daysElapsed >= matchedPlan.days) {
             alert("👋 Hello, Renew Your Investment Now!");
@@ -146,19 +141,56 @@
         }, 200);
     }
 
+    // Function to process referral bonus
+    async function processReferralBonus(referralCode, matchedPlan) {
+        try {
+            const usersRef = ref(db, "users");
+            const usersSnapshot = await get(usersRef);
+
+            if (!usersSnapshot.exists()) return;
+
+            let referrerUserId = null;
+            usersSnapshot.forEach((childSnapshot) => {
+                const userData = childSnapshot.val();
+                if (userData.referralCode === referralCode) {
+                    referrerUserId = childSnapshot.key;
+                }
+            });
+
+            if (!referrerUserId) {
+                console.warn("Referral code not found. Skipping referral bonus.");
+                return;
+            }
+
+            const referrerRef = ref(db, `users/${referrerUserId}`);
+            const referrerSnapshot = await get(referrerRef);
+
+            if (referrerSnapshot.exists()) {
+                const referrerData = referrerSnapshot.val();
+                const referrerUpdates = {
+                    userBalance: (referrerData.userBalance || 0) + matchedPlan.referralBonus,
+                    dailyUpgrade: (referrerData.dailyUpgrade || 0) + matchedPlan.referralUpgrade,
+                };
+
+                await update(referrerRef, referrerUpdates);
+            }
+        } catch (error) {
+            console.error("Error processing referral bonus:", error);
+        }
+    }
+
+    // Initialize user authentication
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const userId = user.uid;
-            loadingScreen.style.display = "flex"; // Nuna loading
             const userData = await getUserData(userId);
             await handleInvestmentLogic(userId, userData);
-            loadingScreen.style.display = "none"; // Cire loading
         } else {
             alert("Please register first.");
             window.location.href = "register.html";
         }
     });
 
-</script>
+  </script>
 </body>
 </html>
