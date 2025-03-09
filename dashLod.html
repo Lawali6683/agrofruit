@@ -39,8 +39,8 @@
 
   <div id="loadingScreen">
         <span></span>  
-              
   </div>
+  
   <script type="module">
     import { app, analytics, firebaseConfig } from './firebase.js';
     import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
@@ -176,7 +176,9 @@
         if (user) {
             const userId = user.uid;
             const userData = await getUserData(userId);
+            loadingScreen.style.display = "flex";
             await handleInvestmentLogic(userId, userData);
+            loadingScreen.style.display = "none";
         } else {
             alert("Please register first.");
             window.location.href = "register.html";
