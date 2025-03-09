@@ -52,22 +52,14 @@
 
     // Function to fetch user data
     async function getUserData(userId) {
-        let localData = localStorage.getItem(`user_${userId}`);
+        console.log("Fetching data from Firebase...");
+        const userRef = ref(db, `users/${userId}`);
+        const snapshot = await get(userRef);
 
-        if (localData) {
-            console.log("Loading data from localStorage...");
-            return JSON.parse(localData);
+        if (snapshot.exists()) {
+            return snapshot.val();
         } else {
-            console.log("Fetching data from Firebase...");
-            const userRef = ref(db, `users/${userId}`);
-            const snapshot = await get(userRef);
-
-            if (snapshot.exists()) {
-                localStorage.setItem(`user_${userId}`, JSON.stringify(snapshot.val())); // Store data in localStorage
-                return snapshot.val();
-            } else {
-                return null;
-            }
+            return null;
         }
     }
 
@@ -97,7 +89,6 @@
 
         const matchedPlan = investmentMap.find(plan => plan.amount === investmentData);
         if (!matchedPlan) {
-            
             window.location.href = "dashboard.html";
             return;
         }
@@ -130,10 +121,11 @@
         }
 
         await update(ref(db, `users/${userId}`), updates);
-        localStorage.setItem(`user_${userId}`, JSON.stringify(updates)); // Update localStorage
 
         if (daysElapsed >= matchedPlan.days) {
             alert("👋 Hello, Renew Your Investment Now!");
+        } else {
+            alert(`You have ${matchedPlan.days - daysElapsed} days remaining for your package.`);
         }
 
         setTimeout(() => {
