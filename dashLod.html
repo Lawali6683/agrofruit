@@ -3,208 +3,162 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loading Screen Example</title>
-  <link rel="stylesheet" href="styles.css">
-  <style>     
-.loading-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
+  <title>Optimized Loading Screen</title>
+  <style>
+    #loadingScreen {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-.dots {
-  display: flex;
-  justify-content: space-around;
-  width: 100px;
-}
+    #loadingScreen span {
+        animation: spin 1s linear infinite;
+        border: 7px solid white;
+        border-top: 7px solid #00796B;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: inline-block;
+    }
 
-.dot {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: red;
-  animation: bounce 1.5s infinite ease-in-out;
-}
-
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-15px);
-  }
-  60% {
-    transform: translateY(-10px);
-  }
-}
-.do {
-    font-size: 35px;
-    font-weight: bold;
-    color: white;    
-}
-h2 {
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-    color: red;
-}
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
-  <div id="loadingScreen" class="loading-screen">  
-    <i class="do">A</i>    
-    <div class="dots">
-      <div class="dot"></div>
-      <div class="do">F</div>
-      <div class="dot"></div>
-    </div>
-    <i class="do">E</i>
-  </div>  
-  <div>
-    <h2>"Please wait while we verify you're human."</h2>
+
+  <div id="loadingScreen">
+        <span></span>  
+              
   </div>
- <script type="module">
-import { app, analytics, firebaseConfig } from './firebase.js';
-import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+  <script type="module">
+    import { app, analytics, firebaseConfig } from './firebase.js';
+    import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-const db = getDatabase(app);
-const auth = getAuth();
+    const db = getDatabase(app);
+    const auth = getAuth();
+    const loadingScreen = document.getElementById("loadingScreen");
 
-// Get user information
-const loadingScreen = document.getElementById("loadingScreen");
+    // Sabunta bayanan user daga Firebase idan localStorage bai da cikakken bayani
+    async function getUserData(userId) {
+        console.log("Checking localStorage...");
+        let localData = localStorage.getItem(`user_${userId}`);
+        let userData;
 
-// Clear loading screen once everything is ready
-window.onload = () => {  
+        if (localData) {
+            userData = JSON.parse(localData);
+            console.log("User data loaded from localStorage:", userData);
+        }
+
+        console.log("Fetching latest data from Firebase...");
+        const userRef = ref(db, `users/${userId}`);
+        const snapshot = await get(userRef);
+
+        if (snapshot.exists()) {
+            console.log("User data updated from Firebase.");
+            userData = snapshot.val();
+            localStorage.setItem(`user_${userId}`, JSON.stringify(userData));
+        }
+
+        return userData;
+    }
+
+    // Gyaran handleInvestmentLogic
+    async function handleInvestmentLogic(userId, userData) {
+        if (!userData) {
+            alert("User data not found.");
+            window.location.href = "register.html";
+            return;
+        }
+
+        const investmentData = parseFloat(userData.investment) || 0;
+        if (investmentData < 3500) {
+            alert("You need to make a valid investment to proceed.");
+            window.location.href = "dashboard.html";
+            return;
+        }
+
+        const currentTime = new Date();
+        const tsohonUser = userData.tsohonUser || "false";
+        const investmentTime = new Date(userData.investmentTime || currentTime.toISOString());
+        const daysElapsed = Math.floor((currentTime - investmentTime) / (1000 * 60 * 60 * 24));
+
+        const investmentMap = [
+            { amount: 3500, dailyUpgrade: 160, referralBonus: 250, referralUpgrade: 12.8, days: 35 },
+            { amount: 8000, dailyUpgrade: 300, referralBonus: 600, referralUpgrade: 28, days: 35 },
+            { amount: 15000, dailyUpgrade: 700, referralBonus: 950, referralUpgrade: 124.8, days: 36 },
+            { amount: 35000, dailyUpgrade: 1100, referralBonus: 2100, referralUpgrade: 124.8, days: 37 },
+            { amount: 70000, dailyUpgrade: 2800, referralBonus: 4300, referralUpgrade: 245.6, days: 39 },
+            { amount: 140000, dailyUpgrade: 5240, referralBonus: 9200, referralUpgrade: 499.2, days: 40 },
+            { amount: 280000, dailyUpgrade: 11300, referralBonus: 20400, referralUpgrade: 998.4, days: 42 },
+        ];
+
+        const matchedPlan = investmentMap.find(plan => investmentData >= plan.amount);
+        if (!matchedPlan) {
+            alert("You need to make a valid investment to proceed.");
+            window.location.href = "dashboard.html";
+            return;
+        }
+
+        const updates = {
+            lastUpdate: currentTime.toISOString(),
+            tsohonUser: tsohonUser === "false" ? "yes" : tsohonUser
+        };
+
+        if (daysElapsed >= matchedPlan.days) {
+            updates.investment = 0;
+            updates.dailyUpgrade = 0;
+            updates.investmentTime = null;
+        }
+
+        if (!userData.dailyUpgrade || userData.dailyUpgrade !== matchedPlan.dailyUpgrade) {
+            updates.dailyUpgrade = matchedPlan.dailyUpgrade;
+        }
+
+        if (!userData.investmentTime) {
+            updates.investmentTime = currentTime.toISOString();
+        }
+
+        if (tsohonUser === "false" && investmentData >= 3500) {
+            updates.userBalance = (userData.userBalance || 0) + 500;
+        }
+
+        await update(ref(db, `users/${userId}`), updates);
+        localStorage.setItem(`user_${userId}`, JSON.stringify(updates)); // Sabunta localStorage
+
+        if (daysElapsed >= matchedPlan.days) {
+            alert("👋 Hello, Renew Your Investment Now!");
+        }
+
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 200);
+    }
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const userId = user.uid;
-            const userRef = ref(db, `users/${userId}`);
-
-            try {
-                const snapshot = await get(userRef);
-                if (snapshot.exists()) {
-                    await handleInvestmentLogic(userId, snapshot.val());
-                } else {
-                    alert("User data not found.");
-                    window.location.href = "register.html";
-                }
-            } catch (error) {
-                console.error("Error fetching user data: ", error);
-                alert("An error occurred while fetching user data.");
-                window.location.href = "register.html";
-            }
+            loadingScreen.style.display = "flex"; // Nuna loading
+            const userData = await getUserData(userId);
+            await handleInvestmentLogic(userId, userData);
+            loadingScreen.style.display = "none"; // Cire loading
         } else {
-            alert("Please register before proceeding.");
+            alert("Please register first.");
             window.location.href = "register.html";
         }
     });
-};
 
-async function handleInvestmentLogic(userId, userData) {
-    const investmentData = parseFloat(userData.investment) || 0;
-    const currentTime = new Date();
-    const tsohonUser = userData.tsohonUser || "false";
-    const investmentTime = new Date(userData.investmentTime || currentTime.toISOString());
-    const daysElapsed = Math.floor((currentTime - investmentTime) / (1000 * 60 * 60 * 24));
-
-    const investmentMap = [
-        { amount: 3500, dailyUpgrade: 160, referralBonus: 250, referralUpgrade: 12.8, days: 35 },
-        { amount: 8000, dailyUpgrade: 300, referralBonus: 600, referralUpgrade: 28, days: 35 },
-        { amount: 15000, dailyUpgrade: 700, referralBonus: 950, referralUpgrade: 124.8, days: 36 },
-        { amount: 35000, dailyUpgrade: 1100, referralBonus: 2100, referralUpgrade: 124.8, days: 37 },
-        { amount: 70000, dailyUpgrade: 2800, referralBonus: 4300, referralUpgrade: 245.6, days: 39 },
-        { amount: 140000, dailyUpgrade: 5240, referralBonus: 9200, referralUpgrade: 499.2, days: 40 },
-        { amount: 280000, dailyUpgrade: 11300, referralBonus: 20400, referralUpgrade: 998.4, days: 42 },
-    ];
-
-    const matchedPlan = investmentMap.find(plan => plan.amount === investmentData);
-    if (!matchedPlan) {
-        alert("You need to make a valid investment to proceed. Please deposit your funds first.");
-        window.location.href = "dashboard.html";
-        return;
-    }
-
-    const updates = {
-        lastUpdate: currentTime.toISOString(),
-        tsohonUser: tsohonUser === "false" ? "yes" : tsohonUser
-    };
-
-    if (daysElapsed >= matchedPlan.days) {
-        updates.investment = 0;
-        updates.dailyUpgrade = 0;
-        updates.investmentTime = null;
-    }
-
-    if (!userData.dailyUpgrade || userData.dailyUpgrade !== matchedPlan.dailyUpgrade) {
-        updates.dailyUpgrade = matchedPlan.dailyUpgrade;
-    }
-
-    if (!userData.investmentTime) {
-        updates.investmentTime = currentTime.toISOString();
-    }
-
-    if (tsohonUser === "false" && investmentData >= 3500) {
-        updates.userBalance = (userData.userBalance || 0) + 500;
-    }
-
-    if (userData.referralBy) {
-        await processReferralBonus(userData.referralBy, matchedPlan);
-    }
-
-    await update(ref(db, `users/${userId}`), updates);
-
-    if (daysElapsed >= matchedPlan.days) {
-        alert("👋 Hello, Renew Your Investment Now! Your investment period has ended! You can reinvest today to continue earning daily profits.");
-    }
-
-    setTimeout(() => {
-        window.location.href = "dashboard.html";
-    }, 200);
-}
-
-async function processReferralBonus(referralCode, matchedPlan) {
-    try {
-        const usersRef = ref(db, "users");
-        const usersSnapshot = await get(usersRef);
-
-        if (!usersSnapshot.exists()) return;
-
-        let referrerUserId = null;
-        usersSnapshot.forEach((childSnapshot) => {
-            const userData = childSnapshot.val();
-            if (userData.referralCode === referralCode) {
-                referrerUserId = childSnapshot.key;
-            }
-        });
-
-        if (referrerUserId) {
-            const referrerRef = ref(db, `users/${referrerUserId}`);
-            const referrerSnapshot = await get(referrerRef);
-
-            if (referrerSnapshot.exists()) {
-                const referrerData = referrerSnapshot.val();
-                const referrerUpdates = {
-                    userBalance: (referrerData.userBalance || 0) + matchedPlan.referralBonus,
-                    dailyUpgrade: (referrerData.dailyUpgrade || 0) + matchedPlan.referralUpgrade,
-                    investmentReferral: (referrerData.investmentReferral || 0) + 1,
-                };
-
-                await update(referrerRef, referrerUpdates);
-            }
-        }
-    } catch (error) {
-        console.error("Error processing referral bonus:", error);
-    }
-}
-</script>      
+</script>
 </body>
 </html>
