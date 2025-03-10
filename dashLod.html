@@ -38,9 +38,9 @@
 <body>
 
   <div id="loadingScreen">
-        <span></span>  
-        <script type="module" >
- import { app, analytics, firebaseConfig } from './firebase.js';
+        <span></span> 
+         <script type="module" >
+        import { app, analytics, firebaseConfig } from './firebase.js';
 import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
@@ -48,14 +48,56 @@ const db = getDatabase(app);
 const auth = getAuth();
 const loadingScreen = document.getElementById("loadingScreen");
 
-// Function to fetch user data
+// Function don samun bayanan user daga Firebase
 async function getUserData(userId) {
     const userRef = ref(db, `users/${userId}`);
     const snapshot = await get(userRef);
     return snapshot.exists() ? snapshot.val() : null;
 }
 
-// Function to handle user investment logic
+// Function don tabbatar da cewa referral bonus ba zai maimaita ba
+async function processReferralBonus(referralCode, matchedPlan, newUserId) {
+    try {
+        const usersRef = ref(db, "users");
+        const usersSnapshot = await get(usersRef);
+
+        if (!usersSnapshot.exists()) return;
+
+        let referrerUserId = null;
+        usersSnapshot.forEach((childSnapshot) => {
+            const userData = childSnapshot.val();
+            if (userData.referralCode === referralCode) {
+                referrerUserId = childSnapshot.key;
+            }
+        });
+
+        if (!referrerUserId) return;
+
+        const referrerRef = ref(db, `users/${referrerUserId}`);
+        const referrerSnapshot = await get(referrerRef);
+
+        if (referrerSnapshot.exists()) {
+            const referrerData = referrerSnapshot.val();
+
+            // Tabbatar da cewa wannan user ba a biya shi referral bonus sau biyu ba
+            if (referrerData.referralPaidUsers && referrerData.referralPaidUsers.includes(newUserId)) {
+                return;
+            }
+
+            const referrerUpdates = {
+                userBalance: (referrerData.userBalance || 0) + matchedPlan.referralBonus,
+                dailyUpgrade: (referrerData.dailyUpgrade || 0) + matchedPlan.referralUpgrade,
+                referralPaidUsers: referrerData.referralPaidUsers ? [...referrerData.referralPaidUsers, newUserId] : [newUserId]
+            };
+
+            await update(referrerRef, referrerUpdates);
+        }
+    } catch (error) {
+        console.error("Error processing referral bonus:", error);
+    }
+}
+
+// Function don sarrafa tsarin saka jari
 async function handleInvestmentLogic(userId, userData) {
     if (!userData) {
         alert("User data not found.");
@@ -104,13 +146,10 @@ async function handleInvestmentLogic(userId, userData) {
         updates.investmentTime = currentTime.toISOString();
     }
 
-    if (tsohonUser === "false" && investmentData >= 3500) {
-        updates.userBalance = (userData.userBalance || 0) + 500;
-    }
-
+    // Tabbatar da cewa referral bonus ba zai maimaita ba
     if (userData.referralBy && !userData.referralPaid) {
         await processReferralBonus(userData.referralBy, matchedPlan, userId);
-        updates.referralPaid = true;  // Ana yin alama cewa an riga an biya referral bonus
+        updates.referralPaid = true;  
     }
 
     await update(ref(db, `users/${userId}`), updates);
@@ -126,52 +165,7 @@ async function handleInvestmentLogic(userId, userData) {
     }, 200);
 }
 
-// Function to process referral bonus
-async function processReferralBonus(referralCode, matchedPlan, newUserId) {
-    try {
-        const usersRef = ref(db, "users");
-        const usersSnapshot = await get(usersRef);
-
-        if (!usersSnapshot.exists()) return;
-
-        let referrerUserId = null;
-        usersSnapshot.forEach((childSnapshot) => {
-            const userData = childSnapshot.val();
-            if (userData.referralCode === referralCode) {
-                referrerUserId = childSnapshot.key;
-            }
-        });
-
-        if (!referrerUserId) {
-            console.warn("Referral code not found. Skipping referral bonus.");
-            return;
-        }
-
-        const referrerRef = ref(db, `users/${referrerUserId}`);
-        const referrerSnapshot = await get(referrerRef);
-
-        if (referrerSnapshot.exists()) {
-            const referrerData = referrerSnapshot.val();
-
-            if (referrerData.referralPaidUsers && referrerData.referralPaidUsers.includes(newUserId)) {
-                console.warn("Referral bonus already paid for this user.");
-                return;
-            }
-
-            const referrerUpdates = {
-                userBalance: (referrerData.userBalance || 0) + matchedPlan.referralBonus,
-                dailyUpgrade: (referrerData.dailyUpgrade || 0) + matchedPlan.referralUpgrade,
-                referralPaidUsers: referrerData.referralPaidUsers ? [...referrerData.referralPaidUsers, newUserId] : [newUserId]
-            };
-
-            await update(referrerRef, referrerUpdates);
-        }
-    } catch (error) {
-        console.error("Error processing referral bonus:", error);
-    }
-}
-
-// Initialize user authentication
+// Tabbatar da cewa user yana login kafin a fara aiki
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         const userId = user.uid;
@@ -185,6 +179,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-  </script>
+</script>
+
 </body>
 </html>
