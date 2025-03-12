@@ -318,114 +318,39 @@ h1{
 }
     </script>    
 <script type="module">
-    import { app, analytics, firebaseConfig } from './firebase.js';
-    import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+        import { app, analytics, firebaseConfig } from './firebase.js';
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-    const auth = getAuth(app);
-    const db = getDatabase(app);
 
-    // Samun IP address da duba VPN
-    async function getIPAddress() {
-        try {
-            const response = await fetch("https://ipapi.co/json/");
-            const data = await response.json();
+const auth = getAuth(app);
 
-            if (data.security && (data.security.vpn || data.security.proxy || data.security.tor)) {
-                alert("Login has been blocked because a VPN or Proxy is being used. Please disable them and try again.");
-                return null;
-            }
-            return data.ip;
-        } catch (error) {
-            console.error("Not get IP address:", error);
-            return null;
+
+// Handle Login Form Submission
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    document.getElementById("loadingScreen").style.display = "flex";
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        alert("Login Successful!");
+        window.location.href = "dashLod.html";
+    } catch (error) {
+        if (error.code === "auth/user-not-found") {
+            alert("This email address is not registered in AgroFruit. Register now!");
+        } else if (error.code === "auth/wrong-password") {
+            alert("The password is not correct. Please try again.");
+        } else {
+            alert("An error occurred. Please try again.");
         }
+    } finally {
+        document.getElementById("loadingScreen").style.display = "none";
     }
-    
-    function getDeviceID() {
-        return navigator.userAgent.replace(/\s/g, '') + screen.width + screen.height;
-    }
+});
 
-    // Duba idan user yana da account da aka ajiye IP ɗinsa
-    async function checkExistingSession() {
-        const user = auth.currentUser;
-        if (user) {
-            const userRef = ref(db, `users/${user.uid}`);
-            const snapshot = await get(userRef);
-
-            if (snapshot.exists()) {
-                const userData = snapshot.val();
-                const userIP = await getIPAddress();
-
-                if (userIP === userData.ip) {
-                    window.location.href = "dashLod.html";
-                }
-            }
-        }
-    }
-
-    // Aiwatar da duba session idan an bude shafin
-    window.onload = checkExistingSession;
-
-    // Login Function
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        document.getElementById("loadingScreen").style.display = "flex";
-
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            const userId = user.uid;
-
-            const userIP = await getIPAddress();
-            const deviceID = getDeviceID();
-
-            if (!userIP) {
-                alert("Unable to retrieve IP address. Please try again.");
-                await signOut(auth);
-                return;
-            }
-
-            const userRef = ref(db, `users/${userId}`);
-            const snapshot = await get(userRef);
-
-            if (snapshot.exists()) {
-                const userData = snapshot.val();
-                
-                if (userData.email !== email) {
-                    alert("You cannot log in with a different account from this device.");
-                    await signOut(auth);
-                    return;
-                }               
-                if (userData.deviceID !== deviceID || userData.ip !== userIP) {
-                    alert("New device or IP detected. Please verify via the OTP sent to you.");
-                    await signOut(auth);
-                    sessionStorage.setItem("otpEmail", email);
-                    window.location.href = "otp.html";
-                    return;
-                }
-            } else {
-                                await set(userRef, { email, deviceID, ip: userIP });
-            }
-
-            alert("Login successful!");
-            window.location.href = "dashLod.html";
-        } catch (error) {
-            if (error.code === "auth/user-not-found") {
-                alert("This email was not found. Please register.");
-            } else if (error.code === "auth/wrong-password") {
-                alert("Error! The password is incorrect.");
-            } else {
-                alert("An error occurred. Please try again.");
-            }
-        } finally {
-            document.getElementById("loadingScreen").style.display = "none";
-        }
-    });
-</script>    
+    </script>
     <script>
   // Register Service Worker
   if ('serviceWorker' in navigator) {
