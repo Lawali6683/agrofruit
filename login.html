@@ -319,86 +319,121 @@ h1{
     </script>    
 <script type="module">
     import { app, analytics, firebaseConfig } from './firebase.js';
-import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
-const auth = getAuth(app);
-const db = getDatabase(app);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
 
-async function getIPAddress() {
-    try {
-        const response = await fetch("https://ipapi.co/json/");
-        const data = await response.json();       
-        if (data.security && (data.security.vpn || data.security.proxy || data.security.tor)) {
-            alert("Your login has been blocked because you are using a VPN or hidden IP. Disable it and try again.");
+    // Function to get IP Address and detect VPN/proxy
+    async function getIPAddress() {
+        try {
+            const response = await fetch("https://ipapi.co/json/");
+            const data = await response.json();
+
+            if (data.security && (data.security.vpn || data.security.proxy || data.security.tor)) {
+                alert("Your login has been blocked because you are using a VPN or hidden IP. Disable it and try again.");
+                return null;
+            }
+
+            return data.ip;
+        } catch (error) {
+            console.error("Failed to fetch IP address:", error);
             return null;
         }
-
-        return data.ip;
-    } catch (error) {
-        console.error("Failed to fetch IP address:", error);
-        return null;
     }
-}
 
-function getDeviceID() {
-    return navigator.userAgent.replace(/\s/g, '') + screen.width + screen.height;
-}
+    // Function to get a unique Device ID
+    function getDeviceID() {
+        return navigator.userAgent.replace(/\s/g, '') + screen.width + screen.height;
+    }
 
-// Login Function
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    document.getElementById("loadingScreen").style.display = "flex";
-
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        const userId = user.uid;
-
-        const userIP = await getIPAddress();
-        const deviceID = getDeviceID();
-
-        if (!userIP) {
-            alert("Failed to retrieve IP address. Please try again.");
-            await signOut(auth);
-            return;
-        }
-
-        const userRef = ref(db, `users/${userId}`);
-        const snapshot = await get(userRef);
-
-        if (snapshot.exists()) {
-            const userData = snapshot.val();
+    // Function to check if a user is already authenticated
+    async function checkExistingSession() {
+        const user = auth.currentUser;
+        if (user) {
+            const userRef = ref(db, `users/${user.uid}`);
+            const snapshot = await get(userRef);
             
-            if (userData.deviceID !== deviceID || userData.ip !== userIP) {
-                alert("New device or IP detected. Please verify via OTP sent to your email.");
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                const userIP = await getIPAddress();
+                
+                if (userIP === userData.ip) {
+                    // Automatically redirect if IP matches saved one
+                    window.location.href = "dashLod.html";
+                }
+            }
+        }
+    }
+
+    // Run session check on page load
+    window.onload = checkExistingSession;
+
+    // Login Function
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        document.getElementById("loadingScreen").style.display = "flex";
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            const userId = user.uid;
+
+            const userIP = await getIPAddress();
+            const deviceID = getDeviceID();
+
+            if (!userIP) {
+                alert("Failed to retrieve IP address. Please try again.");
                 await signOut(auth);
-                sessionStorage.setItem("otpEmail", email);
-                window.location.href = "otp.html";
                 return;
             }
-        }        
-        await set(userRef, { email, deviceID, ip: userIP });
 
-        alert("Login Successful!");
-        window.location.href = "dashLod.html";
-    } catch (error) {
-        if (error.code === "auth/user-not-found") {
-            alert("This email is not registered. Please sign up.");
-        } else if (error.code === "auth/wrong-password") {
-            alert("Incorrect password. Please try again.");
-        } else {
-            alert("An error occurred. Please try again.");
+            const userRef = ref(db, `users/${userId}`);
+            const snapshot = await get(userRef);
+
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+
+                // Check if user tries to log in with another account
+                if (userData.email !== email) {
+                    alert("You cannot log in with a different account.");
+                    await signOut(auth);
+                    return;
+                }
+
+                // Check if the login is from a new device or IP
+                if (userData.deviceID !== deviceID || userData.ip !== userIP) {
+                    alert("New device or IP detected. Please verify via OTP sent to your email.");
+                    await signOut(auth);
+                    sessionStorage.setItem("otpEmail", email);
+                    window.location.href = "otp.html";
+                    return;
+                }
+            } else {
+                // First-time login: Save IP & device details
+                await set(userRef, { email, deviceID, ip: userIP });
+            }
+
+            alert("Login Successful!");
+            window.location.href = "dashLod.html";
+        } catch (error) {
+            if (error.code === "auth/user-not-found") {
+                alert("This email is not registered. Please sign up.");
+            } else if (error.code === "auth/wrong-password") {
+                alert("Incorrect password. Please try again.");
+            } else {
+                alert("An error occurred. Please try again.");
+            }
+        } finally {
+            document.getElementById("loadingScreen").style.display = "none";
         }
-    } finally {
-        document.getElementById("loadingScreen").style.display = "none";
-    }
-});
-
+    });
 </script>
+
     
     <script>
   // Register Service Worker
