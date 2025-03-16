@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroFruit Customer Support</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            background: #f0f8ff;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .admin-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+        .admin-card:hover {
+            background: #d0dce7;
+        }
+        .admin-info {
+            flex: 1;
+            text-align: left;
+        }
+        .admin-info h5 {
+            margin: 0;
+            color: #34495e;
+            Font-size: 16px;
+        }
+        .admin-info p {
+            margin: 3px 0;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .whatsapp-btn {
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .whatsapp-btn:hover {
+            background: #1ebe5d;
+        }
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .close {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .language-select {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>AgroFruit Customer Support</h2>
+
+        <div class="admin-card">
+            <div class="admin-info">
+                <h5>Bangis Lawal</h5>
+                <p>Languages: English, Hausa, Igbo</p>
+            </div>
+            <button class="whatsapp-btn" onclick="openLanguageModal('+2349042967523', 'Bangis Lawal', ['en', 'ha', 'ig'])">
+                <i class="fab fa-whatsapp"></i> Chat
+            </button>
+        </div>
+
+        <div class="admin-card">
+            <div class="admin-info">
+                <h5>EarlyFace</h5>
+                <p>Languages: English, Yoruba</p>
+            </div>
+            <button class="whatsapp-btn" onclick="openLanguageModal('+2347068884949', 'EarlyFace', ['en', 'yo'])">
+                <i class="fab fa-whatsapp"></i> Chat
+            </button>
+        </div>
+
+        <div class="admin-card">
+            <div class="admin-info">
+                <h5>Sufy Abdullahi</h5>
+                <p>Languages: Hausa, English</p>
+            </div>
+            <button class="whatsapp-btn" onclick="openLanguageModal('+2349047525093', 'Sufy Abdullahi', ['ha', 'en'])">
+                <i class="fab fa-whatsapp"></i> Chat
+            </button>
+        </div>
+
+        <div class="admin-card">
+            <div class="admin-info">
+                <h5>Samaila Suleiman </h5>
+                <p>Languages: English, Hausa</p>
+            </div>
+            <button class="whatsapp-btn" onclick="openLanguageModal('+2348132481845', 'Samaila Suleiman', ['en', 'ha'])">
+                <i class="fab fa-whatsapp"></i> Chat
+            </button>
+        </div>
+
+        <div class="admin-card">
+            <div class="admin-info">
+                <h5>Surajo Habibu</h5>
+                <p>Languages: Hausa</p>
+            </div>
+            <button class="whatsapp-btn" onclick="openLanguageModal('+2348100395124', 'Surajo Habibu Ibrahim', ['ha'])">
+                <i class="fab fa-whatsapp"></i> Chat
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal for language selection -->
+    <div id="languageModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLanguageModal()">&times;</span>
+            <h3>Select Your Language</h3>
+            <select id="languageSelect" class="language-select"></select>
+            <button class="whatsapp-btn" onclick="sendWhatsApp()">Proceed</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedNumber = '';
+        let selectedName = '';
+        let availableLanguages = [];
+
+        function openLanguageModal(number, name, languages) {
+            selectedNumber = number;
+            selectedName = name;
+            availableLanguages = languages;
+
+            let select = document.getElementById("languageSelect");
+            select.innerHTML = ""; // Clear previous options
+
+            let languageOptions = {
+                'ha': 'Hausa',
+                'en': 'English',
+                'ig': 'Igbo',
+                'yo': 'Yoruba'
+            };
+
+            languages.forEach(lang => {
+                let option = document.createElement("option");
+                option.value = lang;
+                option.textContent = languageOptions[lang];
+                select.appendChild(option);
+            });
+
+            document.getElementById("languageModal").style.display = "block";
+        }
+
+        function closeLanguageModal() {
+            document.getElementById("languageModal").style.display = "none";
+        }
+
+        function sendWhatsApp() {
+            let language = document.getElementById("languageSelect").value;
+            let message = '';
+
+            let greetings = {
+                'ha': `Sannu ${selectedName}, don Allah ina bukatar taimako daga AgroFruit Support.`,
+                'en': `Hello ${selectedName}, I need assistance from AgroFruit Support.`,
+                'ig': `Ndewo ${selectedName}, biko, achọrọ m enyemaka site na AgroFruit Support.`,
+                'yo': `Ẹ káàbọ̀ ${selectedName}, jọ̀wọ́, mo fẹ́ ìrànlọ́wọ́ láti ọdọ AgroFruit Support.`
+            };
+
+            message = greetings[language] || `Hello ${selectedName}, I need assistance from AgroFruit Support.`;
+
+            let url = `https://wa.me/${selectedNumber}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+            closeLanguageModal();
+        }
+    </script>
+
+</body>
+</html>

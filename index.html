@@ -1,0 +1,2262 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroFruit </title>
+    <meta property="og:title" content="🌟 You’ve win ₦105K and ₦20K Every Month with referrals!🎉"/>            
+<meta property="og:image" content="https://agrofruit.pages.dev/df2.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/png" /> 
+<meta property="og:url" content="https://agrofruit.pages.dev/" />
+<meta property="og:image:alt" content="AgroFruit Logo" /> 
+    <link rel="icon" href="fruit.png" type="image/png">
+    
+    <link rel="manifest" href="/manifest.json">
+ <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+ 
+  <style>
+   body {
+    font-family: 'Arial', sans-serif;
+    
+    background: black;
+    color: white;
+    text-shadow: 2px 3px 6px rgba(255, 255, 255, 0.2);
+    
+    max-width: 100vw;
+    margin: 0 auto;
+    padding: 10px;
+    
+    line-height: 1.4;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+    
+}
+    .header {
+       background-color: #3115ff;
+           
+            Text-align: center;
+            color: white;
+            padding: 2px;
+            position: fixed;
+            
+            width: 100%;
+         border-bottom: 3px solid #90ff55;  
+            top: 0;
+            left: 0;
+                        z-index: 1000;
+            display: flex;
+            Gap: 3p;
+            
+            Space: 10px;
+            align-items: center;
+            Color: #a2ed14c9;
+        }
+
+        .header .logo h1 {
+            font-size: 16px;
+        }
+
+        .header .logo .fruit {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .header .logo .wealth {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .header .logo .farming {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .menu-icon {
+            font-size: 27px;
+            cursor: pointer;
+            
+           display: none;
+           
+        }
+        
+        /* Showcase */
+#showcase {
+    min-height: 100px;
+    
+    width: 100%;
+    background: url('ba.png') no-repeat center center/cover;
+    text-align: center;
+    color: white;
+    padding-top: 80px;
+    position: relative;
+    
+}
+                
+
+#showcase h1 {
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+#showcase p {
+    font-size: 10px;
+}
+
+
+        .nav {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background-color: #444;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .nav.active {
+            display: flex
+        }
+
+        .nav ul {
+            
+            padding: 0;
+        }
+
+        .navx ul li {
+                        padding: 0px 0px;
+        }
+
+        .nav ul li a {
+            text-decoration: none;
+            color: white;
+            
+            margin: 0;
+            
+            gap: 1px;
+            
+        }
+
+        .nav ul li:hover {
+            background-color: black;
+            
+        }        
+
+    .container9 {
+      text-align: center;
+                
+    }
+
+    .heading {
+      font-size: 20px;
+      color: #2d6a4f;
+      margin-bottom: 20px;
+    }
+
+    .icon-section {
+      display: flex;
+      overflow-x: scroll;
+      gap: 2px;
+      padding: 10px;
+            scroll-snap-type: x mandatory;
+    }
+
+    .icon-box {
+      width: 1000px;
+      height: 300px;
+      margin: 10px;
+      background: linear-gradient(10945deg, #afff40, #ffaaf4, #ffc880);
+      box-shadow: 5px 5px 10px #cccccc, -1px -2px 10px #ffffff;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      Font-weight: bold;
+      justify-content: center;
+      scroll-snap-align: start;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .icon-box:hover {
+      transform: scale(1.1);
+      background: #fef9ef;
+      box-shadow: 10px 10px 20px #d9d9d9, -10px -10px 20px #ffffff;
+    }
+
+    .icon {
+      font-size: 100px;
+      color: #d00000;
+      margin-bottom: 20px;
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #1c15ff;
+    }
+
+    .description {
+      font-size: 9px;
+      color: #495057;
+      padding: 0 10px;
+      text-align: center;
+      Font-weight: bold;
+      
+    }
+
+    /* Scrollbar styling */
+    .icon-section::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .icon-section::-webkit-scrollbar-thumb {
+      background-color: #888;
+      border-radius: 10px;
+      
+    }
+
+    .icon-section::-webkit-scrollbar-thumb:hover {
+      background-color: #555;
+    }
+
+    .icon-section::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    
+         /* Responsive Design */
+        @media (max-width: 768px) {
+            .menu-icon {
+                display: block;
+            }
+
+            .nav ul {
+                flex-direction: column;
+            }
+        }
+       .fas{
+           padding: 30px;
+       }
+     
+       button {
+  display: block;
+  margin: 20px auto;
+  padding: 15px 40px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  background: linear-gradient(90deg, #ff007a, #00d4ff);
+  background-size: 300% 300%;
+  animation: gradientShift 4s infinite;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2), 0px 0px 15px rgba(255, 0, 122, 0.5);
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+button:hover {
+  transform: translateY(-5px) scale(1.1);
+  box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.3), 0px 0px 25px rgba(0, 212, 255, 0.7);
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.8);
+  animation: particleEffect 2s infinite ease-in-out;
+}
+
+@keyframes particleEffect {
+  0% {
+    transform: scale(1) translate(-50%, -50%);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(5) translate(-50%, -50%);
+    opacity: 0;
+  }
+}
+  </style> 
+  
+  <style>
+        
+/* Container */
+.container4{
+    width: 85%;
+    margin: auto;
+    overflow; hidden;
+}
+
+/* Menu */
+.menu {
+    display: block; 
+}
+
+.menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+.menu ul li {
+    padding: 10px;
+}
+
+.menu a {
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.menu a:hover {
+    color: #f4a261;
+}
+
+
+/* About Section */
+#about {
+    padding: 40px 0;
+    background-color: #2a6f6f;
+    color: white;
+    text-align: center;
+}
+
+#about h2 {
+    font-size: 30px;
+    margin-bottom: 15px;
+}
+
+#about p {
+    font-size: 18px;
+    margin-bottom: 25px;
+}
+
+#about .button_1 {
+    background-color: #f4a261;
+    color: white;
+    padding: 10px 30px;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#about .button_1:hover {
+    background-color: #e76f51;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    header nav {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    
+    #showcase h1 {
+        font-size: 10px;
+    }
+
+    #showcase p {
+        font-size: 16px;
+    }
+
+    #about .button_1 {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .menu {
+        display: none;
+    }
+}
+.Fruit{
+Padding: px;
+    width: 60px;
+    height: 60px;
+    Border-radius: 50%
+    Border-slid:     
+    
+}
+
+.container79 {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        
+
+        .why-invest {
+            margin-bottom: 2px;
+            text-align: left;
+        }
+
+        .why-invest ul {
+            list-style: none;
+            padding: 0;
+            font-size: 15px;
+            Font-weight: bold;
+            Color: black;
+        }
+
+        .why-invest li {
+            margin: 10px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .why-invest li::before {
+            content: '✔';
+            position: absolute;
+            left: 0;
+            color: #f36f6f;
+        }
+
+        .cta-button {
+            background-color: #f36f6f;
+            color: #fff;
+            padding: 10px 10px;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #d04c4c;
+            transform: translateY(-5px);
+        }
+
+        .cta-button:focus {
+            outline: none;
+        }
+
+        .cta-button-container {
+            margin-top: 30px;
+        }
+
+        /* Button at the bottom */
+        .start-investing {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;            
+            transform: translateX(-50%);
+            background-color: #f36f6f;
+            padding: 5px 3px;
+            color: white;
+            border-radius: 50px;
+            border-bottom: 10px solid red; 
+            font-size: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+           text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00, 0 0 40px #00ff00, 0 0 50px #00ff00;
+             
+        }
+
+        .start-investing:hover {
+            background-color: #d04c4c;
+        }
+
+        .start-investing:focus {
+            outline: none;
+        }
+       h3 {
+    font-size: 20px;
+    color: #5bff15;
+    text-shadow: 0 0 2px #00f, 0 0 5px #00f, 0 0 10px rgba(0, 0, 255, 0.7);
+    padding: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    transition: all 0.3s ease-in-out;
+}
+
+h3:hover {
+    text-shadow: 0 0 5px #00f, 0 0 15px #00f, 0 0 27px rgba(0, 0, 256, 0.7);
+    transform: scale(1.05); 
+}
+
+       /* Button Styles */
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+            margin-top: 20px;
+       margin-top: 20px;
+            text-align: center;
+             
+        }
+
+        .buttons a, .modern-btn {
+            background-color: #1b1b1b;
+            color: #fff;
+            text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00, 0 0 40px #00ff00, 0 0 50px #00ff00;
+            padding: 1px 2px;
+            font-size: 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+       margin-top: 20px;
+                
+            text-align: center;
+        }
+
+        .buttons a:hover, .modern-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Button Styles */
+        .modern-btn {
+            padding: 1px 20px;
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .modern-btn:hover {
+            background-color: #ffa85c;
+        }
+
+        /* Additional Styling */
+        .glow-button {
+            padding: 1px 2px;
+            background-color: #764ba2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(118, 75, 162, 0.5);
+            transition: box-shadow 0.3s ease;
+            display: block;
+            text-align: center;
+            margin: 20px auto;
+        }
+
+        .glow-button:hover {
+            box-shadow: 0 0 40px rgba(118, 75, 162, 0.7);
+        }
+        .outlined-text {
+        font-family: 'Verdana', sans-serif;
+        font-size: 23px;
+        color: transparent;
+        -webkit-text-stroke: 2px #ff6f61;
+        text-align: center;
+    }
+    
+    
+        /* Fancy Text */
+        .fancy-text {
+            font-size: 20px;
+            background-color: #aaffdfa2;
+            padding: 15px;
+            Color: #afff15;
+            border-left: 4px solid #ff6f61;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+.heading{
+    font-size: 30px;
+      color: #15ff62;
+      text-shadow: 3px 3px 0 #ff80dd, 6px 6px 0 #ffb3b3;
+}
+  .fruit{
+       Font-size: 32px;
+   }
+  .wealth{
+      Font-size: 20px;
+  }
+ .farmin{
+     Font-size: 15px;
+     Color: #fffc15;
+ }
+ 
+       
+        #email-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 2px;
+            width: 70px;
+            height: 70px;
+            Top: 220px;
+            
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        #email-icon:hover {
+            transform: scale(1.1);
+        }
+
+        #email-icon img {
+            width: 70px;
+            height: 70px;
+            Border-radius: 50%;
+        }                         
+    </style>        
+    <header     class="header">        
+        <img src="fruit.png" class="Fruit" id="fruitImage">
+        <div class="logo">
+            <h1 class="ghj"><span class="fruit" >Agro</span><span class="wealth">Fruit</span> <span class="farmin">Shares</span></h1>
+        </div>
+        <style>
+           .menu-icon{
+         Background-color:#ff0000; 
+         Border-radius: 50%;
+        border-bottom: 5px solid #90ff55;
+           }
+        </style>
+        <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+        <nav class="nav">
+        <ul>
+            
+            <li><a href="register.html"><i class="fas fa-user-plus"></i> Register</a></li>
+            <li><a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+             <li><a href="about.html"><i class="fas fa-info-circle"></i> About Us</a></li>
+          <li><a href="contact.html"><i class="fas fa-phone"></i> Contact</a></li>   
+            <li><a href="howuse.html"><i class="fas fa-info-circle"></i> How to AgroFruit App</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div id="email-icon">
+    <img src="sup.png" alt="Support Icon">
+</div>
+
+<script>
+    document.getElementById('email-icon').addEventListener('click', function () {
+        const email = 'agrofruitenterprises@gmail.com';
+        const subject = encodeURIComponent("Customer Inquiry from AgroFruit Invest");
+        const body = encodeURIComponent("Dear AgroFruit,\n\nI have questions regarding your services. Please assist.\n\nThank you.");
+        const mailtoUrl = `mailto:${email}?subject=${subject}&body=${body}`;
+        window.location.href = mailtoUrl;
+    });
+</script>
+    <style>                        #whatsapp-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 0px;
+            Top: 300px;
+            width: 60px;
+            height: 60px;
+            animation: motion 3s infinite;
+            z-index: 9999;
+        }
+
+        #whatsapp-icon img {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Animation */
+        @keyframes motion {
+            0% {
+                transform: translateY(0);
+            }
+            10% {
+                transform: translateY(-10px);
+            }
+            20% {
+                transform: translateY(10px);
+            }
+            30% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateX(10px);
+            }
+            50% {
+                transform: translateX(-10px);
+            }
+            60% {
+                transform: translateX(0);
+            }
+            70% {
+                transform: scale(1.1);
+            }
+            80% {
+                transform: scale(1.3);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>    
+    <a href="Adminchat.html" target="_blank" id="whatsapp-icon">
+        <img src="whatsapp.png" alt="WhatsApp" />
+    </a>
+    <section id="showcase">
+        
+        <div class="container4">
+            <h3>Grow Business Opportunities with AgroFruit</h3>
+         <p>We invite you to invest in high-return opportunities with guaranteed daily earnings. This is a unique chance to grow your invest and secure steady income!</p>  
+        </div>
+        
+    </section>
+    
+    <style>
+   .hoto{
+        width: 95%;
+        Text-align: center;
+        animation: swingImage 5s infinite alternate ease-in-out;
+    }
+
+    @keyframes swingImage {
+        0% {
+            transform: rotate(10deg);
+        }
+        50% {
+            transform: rotate(-10deg);
+        }
+        100% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+    <p>
+        <img class="hoto" src="do.png">
+    </p>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+       
+       .h11, h22 {
+            color: gold;
+            Font-size: 15px;
+            margin-bottom: 10px;
+        }
+        .section5 {
+            margin: 40px auto;
+            max-width: 800px;
+            padding: 20px;
+            border-radius: 10px;
+            Font-size: 12px;
+            Font-weight: bold;
+            background: rgba(255, 215, 0, 0.1);
+            text-align: center;
+        }
+        .section5 img {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .highligh {
+            color: gold;
+            font-weight: bold;
+        }
+        .cta {
+            background: gold;
+            color: #000;
+            padding: 15px;
+            font-size: 10px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 20px;
+            border-radius: 5px;
+            text-decoration: none;
+         text-align: center;  
+        }
+        .cta:hover {
+            background: white;
+            color: black;
+            
+        }
+    </style>
+    <h1 class="h11">🌿 How Does AgroFruit Generate Profit for You?</h1>
+
+<style>
+        
+}
+
+.video-container {
+    
+    width: 100%;
+    height: 100%;
+    Border-radius: 20px;
+    Color: green;
+    Pending: 20px;
+    Padding:0px;
+    
+}
+
+.video {
+    width: 100%;
+    height: 100%;
+    
+    top: 140%;
+    left: 50%;
+    transform: 
+    object-fit: cover
+    
+}
+
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <video autoplay muted loop class="video">
+            <source src="video2.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>       
+    </div>
+    <div class="section5">
+        <p>📌 At <span class="highligh">AgroFruit (AFE)</span>, we maximize your deposits by investing in various profitable sectors, including:</p>
+        <ul style="list-style: none; padding: 0;">
+            <li>✔️ <b>Shares in emerging companies</b> – Strategic investments in high-growth businesses 📈</li>
+            <li>✔️ <b>Trade in fruits and local business ventures</b> – Sustainable agribusiness and market expansion 🍍</li>
+            <li>✔️ <b>Major financial technology platforms</b> – Smart investments in trusted platforms like <b>Acons, Charles Schwab, and E*Trade</b> 💹</li>
+        </ul>
+        <img src="w1.png" alt="Investment Growth">
+    </div>
+
+    <div class="section5">
+        <h2 style="font-size:15px;">🔐 A Secure & Reliable Investment System</h2>
+        <p>🔹 <b>Guaranteed fund accessibility</b> – Withdraw your money anytime, hassle-free! 💰</p>
+        <p>🔹 <b>Risk-managed strategies</b> – Ensuring your investment grows securely 🔄</p>
+        <p>🔹 <b>Transparent earnings</b> – We profit when you profit! ✅</p>
+        <img src="w2.png" alt="Financial Security">
+    </div>
+
+    <div class="section5">
+        <h2  style="font-size:15px;">💡 Start Small, Earn Big!</h2>
+        <p>🚀 Want to <span class="highligh">invest with a small amount</span> and earn a <span class="highligh">steady income.</span></p>
+        <p>✅ <b>Join AgroFruit today!</b></p>
+        <p>✅ <b>Start investing & invite your friends to benefit too!</b></p>
+        <p>✅ <b>Grow your wealth with a trusted investment partner.</b></p>
+        <img src="w3.png" alt="Financial Success">
+    </div>
+
+    <div class="section5">
+        <h2 style="font-size:15px;">🏆 Your Trust, Our Priority!</h2>
+        <p>At <span class="highligh">AgroFruit</span>, we strictly adhere to all business regulations to ensure <b>your investment is secure</b> and <b>your trust remains our foundation.</b></p>
+        <a href="register.html" class="cta">Invest with AgroFruit Now!</a>
+    </div>
+    
+    
+    <style>       
+
+/* Container */
+.containergh {
+    max-width: 600px;
+    margin: 50px auto;
+    background: none;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.animate img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+
+.containergh h1 {
+    color: #2D882D;
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.highlight {
+    color: #FF4500;
+    font-weight: bold;
+}
+
+.containergh ul {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    margin-top: 20px;
+}
+
+.containergh ul li {
+    background: #e8f5e9;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    transition: 0.3s;
+}
+
+.containergh ul li:hover {
+    background: #c8e6c9;
+    transform: scale(1.05);
+}
+
+.cta {
+    display: inline-block;
+    background: #2D882D;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 13px;
+    margin-top: 20px;
+    transition: 0.3s;
+}
+
+.cta:hover {
+    background: #237623;
+    transform: scale(1.1);
+}
+
+.animate {
+
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+}
+
+.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+    </style>
+</head>
+<body>
+
+    <div class="containergh">
+        <div class=" animate">
+            <img src="hr.png" alt="AgroFruit Opportunities">
+        </div>
+        <h1 class="animate">🌱 AgroFruit Opportunities – Earn More with Ease! 🌱</h1>
+
+        <p class="animate"><span class="highlight">🔥 Welcome Bonus:</span> Get <b>₦500</b> instantly when you join!</p>
+
+        <p class="animate"><span class="highlight">💰 Referral Bonuses:</span> Earn from inviting friends!</p>
+
+        <ul>
+            <li style="color: black;" class="animate">✅ 8% of their investment and 8% of their daily profit – for life!!</li>
+            <li style="color: black;" class="animate">✅ <b>15 referrals → ₦10,000</b></li>
+            <li style="color: black;" class="animate">✅ <b>30 referrals → ₦15,000</b></li>
+            <li style="color: black;" class="animate">✅ <b>70 referrals → ₦18,000</b></li>
+            <li style="color: black;" class="animate">✅ <b>100 referrals → ₦22,000</b></li>
+            <li style="color: black;" class="animate">✅ <b>150 referrals → ₦40,000</b></li>
+            <li style="color: black;" class="animate"><b>Total Earnings: ₦105,000. </b></li>
+        </ul>
+
+        <p class="animate"><span class="highlight">🎁 Bonus:</span> Earn an extra <b>More</b> every day!</p>
+
+        <p class="animate"><span class="highlight">💵 Minimum Withdrawal:</span> Just <b>₦500</b> – Fast and Easy!</p>
+
+        <a href="register.html" class="cta animate">🔗 Start Earning Today! 🚀</a>
+    </div>
+
+    <script>
+       
+        function scrollAnimations() {
+            let elements = document.querySelectorAll(".animate");
+            let windowHeight = window.innerHeight;
+
+            elements.forEach((element) => {
+                let position = element.getBoundingClientRect().top;
+
+                if (position < windowHeight - 50) {
+                    element.classList.add("fade-in");
+                }
+            });
+        }
+               window.addEventListener("scroll", scrollAnimations);
+              document.addEventListener("DOMContentLoaded", scrollAnimations);
+    </script>
+    
+  <style>
+    
+    .container89 {
+      max-width: 800px;
+      text-align: center;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(145deg, #111, #222);
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+   .hjk{
+      text-align: center;
+      font-size: 15px;
+      margin-bottom: 20px;
+      color: #ffbe0b;
+      text-align: center;
+    }
+
+   .gop{
+      line-height: 1.8;
+      font-size: 9px;
+      text-align: justify;
+      Font-weight: bold;
+      text-align: center;
+    }
+
+    .image-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .image-container img {
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .highlight2 {
+      color: #ffbe0b;
+      font-weight: bold;
+      text-align: center;
+      Font-size: 10px;
+    }     
+  </style>
+  <div class="container89">
+    <h1 class="hjk">AgroFruit</h1>
+    <p class="gop">
+      <span class="highlight2">AgroFruit</span> is a partnership with leading global invest Team recognized worldwide. 
+      Our mission is to provide you with an easy way to earn profits, free from risk, and with a minimal starting limit to ensure trust and transparency. 
+      Join over <span class="highlight2">3500 allies</span> who have already started their journey with us.
+    </p>
+    <div class="image-container">
+      <img src="gtk.png" alt="Fruit">
+    </div>
+  </div>
+ <img src="tt3.png" style="width: 100%;">     
+  
+  
+  <style>   
+    .carousel-container {
+      width: 100%;
+      max-width: 600px;
+      overflow: hidden;
+      margin: 50px auto;
+      position: relative;
+      border-radius: 10px;
+      
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .image-container {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .carousel-item {
+      min-width: 100%;
+      position: relative;
+      
+    }
+
+    .carousel-item img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    
+    .caption-top {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      
+      color: #fff;
+      padding: 5px 10px
+      border-radius: 5px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    
+    .caption-bottom {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      
+      color: #fff;
+      padding: 10px 20px
+      border-radius: 5px;
+      font-size: 13px;
+      font-weight: bold;
+    }    
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%); 
+           background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    .prev {
+      left: 10px;
+    }
+
+    .next {
+      right: 10px;
+    }
+  </style>
+
+<div class="carousel-container">
+  <div class="image-container" id="imageContainer">
+    <div class="carousel-item">
+      <img src="ba.png" alt="Image 1">
+      <div class="caption-top">Invest ₦3,500 </div>
+      <div class="caption-bottom">Daily Profit ₦160, end 35 days, Total ₦5,600</div>
+    </div>
+    <div class="carousel-item">
+      <img src="or.png" alt="Image 2">
+      <div class="caption-top">Invest ₦8,000</div>
+      <div class="caption-bottom">Daily Profit ₦390, end 35 days, Total ₦13,650</div>
+    </div>
+    <div class="carousel-item">
+      <img src="ap.png" alt="Image 3">
+      <div class="caption-top">Invest ₦15,000 </div>
+      <div class="caption-bottom">Daily Profit ₦780, end 36 days, Total ₦28,080</div>
+    </div>
+    <div class="carousel-item">
+      <img src="av.png" alt="Image 4">
+      <div class="caption-top">Invest ₦35,000 </div>
+      <div class="caption-bottom">Daily Profit ₦1,560, end 37 days, Total ₦57,720</div>
+    </div>
+    <div class="carousel-item">
+      <img src="be.png" alt="Image 5">
+      <div class="caption-top">Invest ₦70,000</div>
+      <div class="caption-bottom">Daily Profit ₦3,120, end 39 days, Total ₦121,680</div>
+    </div>
+    <div class="carousel-item">
+      <img src="man.png" alt="Image 6">
+      <div class="caption-top">Invest ₦140,000 </div>
+      <div class="caption-bottom">Daily Profit ₦6,240, end 40 days, Total ₦249,600</div>
+    </div>
+    <div class="carousel-item">
+      <img src="gu.png" alt="Image 7">
+      <div class="caption-top">Invest ₦280,000 </div>
+      <div class="caption-bottom">Daily Profit ₦12,480, end 42 days, Total ₦524,160</div>
+    </div>
+  </div>
+  <button class="carousel-btn prev" onclick="prevSlide()">&#10094;</button>
+  <button class="carousel-btn next" onclick="nextSlide()">&#10095;</button>
+</div>
+    <style>
+        .co {
+      max-width: 900px;
+      text-align: center;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(145deg, #111, #222);
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+      gap: 75px;
+      display: flex;
+            flex-direction: column;      
+            
+    }      
+       
+       
+        .post {
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+       
+        .post {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.7); 
+        }
+
+        .post h2 {
+            font-size: 15px;
+            color: #4CAF50;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .post p {
+            font-size: 10px;
+            line-height: 1.5;
+            color: #ddd;
+            margin-bottom: 10px;
+            font-weight: bold;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .post img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.7); 
+        }
+
+        @media (max-width: 768px) {
+            .post {
+                padding: 20px;
+            }
+
+            .post h2 {
+                font-size: 13px;
+            }
+
+            .post p {
+                font-size: 10px;
+            }
+        }
+
+    </style>
+
+
+    <div class="co">
+        <div class="post">
+            <h2>🌱 Partner with AgroFruit Today! 🌱</h2>
+            <p>Looking for business or tech partnerships? AgroFruit is ready to collaborate with you. Reach out now for more details!</p>
+            <p>📩 Contact AgroFruit Support for inquiries.</p>
+            <img src="tf1.png" alt="Partner with AgroFruit">
+        </div>
+
+        <div class="post">
+            <h2>⚠️ Report Unwanted Activities to AgroFruit Support ⚠️</h2>
+            <p>Your peace of mind matters. Let us know if something doesn’t sit right with you.</p>
+            <img src="tf2.png" alt="Report Unwanted Activities">
+        </div>
+
+        <div class="post">
+            <h2>💸 Invest & Earn with AgroFruit! 💸</h2>
+            <p>Did you know? AgroFruit offers easy loan options, letting you earn a share of the profits from your investments!</p>
+            <p>📞 Contact AgroFruit Support for more details.</p>
+            <img src="tf3.png" alt="Invest & Earn">
+        </div>
+
+        <div class="post">
+            <h2>👨‍🎓👩‍💼 AgroFruit: Perfect for Students and Entrepreneurs 👨‍🎓👩‍💼</h2>
+            <p>Whether you're studying or running a business, AgroFruit is the ideal partner to help you grow. Start today!</p>
+            <img src="tf4.png" alt="AgroFruit for Students and Entrepreneurs">
+        </div>
+
+        <div class="post">
+            <h2>🤔 Still Hesitant? 🤔</h2>
+            <p>AgroFruit is a trustworthy partner, and we’ve got your back every step of the way. Rest assured, you're in good hands.</p>
+            <img src="tt4.png" alt="AgroFruit Trust">
+        </div>
+    </div>
+
+
+<script>
+  const imageContainer = document.getElementById('imageContainer');
+  const carouselItems = document.querySelectorAll('.carousel-item');
+  const totalItems = carouselItems.length;
+
+  let currentIndex = 0;
+
+  function showSlide(index) {
+    const offset = -index * 100; 
+    imageContainer.style.transform = `translateX(${offset}%)`;
+  }
+
+  function nextSlide() {
+    currentIndex = (currentIndex + 1) % totalItems; 
+    showSlide(currentIndex);
+  }
+
+  function prevSlide() {
+    currentIndex = (currentIndex - 1 + totalItems) % totalItems; 
+    showSlide(currentIndex);
+  }
+
+  // Autoplay the carousel
+  setInterval(nextSlide, 3500); 
+</script>
+
+<img src="gl.png" style="width: 100%;">
+  <p class="fas">  
+  <div class="container9">
+    <h3 class="heading">Investment Options</h3>
+    <div class="icon-section">
+      <!-- First Investment - Banana -->
+      <div class="icon-box">
+        <div class="icon">🍌</div>
+        <div class="title">Banana Investment</div>
+        <div class="description">
+          <strong>Investment Amount:</strong> ₦3,500 <br>
+          <strong>Daily Earnings:</strong> ₦160 <br>
+          <strong>Duration:</strong> 35 days <br>
+          <strong>Total Earnings:</strong> ₦5,600
+        </div>
+      </div>
+
+      <!-- Second Investment - Orange -->
+      <div class="icon-box">
+        <div class="icon">🍊</div>
+            
+        <div class="title">Orange Investment</div>
+        <div class="description">
+          <strong>Investment Amount:</strong> ₦8,000 <br>
+          <strong>Daily Earnings:</strong> ₦390 <br>
+          <strong>Duration:</strong> 35 days <br>
+          <strong>Total Earnings:</strong> ₦13,650
+        </div>
+      </div>
+
+     
+      <div class="icon-box">
+        <div class="icon">🍎</div>
+        <div class="title">Apple Investment</div>
+        <div class="description">
+          <strong>Investment Amount:</strong> ₦15,000 <br>
+          <strong>Daily Earnings:</strong> ₦780 <br>
+          <strong>Duration:</strong> 36 days <br>
+          <strong>Total Earnings:</strong> ₦28,080
+        </div>
+      </div>
+
+      <!-- Fourth Investment - Avocado -->
+      <div class="icon-box">
+        <div class="icon">🥑</div>
+        <div class="title">Avocado Investment</div>
+        <div class="description">
+          <strong>Investment Amount:</strong> ₦35,000 <br>
+          <strong>Daily Earnings:</strong> ₦1,560 <br>
+          <strong>Duration:</strong> 37 days <br>
+          <strong>Total Earnings:</strong> ₦57,720
+        </div>
+      </div>
+
+      <!-- Fifth Investment - Berry -->
+      <div class="icon-box">
+        <div class="icon">🍇</div>
+        <div class="title">Berry Investment</div>
+        <div class="description">
+          <strong>Investment Amount:</strong> ₦70,000 <br>
+          <strong>Daily Earnings:</strong> ₦3,120 <br>
+          <strong>Duration:</strong> 39 days <br>
+          <strong>Total Earnings:</strong> ₦121,680
+        </div>
+      </div>
+
+      <!-- Sixth Investment - Grape -->
+      <div class="icon-box">
+        <div class="icon">🍋</div>
+        <div class="title">Mango Investment</div>
+        <div class="description">
+          <strong>Investment Amount:</strong> ₦140,000 <br>
+          <strong>Daily Earnings:</strong> ₦6,240 <br>
+          <strong>Duration:</strong> 40 days <br>
+          <strong>Total Earnings:</strong> ₦249,600
+        </div>
+      </div>
+
+      <!-- Seventh Investment - Guava -->
+      <div class="icon-box">
+        <div class="icon">🍈</div>
+        <div class="title">Guava Investment</div>
+        <div class="description">
+          <strong>Investment Amount:</strong> ₦280,000 <br>
+          <strong>Daily Earnings:</strong> ₦12,480 <br>
+          <strong>Duration:</strong> 42 days <br>
+          <strong>Total Earnings:</strong> ₦524,160
+        </div>
+      </div>
+    </div>
+  </div></p>
+  <div class="container89">
+    <h1 class="hjk">AFE: Complete Tasks and earn Data</h1>
+    <p class="gop">
+      <span class="highlight">Free Tasks From AgroFruit</span>  <span class="highlight">Minimum Withdrawal 500 MB</span> Start Now to enjoy exciting benefits and opportunities!
+    </p>
+    <div class="image-container">        
+        <img src="d1.png" alt="Frui"></p>
+        </div>
+        <div class="image-container">
+      <img src="d2.png" alt="F"></p>      
+    </div>
+   <a href="register.html" class="cta-button">Start Now</a>
+  </div>
+  <p>
+      
+  <style>       
+    .container800 {
+      max-width: 700px;
+      margin: 2rem auto;
+      background-color: #e0f7fa;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      Color: black;
+    }
+
+    /* Header */
+    .header76 {
+      background: linear-gradient(90deg, #0288d1, #4fc3f7);
+      color: #ffffff;
+      text-align: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .header76 h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    
+    .content5 {
+      padding: 1.5rem;
+    }
+
+    .content5 p {
+      margin: 1rem 0;
+      font-size: 10px;
+      line-height: 1.6;
+    }
+
+    .content strong {
+      color: #0288d1;
+    }
+
+    .content5 a {
+      color: #0288d1;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    .content5 a:hover {
+      color: #4fc3f7;
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    .footer78 {
+      background: #01579b;
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .footer78 span {
+      font-weight: bold;
+    }
+  </style>
+  <div class="container800">
+    <header class="header76">
+      <h1>AgroFruit</h1>
+      <p>Creating Wealth, Growing Together</p>
+    </header>
+    <main class="content5">
+      <p><strong>AgroFruit</strong> is unique in its operations. We prioritize the integrity and trust of our investors by safeguarding your information and ensuring security. Each investor is provided with a personalized account number, making it easy to deposit investments directly into their secure account.</p>
+      <p>Our team of professionals works tirelessly, 24/7, to address your needs. With our advanced financial systems, your funds remain safe and secure in your account. Using your <strong>AgroFruit</strong> account number, you can seamlessly transfer funds from any service bank without issues.</p>
+      <p>We offer attractive profits on every product you invest in, while also providing an option for savings and top-ups to your account. At <strong>AgroFruit </strong>, your satisfaction is our priority.</p>
+      <p>We collaborate with prominent entrepreneurs, platforms, and fruit production companies to deliver outstanding services and create mutual growth opportunities.</p>
+      <p>Have any questions or issues? <a href="contact.html">Send a message to customer care.</a></p>
+    </main>
+    <footer class="footer78">
+       <span>AgroFruit</span>. Is a best for invest. 
+    </footer>
+  </div>
+
+  </p>
+  <p>          <img src="tt5.png" style="width: 100%;">
+  </p>
+  
+                      
+    <div class="container79">
+        <h1>Why You  Should Invest</h1>
+        <div class="why-invest">
+            <ul>
+           <li>Guaranteed Returns: We provide clear and reliable earnings data with proven returns.</li>
+                <li>Fixed Duration: Each investment comes with a specified and predictable timeframe.</li>
+                <li>Profitable Opportunity: This is a chance to grow your investment in a short amount of time.</li>
+            </ul>
+        </div>
+
+        <div class="cta-button-container">
+            <button class="cta-button" onclick="window.location.href='register.html'">Start Investing Now</button>
+        </div>
+    </div>
+
+    <p>
+      <img src="ght.png" style="width: 100%;">
+  </p> 
+    <button class="start-investing" onclick="window.location.href='register.html'">Join Now</button>
+
+<p>
+          
+<div class="fancy-text">
+        
+        <p>Your gateway to effortless earnings.</p>
+        <p>Are you searching for reliable ways to make money at mini invest? Look no further! At:</p>
+🔴  🔵   ⚪   ⚫      
+    </div>
+   
+   <h2 class="outlined-text"> 
+        <img class="gh" style="width: 100%; "src="fruit.png">
+        Welcome Bonus: Anyone who makes a minimum investment of ₦3,500 will receive ₦500.
+
+Referral Bonus You will earn 8% of the amount invested by anyone you refer.
+
+Daily Profit: You will earn 8% of your investment amount every day as profit.
+
+Minimum Withdrawal: You can withdraw starting from ₦500.
+
+        
+        </h2>
+ <div class="buttons"> 
+     <a href="register.html" class="btn"><i class="fas fa-user-plus"></i> Register</a>
+  <a href="login.html" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+   </div>
+    
+ </p>
+ 
+    <style>                        
+       .step, .example {
+            margin-bottom: 20px;
+            border-left: 4px solid #1c64f2;
+            padding-left: 20px;
+            margin-left: 10px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .step:hover, .example:hover {
+            background-color: #f0f8ff;
+        }
+
+      .g11 {
+            font-size: 20px;
+            
+            margin-bottom: 10px;
+        }
+
+       strong {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .example {
+            background-color: #ecf0f5;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            Color: black;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+             {
+                font-size: 25px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .step, .example {
+                padding-left: 15px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>How the Referral Bonus Works</h1>
+
+        <div class="step">
+            <h2>Step 1:</h2>
+            <p class="g11">Invite friends to register using your referral link.</p>
+        </div>
+
+        <div class="step">
+            <h2>Step 2:</h2>
+            <p class="g11">When they invest, you will earn 8% of their total investment as a Referral Bonus.</p>
+        </div>
+
+        <div class="step">
+            <h2>Step 3:</h2>
+            <p class="g11">Additionally, you will earn 8% Daily Profit from their daily earnings.</p>
+        </div>
+</div>
+
+<div>      
+    <style>               
+        
+     .gkl li {
+            list-style: none;
+            padding: 0;
+        }
+  .gkl ul li  {
+            margin: 10px 0;
+            padding: 10px;
+            background: #edf2f7;
+            border-left: 4px solid #2b6cb0;
+            border-radius: 4px;
+        }
+        .cta {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .cta button {
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .cta button:hover {
+            background: #1e4a75;
+        }
+       .gk{
+           Color: black;
+           Font-size: 13px;
+           
+       }
+    </style>
+</head>
+<body>
+    <div class="containe">
+        <h1>Invite Referrals & Earn Bonuses</h1>
+        <h4>Investment & Bonuses Breakdown</h4>
+      <div class="gkl">  <ul class="gkl">
+            <li class="gk"><strong>₦3,500:</strong class="gk"> Referral Bonus = ₦280 | Daily Profit = ₦12.8</li>
+            <li class="gk"><strong>₦8,000:</strong class="gk"> Referral Bonus = ₦640 | Daily Profit = ₦28</li>
+            <li class="gk"><strong>₦15,000:</strong class="gk"> Referral Bonus = ₦1,200 | Daily Profit = ₦62.4</li>
+            <li class="gk"><strong>₦35,000:</strong class="gk"> Referral Bonus = ₦2,800 | Daily Profit = ₦124.8</li>
+            <li class="gk"><strong>₦70,000:</strong class="gk"> Referral Bonus = ₦5,600 | Daily Profit = ₦245.6</li>
+            <li class="gk"><strong>₦140,000:</strong> Referral Bonus = ₦11,200 | Daily Profit = ₦499.2</li>
+            <li class="gk"><strong>₦280,000:</strong> Referral Bonus = ₦22,400 | Daily Profit = ₦998.4</li>
+        </ul>
+        </div>
+        <h4>Special Bonuses & Levels</h4>
+      <div class="gkl">  <ul>
+            <li class="gk">Level 1: 15 Referrals = ₦10,000 Bonus</li>
+            <li class="gk">Level 2: 30 Referrals = ₦15,000 Bonus</li>
+            <li class="gk">Level 3: 70 Referrals = ₦18,000 Bonus</li>
+            <li class="gk">Level 4: 100 Referrals = ₦22,000 Bonus</li>
+            <li class="gk">Level 5: 150 Referrals = ₦40,000 Bonus + Certification</li>
+        </ul></div>
+        <h4>
+            Total Earnings: ₦105,000 for 150 investment referrals Ally, 
+</h4>
+<img src="t1.png" style="width: 100%;">
+<img src="tt2.png" style="width: 100%;">
+<p>Don't miss this opportunity—start now and share your referral link on social media to win in 7 days ally. 
+        </p>        
+        </p>
+    </div>
+ 
+<div>
+  <style>
+        
+    h1, h2 {
+      color: #0078d7;
+      text-align: center;
+      Font-size: 23px;
+    }
+    
+ table {
+      width: 95%;
+     height: 100%; border-collapse: collapse;
+      margin: 2px px;
+    }
+
+    th, td {
+      padding:      5px;
+      text-align: center;
+      Font-size: 8px;
+      Font-weight: bold;
+      border: 3px solid #ddd;
+      Color: green;
+    }
+
+    th {
+      background-color: #0078d7;
+      color: #fff;
+    }
+
+     {
+      background-color: #f2f2f2;
+    }
+    .note {
+      background: #e7f4e7;
+      border-left: 5px solid #4caf50;
+      padding: 15px;
+      margin: 20px 0;
+      font-style: italic;
+      Font-size: 15px;
+      Color: blue;
+    }
+
+    .cta {
+      text-align: center;
+      margin-top: 2px;
+    }
+
+    .cta a {
+      text-decoration: none;
+      color: #fff;
+      background: #0078d7;
+      padding: 10px 20px;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    .cta a:hover {
+      background: #005bb5;
+    }
+    .ghk{
+        Font-size: 16px;
+        Text-align: center;
+        Font-weight:bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="contain">
+    <h1>Referral and Bonus Program, Tebles</h1>
+    <p class="ghk">Invite your referrals to join and earn amazing bonuses! Here's how it works:</p>
+
+    <h2>Referral Bonuses Teble </h2>
+    <table>
+      <tr>
+        <th>Investment Amount</th>
+        <th>Referral Bonus (8%)</th>
+        <th>Daily Profit Bonus (8%)</th>
+      </tr>
+      <tr>
+        <td>₦3,500</td>
+        <td>₦280</td>
+        <td>₦12.8</td>
+      </tr>
+      <tr>
+        <td>₦8,000</td>
+        <td>₦640</td>
+        <td>₦28</td>
+      </tr>
+      <tr>
+        <td>₦15,000</td>
+        <td>₦1,200</td>
+        <td>₦62.4</td>
+      </tr>
+      <tr>
+        <td>₦35,000</td>
+        <td>₦2,800</td>
+        <td>₦124.8</td>
+      </tr>
+      <tr>
+        <td>₦70,000</td>
+        <td>₦5,600</td>
+        <td>₦245.6</td>
+      </tr>
+      <tr>
+        <td>₦140,000</td>
+        <td>₦11,200</td>
+        <td>₦499.2</td>
+      </tr>
+      <tr>
+        <td>₦280,000</td>
+        <td>₦22,400</td>
+        <td>₦998.4</td>
+      </tr>
+    </table>
+
+    <h2>Bonus Levels</h2>
+    <table>
+      <tr>
+        <th>Level</th>
+        <th>Referrals Required</th>
+        <th>Bonus Amount</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>15</td>
+        <td>₦10,000</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>30</td>
+        <td>₦15,000</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>70</td>
+        <td>₦18,000</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>100</td>
+        <td>₦22,000</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>150</td>
+        <td>₦40,000</td>
+      </tr>
+    </table>
+
+    <div class="note">
+      <strong style="color: red;">Note:</strong> Achieve higher referral 150 levels 5 to earn additional ₦40,000 this bonuses is official bonus from Global Fruit Industries. 
+      You also receive in your Balance. 
+    </div>
+
+    <div class="cta">
+      <a href="register.html">Start Referring Now</a>
+    </div>
+  </div>        
+    </div>
+ <p>
+     <p>
+                            
+</head>
+<body>
+    <div class="contaie">
+        <h1>Deposit Packages and Earnings</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Package</th>
+                    <th>Investment</th>
+                    <th>Daily Profit (8%)</th>
+                    <th>Duration (Days)</th>
+                    <th>Total Income</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Banana</td>
+                    <td>₦3,500</td>
+                    <td>₦280</td>
+                    <td>35</td>
+                    <td>₦5,600</td>
+                </tr>
+                <tr>
+                    <td>Orange</td>
+                    <td>₦8,000</td>
+                    <td>₦640</td>
+                    <td>35</td>
+                    <td>₦13,650</td>
+                </tr>
+                <tr>
+                    <td>Apple</td>
+                    <td>₦15,000</td>
+                    <td>₦1,200</td>
+                    <td>36</td>
+                    <td>₦28,080</td>
+                </tr>
+                <tr>
+                    <td>Avocados</td>
+                    <td>₦35,000</td>
+                    <td>₦2,800</td>
+                    <td>39</td>
+                    <td>₦57,720</td>
+                </tr>
+                <tr>
+                    <td>Berry</td>
+                    <td>₦70,000</td>
+                    <td>₦5,600</td>
+                    <td>39</td>
+                    <td>₦121,680</td>
+                </tr>
+                <tr>
+                    <td>Mango</td>
+                    <td>₦140,000</td>
+                    <td>₦11,200</td>
+                    <td>40</td>
+                    <td>₦249,600</td>
+                </tr>
+                <tr>
+                    <td>Guava</td>
+                    <td>₦280,000</td>
+                    <td>₦22,400</td>
+                    <td>42</td>
+                    <td>₦524,160</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    </div></div>
+        
+        <p>
+          
+  <style>
+    
+    .container8m {
+      text-align: center
+      width: 100%;
+      padding: 20px;
+    }
+
+    .hea{
+      margin-bottom: 20px;
+      
+    }
+
+    .main-logo {
+    
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+   
+
+.tagline {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.6;
+  text-align: center;
+  margin: 20px 0;
+  background: linear-gradient(90deg, #ff6f61, #ffa726, #66bb6a, #42a5f5, #ab47bc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+
+
+    /* Partners Icons */
+    .partners {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 2px 0;
+    }
+
+    .icon8m {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      
+      
+      padding: 1px;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .icon:hover {
+      transform: scale(1.1);
+    }
+
+/* Slideshow Styles */
+.slideshow {
+  position: relative;
+  width: 100%; 
+  max-width: 100%; 
+  height: 400px; 
+  margin: 2px auto; 
+  overflow: hidden; 
+  border-radius: 10px; 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8); 
+  background: #111; 
+}
+
+.slide {
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+  object-position: center; 
+  opacity: 0; 
+  transition: opacity 1s ease-in-out; 
+}
+
+.slide.active {
+  opacity: 1; 
+}
+
+  </style>
+  <div class="container8m">
+    <!-- Header Section -->
+    <hea class="hea">
+      <img src="fruit.png" alt=" Logo" class="main-logo"> 
+      <p class="tagline">
+        We provide you with profits through collaboration and the best global investment platform. 
+        AgroFruit  investment partners with:
+      </p>
+    
+
+    <!-- Partner Icons -->
+    <div class="partners">
+      <img src="acorns.png" alt="Partner 1" class="icon8m">
+      <img src="cha.png" alt="Partner 2" class="icon8m">
+      <img src="e.png" alt="Partner 3" class="icon8m">     
+    </div>
+
+    <!-- Slideshow Section -->
+    <div class="slideshow">
+  <img src="s1.png" alt="Slide 1" class="slide active">
+  <img src="s2.png" alt="Slide 2" class="slide">
+  <img src="s3.png" alt="Slide 3" class="slide">
+  <img src="s4.png" alt="Slide 4" class="slide">
+  <img src="s5.png" alt="Slide 5" class="slide">
+  <img src="s6.png" alt="Slide 6" class="slide">
+</div>
+
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const slides = document.querySelectorAll('.slide');
+      let currentIndex = 0;
+
+      function showNextSlide() {
+        slides[currentIndex].classList.remove('active');
+        currentIndex = (currentIndex + 1) % slides.length;
+        slides[currentIndex].classList.add('active');
+      }
+
+      setInterval(showNextSlide, 3000); // Change slide every 3 seconds
+    });
+  </script> 
+        </p>        
+    </section>
+    <button id="install-btn">Install App</button>
+        <footer>
+            <p>👉 Don’t Miss Out! Join Now and Start Earning!</p>
+            <button  onclick="window.location.href='register.html'" > Click here to Join</button>
+        </footer>
+    </div>
+  
+     </p>
+     
+
+<style>
+    .footery {
+        width: 100%;
+        background: linear-gradient(to right, #2575fc, #6a11cb);
+        color: white;
+        margin-top: 30px;
+        border-top-left-radius: 30px;
+        border-top-right-radius: 30px;
+        padding: 20px 0;
+    }
+
+    .footer-container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .footer-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center
+    }
+
+    .footer-title {
+        font-size: 28px;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .footer-description {
+        font-size: 18px;
+        margin-bottom: 20px;
+        font-weight: 300;
+    }
+
+    .footer-links {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-bottom: 20px;
+    }
+
+    .footer-link-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+    }
+
+    .footer-links a {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        transition: color 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .footer-links a:hover {
+        color: #4CAF50;
+    }
+
+    .footer-social-media {
+        margin: 10px 0;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .footer-social-media i {
+        color: white;
+        font-size: 24px;
+        transition: color 0.3s ease;
+    }
+
+    .footer-social-media i:hover {
+        color: #4CAF50;
+    }
+
+    .footer-bottom {
+        margin-top: 10px;
+        font-size: 14px;
+        font-weight: 300;
+    }
+
+   
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<footer class="footery">
+  <div class="footer-container">
+    <div class="footer-content">
+      <h3 class="footer-title">AgroFruit</h3>
+      <p class="footer-description">Invest in a fruitful future with sustainable farming.</p>
+      
+      <div class="footer-links">
+        
+      <div class="footer-social-media">
+        <i href="https://facebook.com" class="fab fa-facebook"></i>
+        <i href="https://twitter.com" class="fab fa-twitter"></i>
+        <i href="https://instagram.com" class="fab fa-instagram"></i>
+        <i href="https://linkedin.com" class="fab fa-linkedin"></i>
+        <i href="https://youtube.com" class="fab fa-youtube"></i>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; AgroFruit. All Rights Reserved.</p>
+        <p>Contact us: agrofruitenterprises@gmail.com</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+ </p>
+<script>
+  // Function don samun referral code daga URL
+  function getReferralCode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get("ref");
+  }
+
+  // Adana referral code a cikin Local Storage
+  const referralCode = getReferralCode();
+  if (referralCode) {
+    localStorage.setItem("referralCode", referralCode);
+  }
+</script>
+<script>
+        function toggleMenu() {
+            const nav = document.querySelector('.nav');
+            nav.classList.toggle('active');
+        }
+    </script>
+   
+<script>
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then(() => console.log('Service Worker registered successfully'))
+      .catch((error) => console.error('Service Worker registration failed:', error));
+  }
+
+  // Install prompt event
+  let deferredPrompt;
+  const installButton = document.getElementById('install-btn');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installButton.style.display = 'block'; 
+    installButton.addEventListener('click', () => {
+      installButton.style.display = 'none'; 
+      deferredPrompt.prompt(); 
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+          alert('AgroFruit App installed successfully!');
+        } else {
+          console.log('User dismissed the install prompt');
+        }
+        deferredPrompt = null; 
+      });
+    });
+  });
+
+  window.addEventListener('appinstalled', (e) => {
+    console.log('App was installed');
+    alert('Thanks for installing the AgroFruit App!');
+  });
+</script>
+    <link rel="manifest" href="/manifest.json">
+<script src="/sw.js" defer></script>
+    </body>
+    </html>
