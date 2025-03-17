@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Optimized Loading Screen</title>
+  <style>
+    #loadingScreen {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #loadingScreen span {
+        animation: spin 1s linear infinite;
+        border: 7px solid white;
+        border-top: 7px solid #00796B;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: inline-block;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loadingScreen">
+        <span></span> 
+         
+<script type="module">
+    import { app } from './firebase.js';
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    const db = getDatabase(app);
+    const auth = getAuth();
+    const loadingScreen = document.getElementById("loadingScreen");
+
+    // Function to get user data from Firebase
+    async function getUserData(userId) {
+        const userRef = ref(db, `users/${userId}`);
+        const snapshot = await get(userRef);
+        return snapshot.exists() ? snapshot.val() : null;
+    }
+
+    // Function to handle investment logic
+    async function handleInvestmentLogic(userId, userData) {
+        if (!userData) {
+            alert("User data not found.");
+            window.location.href = "register.html";
+            return;
+        }
+
+        const investmentData = parseFloat(userData.investment) || 0;
+        const currentTime = new Date();
+        const investmentTime = new Date(userData.investmentTime || currentTime.toISOString());
+        const daysElapsed = Math.floor((currentTime - investmentTime) / (1000 * 60 * 60 * 24));
+
+        const investmentMap = [
+            { amount: 3500, dailyUpgrade: 160, days: 35 },
+            { amount: 8000, dailyUpgrade: 350, days: 35 },
+            { amount: 15000, dailyUpgrade: 750, days: 36 },
+            { amount: 35000, dailyUpgrade: 1560, days: 37 },
+            { amount: 70000, dailyUpgrade: 3160, days: 39 },
+            { amount: 140000, dailyUpgrade: 6240, days: 40 },
+            { amount: 280000, dailyUpgrade: 12300, days: 42 },
+        ];
+
+        let matchedPlan = investmentMap.find(plan => plan.amount === investmentData);
+        if (!matchedPlan) {
+            matchedPlan = investmentMap.reduce((prev, curr) => (curr.amount <= investmentData ? curr : prev), investmentMap[0]);
+        }
+
+        const updates = {
+            lastUpdate: currentTime.toISOString(),
+        };
+
+        if (daysElapsed >= matchedPlan.days) {
+            updates.investment = 0;
+            updates.dailyUpgrade = 0;
+            updates.investmentTime = null;
+
+            // Send request to update server
+            const response = await fetch("https://fruit-ruddy.vercel.app/api/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": "@haruna66"
+                },
+                body: JSON.stringify({
+                    email: userData.email,
+                    dailyUpgrade: 0,
+                    investmentTime: null,
+                    investment: 0
+                })
+            });
+
+            if (!response.ok) {
+                console.error("Failed to update server:", await response.json());
+            }
+        }
+
+        if (!userData.dailyUpgrade || userData.dailyUpgrade !== matchedPlan.dailyUpgrade) {
+            updates.dailyUpgrade = matchedPlan.dailyUpgrade;
+        }
+
+        if (!userData.investmentTime) {
+            updates.investmentTime = currentTime.toISOString();
+        }
+
+        await update(ref(db, `users/${userId}`), updates);
+
+        if (daysElapsed >= matchedPlan.days) {
+            alert("👋 Hello, Renew Your Investment Now!");
+        } else {
+            alert(`You have ${matchedPlan.days - daysElapsed} days remaining for your package.`);
+        }
+
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 200);
+    }
+
+    // Ensure user is logged in before proceeding
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userId = user.uid;
+            const userData = await getUserData(userId);
+            loadingScreen.style.display = "flex";
+            await handleInvestmentLogic(userId, userData);
+            loadingScreen.style.display = "none";
+        } else {
+            alert("Please register first.");
+            window.location.href = "register.html";
+        }
+    });
+</script>
+</body>
+</html>
