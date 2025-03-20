@@ -108,6 +108,13 @@
         }
 
         const investmentData = parseFloat(userData.investment) || 0;
+        
+        if (investmentData === 0 || investmentData < 3500) {
+            alert("Please minimum amount deposit of to 3500 to proceed.");
+            window.location.href = "dashboard.html";
+            return;
+        }
+
         const currentTime = new Date();
         const tsohonUser = userData.tsohonUser || "false";
         const investmentTime = new Date(userData.investmentTime || currentTime.toISOString());
