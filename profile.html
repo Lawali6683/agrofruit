@@ -1,44 +1,409 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maintenance Page - AgroFruit</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>User Profile</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-    background-color: #f2f2f2;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom right, #e9f5e9, #f9f5d7);
+            color: #2d3436;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .profile-container {
+            width: 100%;
+            max-width: 400px;
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            border: 2px solid #d4a373;
+            text-align: center;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #88d498, #f4a261);
+            padding: 40px 20px;
+            color: #fff;
+        }
+
+        .profile-avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            object-fit: cover;
+            background-color: #fff;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #2c3e50;
+        }
+
+        p {
+            font-size: 14px;
+        }
+
+        .profile-details {
+            padding: 2px;
+            background-color: #f9f7f1;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        ul li {
+            font-size: 14px;
+            margin: 8px 0;
+        }
+
+        .copy-btn {
+            background: #88d498;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #68b36b;
+        }
+
+        /* Main Container */
+        #transferPinContainer {
+            background: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .pin-input {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .pin-input input {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 1.2rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .pin-input input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        button {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        
+        /* Loading Screen */
+#loadingScreen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.container {
-    max-width: 600px;
-    margin: 100px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
+#loadingScreen span {
+    animation: spin 1s linear infinite;
+    border: 7px solid white;
+    border-top: 7px solid #00796B;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: inline-block;
 }
 
-h1 {
-    color: blue;
-    font-size: 24px;
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
-p {
-    color: red;
-    font-size: 16px;
-}
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Welcome to AgroFruit</h1>
-        <p>Currently, we are undergoing maintenance and you will not be able to place an order at this time. However, our engineering team is working hard to resolve this issue.</p>
-        <p>Thank you for your patience. If you have any questions, please contact the admin.</p>
+    <script type="module" src="app.js"></script>
+    <div id="loadingScreen">
+        <span></span>
     </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+
+            <h3>Create Your Account Transfer PIN</h3>
+
+            <label>Enter 5-digit Transfer PIN:</label>
+            <div class="pin-input" id="enterPin">
+                <input type="password" maxlength="1" />
+                <input type="password" maxlength="1" />
+                <input type="password" maxlength="1" />
+                <input type="password" maxlength="1" />
+                <input type="password" maxlength="1" />
+            </div>
+            <label>Confirm Transfer PIN:</label>
+            <div class="pin-input" id="confirmPin">
+                <input type="password" maxlength="1" />
+                <input type="password" maxlength="1" />
+                <input type="password" maxlength="1" />
+                <input type="password" maxlength="1" />
+                <input type="password" maxlength="1" />
+            </div>
+
+            <button id="submitPin">Submit PIN</button>
+        </div>
+    </div>
+
+    <div class="profile-container">
+        <div class="hover-effect">
+            <h1>AgroFruit</h1>
+        </div>
+        <div class="profile-header">
+            <img id="avatarImage" class="profile-avatar" src="avatar.png" alt="Profile Image">
+            <h1><i id="fullName"></i>👋</h1>
+            <p id="username"></p>
+            <p><strong> Costumes ID:</strong> <span id="paystackCustomerId"></span></p>
+            <p><strong>Email:</strong> <span id="email"></span></p>
+        </div>
+        <div class="profile-details">
+            <ul></ul>
+        </div>
+    </div>
+    
+    <style>
+    #email-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 2px;
+            width: 70px;
+            height: 70px;
+            Top: 220px;
+            
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        #email-icon:hover {
+            transform: scale(1.1);
+        }
+
+        #email-icon img {
+            width: 70px;
+            height: 70px;
+            Border-radius: 50%;
+        }
+</style>
+
+<div id="email-icon">
+    <img src="sup.png" alt="Support Icon">
+</div>
+
+<script>
+    document.getElementById('email-icon').addEventListener('click', function () {
+        const email = 'agrofruitenterprises@gmail.com';
+        const subject = encodeURIComponent("Customer Inquiry from AgroFruit Invest");
+        const body = encodeURIComponent("Dear AgroFruit,\n\nI have questions regarding your services. Please assist.\n\nThank you.");
+        const mailtoUrl = `mailto:${email}?subject=${subject}&body=${body}`;
+        window.location.href = mailtoUrl;
+    });
+</script>
+
+    <script type="module">
+        import { app } from './firebase.js';
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+        const loadingScreen = document.getElementById("loadingScreen");
+
+        function toggleLoading(show) {
+            loadingScreen.style.display = show ? "block" : "none";
+        }
+
+        function generatePaystackCustomerId() {
+            return 'AFE_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        async function createPaystackCustomerId(userData, uid) {
+            try {
+                const paystackCustomerId = generatePaystackCustomerId();
+                userData.paystackCustomerId = paystackCustomerId;
+
+                const response = await fetch("https://fruit-ruddy.vercel.app/api/massage", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-api-key": "@haruna66"
+                    },
+                    body: JSON.stringify({
+                        paystackCustomerId: paystackCustomerId,
+                        email: userData.email
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to update user with Paystack Customer ID");
+                }
+
+                await set(ref(db, `users/${uid}`), userData);
+                displayUserData(userData);
+            } catch (error) {
+                console.error("Error creating Paystack Customer ID:", error);
+                alert("Error: " + error.message);
+                throw error;
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        function displayUserData(userData) {
+            document.getElementById("fullName").innerText = userData.fullName || "User";
+            document.getElementById("email").innerText = userData.email || "example@example.com";
+            document.getElementById("paystackCustomerId").innerText = userData.paystackCustomerId || "Generating";
+        }
+
+        async function fetchUserData(uid) {
+            try {
+                const userRef = ref(db, `users/${uid}`);
+                const snapshot = await get(userRef);
+
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    if (userData.paystackCustomerId) {
+                        displayUserData(userData);
+                        toggleLoading(false);
+                    } else {
+                        await createPaystackCustomerId(userData, uid);
+                    }
+                } else {
+                    throw new Error("No user data found");
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                alert("Error: " + error.message);
+                toggleLoading(false);
+            }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                toggleLoading(true);
+                try {
+                    await fetchUserData(user.uid);
+                } catch (error) {
+                    console.error("Error processing user:", error);
+                }
+            } else {
+                console.log("No user is signed in");
+                toggleLoading(false);
+            }
+        });
+    </script>
 </body>
 </html>
