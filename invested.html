@@ -331,16 +331,17 @@
     </main>
 
     <div class="form-container" id="depositForm">
-        <h2>Deposit Form</h2>
-        <label for="userName">Welcome, <span id="userName"></span></label>
-        <label for="amount">Amount</label>
-        <input type="text" id="amount" readonly>
-        <label for="email">Email</label>
-        <input type="text" id="email" readonly>
-        <label for="senderAccount">Your Sender Account Number</label>
-        <input type="text" id="senderAccount">
-        <button id="submitPayment">Payment Now</button>
-    </div>
+    <h2>Deposit Form</h2>
+    <label for="userName">Welcome, <span id="userName"></span></label>
+    <label for="amount">Amount</label>
+    <input type="text" id="amount" readonly>
+    <label for="email">Email</label>
+    <input type="text" id="email" readonly>
+    <label for="senderAccount">Your Sender Account Number</label>
+    <input type="text" id="senderAccount">
+    <label for="accountName">Your Account Name</label> <!-- New field for account name -->
+    <input type="text" id="accountName">
+</div>
     
     <style>
     #email-icon {
@@ -445,7 +446,7 @@
         <p>&copy; AgroFruit. All rights reserved.</p>
     </footer>
 
-    <script type="module">
+   <script type="module">
     import { app, analytics, firebaseConfig } from './firebase.js';
     import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
@@ -460,6 +461,7 @@
     const amountElement = document.getElementById('amount');
     const emailElement = document.getElementById('email');
     const senderAccountElement = document.getElementById('senderAccount');
+    const accountNameElement = document.getElementById('accountName'); // New input element for account name
     const submitPaymentButton = document.getElementById('submitPayment');
     const bankInfoContainer = document.getElementById('bankInfoContainer');
     const copyButton = document.getElementById('copyButton');
@@ -526,6 +528,12 @@
                 const amount = amountElement.value;
                 const email = emailElement.value;
                 const senderAccount = senderAccountElement.value;
+                const accountName = accountNameElement.value; // Retrieve account name
+
+                if (!amount || !email || !senderAccount || !accountName) {
+                    alert("Please fill in all required fields.");
+                    return;
+                }
 
                 try {
                     const response = await fetch("https://fruit-ruddy.vercel.app/api/pendingpay", {
@@ -538,6 +546,7 @@
                             amount,
                             email,
                             senderAccount,
+                            accountName, // Include account name in the request
                             status: "pending",
                             time: new Date().toISOString()
                         })
@@ -558,7 +567,8 @@
                         bankInfoContainer.innerHTML = `
                             <p>Account Number: ${bankInfo.accountNumber}</p>
                             <p>Bank Name: ${bankInfo.bankName}</p>
-                            <p>Account Name: ${bankInfo.accountName}</p>
+                            <p style="color: red;">Account Name: ${bankInfo.accountName}</p>
+                            <p style="color: red;">Please make the payment after 3 to 4 hours.</p>
                         `;
 
                         // Handle copy button click
@@ -570,7 +580,7 @@
 
                         // Handle complete button click
                         completeButton.addEventListener('click', () => {
-                            alert("Log out to new login after 2 to 3 minutes. Any issue contact admin.");
+                            alert("Please wait, confirm payment notifications in your email address.");
                             window.location.href = 'index.html';
                         });
                     } else {
