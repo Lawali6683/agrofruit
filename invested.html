@@ -247,7 +247,7 @@
         <!-- Banana -->
         <div class="product-card" data-product="Banana" data-price="3500">
             <img src="ba.png" alt="Banana">
-            <h2>Banana</h2>
+            
              <h2>Banana</h2>
             <p>Price: ₦3,500</p>
             <p>Daily Income: ₦160</p>
@@ -446,145 +446,154 @@
     </footer>
 
     <script type="module">
-        import { app, analytics, firebaseConfig } from './firebase.js';
-        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    import { app, analytics, firebaseConfig } from './firebase.js';
+    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-        const db = getDatabase(app);
-        const auth = getAuth(app);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
 
-        // DOM elements
-        const userFullNameElement = document.getElementById('userfullName');
-        const depositForm = document.getElementById('depositForm');
-        const userNameElement = document.getElementById('userName');
-        const amountElement = document.getElementById('amount');
-        const emailElement = document.getElementById('email');
-        const senderAccountElement = document.getElementById('senderAccount');
-        const submitPaymentButton = document.getElementById('submitPayment');
+    // DOM elements
+    const userFullNameElement = document.getElementById('userfullName');
+    const depositForm = document.getElementById('depositForm');
+    const userNameElement = document.getElementById('userName');
+    const amountElement = document.getElementById('amount');
+    const emailElement = document.getElementById('email');
+    const senderAccountElement = document.getElementById('senderAccount');
+    const submitPaymentButton = document.getElementById('submitPayment');
+    const bankInfoContainer = document.getElementById('bankInfoContainer');
+    const copyButton = document.getElementById('copyButton');
+    const completeButton = document.getElementById('completeButton');
 
-        // Check authentication state
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const userId = user.uid;
-                const userRef = ref(db, `users/${userId}`);
+    // Check authentication state
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const userId = user.uid;
+            const userRef = ref(db, `users/${userId}`);
 
-                // Fetch user's fullName and display it
-                get(child(userRef, 'fullName'))
-                    .then(snapshot => {
-                        if (snapshot.exists()) {
-                            const fullName = snapshot.val();
-                            userFullNameElement.textContent = fullName;
-                            userNameElement.textContent = fullName;
-                        } else {
-                            userFullNameElement.textContent = "Guest";
-                            userNameElement.textContent = "Guest";
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error fetching user fullName:", error);
-                        userFullNameElement.textContent = "Error";
-                        userNameElement.textContent = "Error";
-                    });
-
-                // Fetch user email and display it
-                get(child(userRef, 'email'))
-                    .then(snapshot => {
-                        if (snapshot.exists()) {
-                            const email = snapshot.val();
-                            emailElement.value = email;
-                        } else {
-                            emailElement.value = "Not Available";
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error fetching user email:", error);
-                        emailElement.value = "Error";
-                    });
-
-                // Handle deposit button clicks
-                document.querySelectorAll('.invest-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const productCard = e.target.closest('.product-card');
-                        const price = productCard.dataset.price;
-
-                        // Populate form with package details
-                        amountElement.value = price;
-
-                        // Show the form container
-                        depositForm.style.display = 'flex';
-
-                        // Scroll to the form container
-                        depositForm.scrollIntoView({ behavior: 'smooth' });
-                    });
+            // Fetch user's fullName and display it
+            get(child(userRef, 'fullName'))
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const fullName = snapshot.val();
+                        userFullNameElement.textContent = fullName;
+                        userNameElement.textContent = fullName;
+                    } else {
+                        userFullNameElement.textContent = "Guest";
+                        userNameElement.textContent = "Guest";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching user fullName:", error);
+                    userFullNameElement.textContent = "Error";
+                    userNameElement.textContent = "Error";
                 });
 
-                // Handle form submission
-                submitPaymentButton.addEventListener('click', async () => {
-                    const amount = amountElement.value;
-                    const email = emailElement.value;
-                    const senderAccount = senderAccountElement.value;
+            // Fetch user email and display it
+            get(child(userRef, 'email'))
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const email = snapshot.val();
+                        emailElement.value = email;
+                    } else {
+                        emailElement.value = "Not Available";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching user email:", error);
+                    emailElement.value = "Error";
+                });
 
-                    try {
-                        const response = await fetch("https://fruit-ruddy.vercel.app/api/pendingpay", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "x-api-key": "@haruna66"
-                            },
-                            body: JSON.stringify({
-                                amount,
-                                email,
-                                senderAccount,
-                                status: "pending",
-                                time: new Date().toISOString()
-                            })
-                        });
+            // Handle deposit button clicks
+            document.querySelectorAll('.invest-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productCard = e.target.closest('.product-card');
+                    const price = productCard.dataset.price;
 
-                        if (response.ok) {
-                            const bankInfo = {
-                                accountNumber: "6103540277",
-                                bankName: "MONIEPOINT",
-                                accountName: "AGRO FRUIT INVESTMENT"
-                            };
+                    // Populate form with package details
+                    amountElement.value = price;
 
-                            // Display bank information
-                            alert(`Copy AgroFruit Trading account number and send your funds:\n\n${bankInfo.accountNumber} (Copy)\n${bankInfo.bankName}\n${bankInfo.accountName}`);
+                    // Show the form container
+                    depositForm.style.display = 'flex';
 
-                            // Copy account number to clipboard
+                    // Scroll to the form container
+                    depositForm.scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            // Handle form submission
+            submitPaymentButton.addEventListener('click', async () => {
+                const amount = amountElement.value;
+                const email = emailElement.value;
+                const senderAccount = senderAccountElement.value;
+
+                try {
+                    const response = await fetch("https://fruit-ruddy.vercel.app/api/pendingpay", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "x-api-key": "@haruna66"
+                        },
+                        body: JSON.stringify({
+                            amount,
+                            email,
+                            senderAccount,
+                            status: "pending",
+                            time: new Date().toISOString()
+                        })
+                    });
+
+                    if (response.ok) {
+                        const bankInfo = {
+                            accountNumber: "6952015771",
+                            bankName: "Moniepoint MFB",
+                            accountName: "AGRO FRUIT ENTERPRISES"
+                        };
+
+                        // Hide the deposit form
+                        depositForm.style.display = 'none';
+
+                        // Display bank information container
+                        bankInfoContainer.style.display = 'flex';
+                        bankInfoContainer.innerHTML = `
+                            <p>Account Number: ${bankInfo.accountNumber}</p>
+                            <p>Bank Name: ${bankInfo.bankName}</p>
+                            <p>Account Name: ${bankInfo.accountName}</p>
+                        `;
+
+                        // Handle copy button click
+                        copyButton.addEventListener('click', () => {
                             navigator.clipboard.writeText(bankInfo.accountNumber).then(() => {
                                 alert("Account number copied successfully!");
                             });
+                        });
 
-                            // Show complete button
-                            const completeButton = document.createElement('button');
-                            completeButton.textContent = "Complete";
-                            completeButton.addEventListener('click', () => {
-                                alert("Log out to new login after 2 to 3 minutes. Any issue contact admin.");
-                                window.location.href = 'index.html';
-                            });
-                            depositForm.appendChild(completeButton);
-                        } else {
-                            alert("An error occurred. Please try again later.");
-                        }
-                    } catch (error) {
-                        console.error("Error processing payment:", error);
+                        // Handle complete button click
+                        completeButton.addEventListener('click', () => {
+                            alert("Log out to new login after 2 to 3 minutes. Any issue contact admin.");
+                            window.location.href = 'index.html';
+                        });
+                    } else {
                         alert("An error occurred. Please try again later.");
                     }
-                });
-            } else {
-                userFullNameElement.textContent = "Guest";
-                alert("Please log in to deposit.");
-            }
-        });
+                } catch (error) {
+                    console.error("Error processing payment:", error);
+                    alert("An error occurred. Please try again later.");
+                }
+            });
+        } else {
+            userFullNameElement.textContent = "Guest";
+            alert("Please log in to deposit.");
+        }
+    });
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const loadingScreen = document.getElementById("loadingScreen");
-            loadingScreen.style.display = "flex";
-            setTimeout(() => {
-                loadingScreen.style.display = "none";
-            }, 3000);
-        });
-    </script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const loadingScreen = document.getElementById("loadingScreen");
+        loadingScreen.style.display = "flex";
+        setTimeout(() => {
+            loadingScreen.style.display = "none";
+        }, 3000);
+    });
+</script>
 </body>
-
 </html>
