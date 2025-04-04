@@ -229,19 +229,70 @@
 }
     </style>
     <style>
-        .form-container {
+       
+
+       .form-container, .bank-info-container {
             display: none;
             flex-direction: column;
             align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
         }
-        .bank-info-container {
-            display: none;
-            flex-direction: column;
-            align-items: center;
+
+        .form-container h2, .bank-info-container p {
+            margin: 10px 0;
         }
+
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px 0;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
         .highlight-red {
             color: red;
+            font-weight: bold;
         }
+
+        .bank-info-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
     </style>
 </head>
 
@@ -582,15 +633,16 @@
                         // Display bank information container
                         bankInfoContainer.style.display = 'flex';
                         bankInfoContainer.innerHTML = `
-                            <p>Account Number: ${bankInfo.accountNumber}</p>
+                            <p>Account Number: <span id="accountNumber">${bankInfo.accountNumber}</span></p>
                             <p>Bank Name: ${bankInfo.bankName}</p>
                             <p>Account Name: ${bankInfo.accountName}</p>
-                            <p style="color: red;">Please make payment within 3 to 4 hours. After that, the request will be cancelled.</p>
+                            <p class="highlight-red">Please make payment within 3 to 4 hours. After that, the request will be cancelled.</p>
                         `;
 
                         // Handle copy button click
                         copyButton.addEventListener('click', () => {
-                            navigator.clipboard.writeText(bankInfo.accountNumber).then(() => {
+                            const accountNumber = document.getElementById('accountNumber').textContent;
+                            navigator.clipboard.writeText(accountNumber).then(() => {
                                 alert("Account number copied successfully!");
                             });
                         });
