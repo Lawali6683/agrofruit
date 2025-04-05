@@ -198,28 +198,10 @@ main {
     <div class="container">
         <h1>Invite Referrals & Earn Bonuses</h1>
         <h2>Investment & Bonuses Breakdown</h2>
+        
+        <h1>Referrals Bonus ₦1000</h1>
         <ul>
-            <li><strong>₦3,500:</strong> Referral Bonus = ₦280 | Daily Profit = ₦12.8</li>
-            <li><strong>₦8,000:</strong> Referral Bonus = ₦640 | Daily Profit = ₦28</li>
-            <li><strong>₦15,000:</strong> Referral Bonus = ₦1,200 | Daily Profit = ₦62.4</li>
-            <li><strong>₦35,000:</strong> Referral Bonus = ₦2,800 | Daily Profit = ₦124.8</li>
-            <li><strong>₦70,000:</strong> Referral Bonus = ₦5,600 | Daily Profit = ₦245.6</li>
-            <li><strong>₦140,000:</strong> Referral Bonus = ₦11,200 | Daily Profit = ₦499.2</li>
-            <li><strong>₦280,000:</strong> Referral Bonus = ₦22,400 | Daily Profit = ₦998.4</li>
-        </ul>
-        <h2>Special Bonuses & Levels</h2>
-        <ul>
-            <li>Level 1: 15 Referrals = ₦10,000 Bonus</li>
-            <li>Level 2: 30 Referrals = ₦15,000 Bonus</li>
-            <li>Level 3: 70 Referrals = ₦18,000 Bonus</li>
-            <li>Level 4: 100 Referrals = ₦22,000 Bonus</li>
-            <li>Level 5: 150 Referrals = ₦40,000 Bonus + More</li>
-        </ul>
-        <h2>
-            Total Earnings: ₦105,000 and + More Bonus!, if you have 150 investment referrals, 
-</h2>
-<p>Don't miss this opportunity—start now and share your referral link on social media to win in 7 days ally. 
-        </p>
+                   
         <p class="cta">
             <button>Start Earning Now</button>
         </p>
@@ -247,7 +229,7 @@ main {
     </table>
         
              <div id="congratulations" style="display:none;">
-            <p>Congratulations! You receive ₦1500,000
+            <p>Congratulations! You receive 
             You are now a professional admin member of AgroFruit, </p>
         </section>
     </main>
@@ -353,86 +335,9 @@ main {
     <h1>Referral and Bonus Program</h1>
     <p class="ghk">Invite your referrals to join and earn amazing bonuses! Here's how it works:</p>
 
-    <h2><center>Referral Bonuses</center></h2>
-    <table>
-      <tr>
-        <th>Investment Amount</th>
-        <th>Referral Bonus (8%)</th>
-        <th>✔️</th>
-      </tr>
-      <tr>
-        <td>₦3,500</td>
-        <td>₦280</td>
-        <td>✔️</td>
-      </tr>
-      <tr>
-        <td>₦8,000</td>
-        <td>₦640</td>
-        <td>✔️</td>
-      </tr>
-      <tr>
-        <td>₦15,000</td>
-        <td>₦1,200</td>
-        <td>✔️</td>
-      </tr>
-      <tr>
-        <td>₦35,000</td>
-        <td>₦2,800</td>
-        <td>✔️</td>
-      </tr>
-      <tr>
-        <td>₦70,000</td>
-        <td>₦5,600</td>
-        <td>✔️</td>
-      </tr>
-      <tr>
-        <td>₦140,000</td>
-        <td>₦11,200</td>
-        <td>✔️</td>
-      </tr>
-      <tr>
-        <td>₦280,000</td>
-        <td>₦22,400</td>
-        <td>✔️</td>
-      </tr>
-    </table>
-
-    <h2><center>Bonus Levels</center></h2>
-    <table>
-      <tr>
-        <th>Level</th>
-        <th>Referrals Required</th>
-        <th>Bonus Amount</th>
-      </tr>
-      <tr>
-        <td>1</td>
-        <td>15</td>
-        <td>₦10,000</td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>30</td>
-        <td>₦15,000</td>
-      </tr>
-      <tr>
-        <td>3</td>
-        <td>70</td>
-        <td>₦18,000</td>
-      </tr>
-      <tr>
-        <td>4</td>
-        <td>100</td>
-        <td>₦22,000</td>
-      </tr>
-      <tr>
-        <td>5</td>
-        <td>150</td>
-        <td>₦40,000</td>
-      </tr>
-    </table>
-
+    
     <div class="note">
-      <strong>Note:</strong> Achieve higher referral 150, levels 5 to earn additional ₦40,000 bonuses and an official bonus from Global Fruit Industries. 
+      <strong>Note:</strong> 150 Referrals you get 150,000. 
     </div>
 
     <div class="cta">
@@ -582,11 +487,11 @@ main {
 
     function calculateReferralBonus(referralCount, uid, currentBalance) {
         let bonus = 0;
-        if (referralCount >= 150) bonus = 40000;
-        else if (referralCount >= 100) bonus = 22000;
-        else if (referralCount >= 70) bonus = 18000;
-        else if (referralCount >= 30) bonus = 15000;
-        else if (referralCount >= 15) bonus = 10000;
+        if (referralCount >= 150) bonus = 0;
+        else if (referralCount >= 100) bonus = 0;
+        else if (referralCount >= 70) bonus = 0;
+        else if (referralCount >= 30) bonus = 0;
+        else if (referralCount >= 15) bonus = 0;
 
         if (bonus > 0) {
             update(ref(database, `users/${uid}`), {
