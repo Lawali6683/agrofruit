@@ -282,7 +282,7 @@
 
         .bank-info-container {
             position: fixed;
-            top: 50%;
+            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1000;
@@ -416,10 +416,8 @@
         <input type="text" id="accountName">
         <button id="submitPayment">Submit Payment</button>
     </div>
-
-    <div class="bank-info-container" id="bankInfoContainer">
-        <button id="copyButton">Copy Account Number</button>
-        <button id="completeButton">Complete</button>
+   <div class="bank-info-container" id="bankInfoContainer">
+    
     </div>
      
 </div>
@@ -430,7 +428,7 @@
             right: 2px;
             width: 70px;
             height: 70px;
-            Top: 100px;
+            Top: 70px;
             
             border-radius: 50%;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
@@ -477,7 +475,7 @@
             position: fixed;
             bottom: 20px;
             right: 0px;
-            Top: 150px;
+            Top: 110px;
             width: 60px;
             height: 60px;
             animation: motion 3s infinite;
@@ -648,6 +646,9 @@
                             <p class="highlight-green">Account Number: <span id="accountNumber">${bankInfo.accountNumber}</span></p>
                             <p class="highlight-green">Bank Name: ${bankInfo.bankName}</p>
                             <p class="highlight-green">Account Name: ${bankInfo.accountName}</p>
+               
+        <button id="copyButton">Copy Account Number</button>
+        <button id="completeButton">Complete</button>         
                             <p class="highlight-red">Please make payment within 3 to 4 hours. After that, the request will be cancelled.</p>
                         `;
 
