@@ -110,7 +110,7 @@
         const investmentData = parseFloat(userData.investment) || 0;
         
         if (investmentData === 0 || investmentData < 3500) {
-            alert("Please minimum amount deposit of to 3500 to proceed.");
+            alert("Please minimum amount deposit of to 3500 to proceed Shere Your link to social media referral bonus ₦1,000.");
             window.location.href = "dashboard.html";
             return;
         }
@@ -121,13 +121,13 @@
         const daysElapsed = Math.floor((currentTime - investmentTime) / (1000 * 60 * 60 * 24));
 
         const investmentMap = [
-            { amount: 3500, dailyUpgrade: 160, referralBonus: 250, referralUpgrade: 0, days: 35 },
-            { amount: 8000, dailyUpgrade: 350, referralBonus: 600, referralUpgrade: 0, days: 35 },
-            { amount: 15000, dailyUpgrade: 750, referralBonus: 950, referralUpgrade: 0, days: 36 },
-            { amount: 35000, dailyUpgrade: 1560, referralBonus: 2100, referralUpgrade: 0, days: 37 },
-            { amount: 70000, dailyUpgrade: 3160, referralBonus: 4300, referralUpgrade: 0, days: 39 },
-            { amount: 140000, dailyUpgrade: 6240, referralBonus: 9200, referralUpgrade: 0, days: 40 },
-            { amount: 280000, dailyUpgrade: 12300, referralBonus: 15300, referralUpgrade: 0, days: 42 },
+            { amount: 3500, dailyUpgrade: 160, referralBonus: 1000, referralUpgrade: 0, days: 35 },
+            { amount: 8000, dailyUpgrade: 350, referralBonus: 1000, referralUpgrade: 0, days: 35 },
+            { amount: 15000, dailyUpgrade: 750, referralBonus: 1000, referralUpgrade: 0, days: 36 },
+            { amount: 35000, dailyUpgrade: 1560, referralBonus: 1000, referralUpgrade: 0, days: 37 },
+            { amount: 70000, dailyUpgrade: 3160, referralBonus: 1000, referralUpgrade: 0, days: 39 },
+            { amount: 140000, dailyUpgrade: 6240, referralBonus: 1000, referralUpgrade: 0, days: 40 },
+            { amount: 280000, dailyUpgrade: 12300, referralBonus: 1000, referralUpgrade: 0, days: 42 },
         ];
 
         let matchedPlan = investmentMap.find(plan => plan.amount === investmentData);
@@ -194,7 +194,7 @@
         if (daysElapsed >= matchedPlan.days) {
             alert("👋 Hello, Renew Your Investment Now!");
         } else {
-            alert(`You have ${matchedPlan.days - daysElapsed} days remaining for your package.`);
+            alert(`You have ${matchedPlan.days - daysElapsed} days remaining for your package. NEW UPDATE REFERRAL BONUS ₦1,000`);
         }
 
         setTimeout(() => {
