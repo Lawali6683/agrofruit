@@ -288,88 +288,29 @@ function togglePassword(fieldId) {
 </script>
 
    <script type="module">
-import { app, analytics, firebaseConfig } from './firebase.js';
-import { 
-    getAuth, 
-    createUserWithEmailAndPassword, 
+import { app } from './firebase.js';
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
     sendEmailVerification
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-import { 
-    getDatabase, 
-    ref, 
-    set, 
-    update, 
-    get 
-} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
-// Initialize Firebase Auth and Database
 const auth = getAuth(app);
-const db = getDatabase(app);
 
-// Default referral code
-const defaultReferralCode = "nopp0z";
+const API_URL = "https://fruit-ruddy.vercel.app/api/userData";
+const API_KEY = "@haruna66";
 
-// Function to retrieve referral code
-function getReferralCode() {
-    return localStorage.getItem("referralCode") || defaultReferralCode;
-}
-
-// Store referral code from URL on page load
-function storeReferralCode() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const refFromUrl = urlParams.get("ref");
-    if (refFromUrl) {
-        localStorage.setItem("referralCode", refFromUrl.trim());
-    }
-}
-
-// Handle referral code validation
-async function handleReferralCode() {
-    document.getElementById("loadingScreen").style.display = "flex";
-    const referralCode = getReferralCode();
-    document.getElementById("referralCode").value = referralCode;
-
-    try {
-        const snapshot = await get(ref(db, 'users'));
-        if (snapshot.exists()) {
-            const users = snapshot.val();
-            const referrer = Object.keys(users).find(uid => users[uid].referralCode === referralCode);
-
-            if (referrer) {
-                const referrerData = users[referrer];
-                await update(ref(db, `users/${referrer}`), {
-                    referralCount: (referrerData.referralCount || 0) + 1
-                });
-            } else if (referralCode !== defaultReferralCode) {
-                alert("Referral code is invalid. Using the default code.");
-                document.getElementById("referralCode").value = defaultReferralCode;
-            }
-        }
-    } catch (error) {
-        console.error("Error checking referral code:", error);
-    } finally {
-        document.getElementById("loadingScreen").style.display = "none";
-    }
-}
-
-// Handle form submission
 document.getElementById("registrationForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const referralCode = getReferralCode();
-    await registerUser(referralCode);
-});
-
-// User registration function
-async function registerUser(referralCode) {
     document.getElementById("loadingScreen").style.display = "flex";
 
-    const fullName = document.getElementById("fullName").value;
+    const fullName = document.getElementById("fullName").value.trim();
     const gender = document.getElementById("gender").value;
     const county = document.getElementById("county").value;
-    const address = document.getElementById("address").value;
-    const username = document.getElementById("username").value;
-    const phoneNumber = document.getElementById("phoneNumber").value;
-    const email = document.getElementById("email").value;
+    const address = document.getElementById("address").value.trim();
+    const username = document.getElementById("username").value.trim();
+    const phoneNumber = document.getElementById("phoneNumber").value.trim();
+    const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
 
@@ -383,56 +324,50 @@ async function registerUser(referralCode) {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Generate referral code
-        const generatedReferralCode = Math.random().toString(36).substring(2, 8);
-        const referralLink = `https://agrofruit.pages.dev/?user=${encodeURIComponent(username)}&ref=${generatedReferralCode}`;
-
-        // Store user data in database
-        await set(ref(db, `users/${user.uid}`), {
-            fullName,
-            gender,
-            county,
-            address,
-            username,
-            phoneNumber,
-            email,
-            referralCode: generatedReferralCode,
-            referralBy: referralCode,
-            referralCount: 0,
-            referralLink,
-            dailyUpgrade: 0.00,
-            investment: 0.00,
-            tsohonUser: false,  
-            userBalance: 0.00,
-            accountNumber: [],
-            withdrawalPending: [],
-            withdrawalHistory: [],
-            registrationDate: new Date().toISOString(),            
-            activeStatus: true
-        });
-
-        // Send email verification
+        // Send Email Verification
         await sendEmailVerification(user);
 
-        alert("Your registration was successful. Please verify your email...");
-        window.location.href = "whaitVerified.html"; 
+        // Prepare referral code
+        const referralCode = Math.random().toString(36).substring(2, 8);
+        const referralBy = localStorage.getItem("referralCode") || "nopp0z";
+        const referralLink = `https://agrofruit.pages.dev/?user=${encodeURIComponent(username)}&ref=${referralCode}`;
+
+        // Send user data to secure backend
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-api-key": API_KEY
+            },
+            body: JSON.stringify({
+                uid: user.uid,
+                fullName,
+                gender,
+                county,
+                address,
+                username,
+                phoneNumber,
+                email,
+                referralCode,
+                referralBy,
+                referralLink
+            })
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Failed to save user data.");
+
+        alert("Your registration was successful. Please check your email to verify.");
+        window.location.href = "whaitVerified.html";
 
     } catch (error) {
-        if (error.code === "auth/email-already-in-use") {
-            alert("This email is already registered. Redirecting to login...");
-            window.location.href = "login.html";
-        } else {
-            console.error("Registration error:", error);
-            alert("Error: " + error.message);
-        }
+        console.error("Registration error:", error);
+        alert(error.message || "An error occurred.");
     } finally {
         document.getElementById("loadingScreen").style.display = "none";
     }
-}
-
-// Run referral code handling on load
-storeReferralCode();
-handleReferralCode();
+});
 </script>
+
     </body>
 </html>
