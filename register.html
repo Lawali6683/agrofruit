@@ -299,7 +299,31 @@ const auth = getAuth(app);
 
 const API_URL = "https://fruit-ruddy.vercel.app/api/userData";
 const API_KEY = "@haruna66";
+const defaultReferralCode = "nopp0z";
 
+// ===== STORE REFERRAL CODE FROM URL IF AVAILABLE =====
+window.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refFromUrl = urlParams.get("ref");
+    
+    document.getElementById("loadingScreen").style.display = "flex";
+    
+    if (refFromUrl) {
+        localStorage.setItem("referralCode", refFromUrl.trim());
+    }
+
+    const referralCode = localStorage.getItem("referralCode") || defaultReferralCode;
+
+    // If you have an input field to show the code
+    const referralInput = document.getElementById("referralCode");
+    if (referralInput) {
+        referralInput.value = referralCode;
+    }
+
+    document.getElementById("loadingScreen").style.display = "none";
+});
+
+// ===== HANDLE FORM SUBMISSION =====
 document.getElementById("registrationForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     document.getElementById("loadingScreen").style.display = "flex";
@@ -324,15 +348,12 @@ document.getElementById("registrationForm").addEventListener("submit", async (e)
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Send Email Verification
         await sendEmailVerification(user);
 
-        // Prepare referral code
         const referralCode = Math.random().toString(36).substring(2, 8);
-        const referralBy = localStorage.getItem("referralCode") || "nopp0z";
+        const referralBy = localStorage.getItem("referralCode") || defaultReferralCode;
         const referralLink = `https://agrofruit.pages.dev/?user=${encodeURIComponent(username)}&ref=${referralCode}`;
 
-        // Send user data to secure backend
         const response = await fetch(API_URL, {
             method: "POST",
             headers: {
