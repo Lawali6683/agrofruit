@@ -58,7 +58,7 @@
     }
 
     // Function to ensure referral bonus is not duplicated
-    async function processReferralBonus(referralCode, matchedPlan, newUserId) {
+    async function processReferralBonus(referralCode, newUserId) {
         try {
             const usersRef = ref(db, "users");
             const usersSnapshot = await get(usersRef);
@@ -87,8 +87,7 @@
                 }
 
                 const referrerUpdates = {
-                    userBalance: (referrerData.userBalance || 0) + matchedPlan.referralBonus,
-                    dailyUpgrade: (referrerData.dailyUpgrade || 0) + matchedPlan.referralUpgrade,
+                    userBalance: (referrerData.userBalance || 0) + 1000,
                     referralPaidUsers: referrerData.referralPaidUsers ? [...referrerData.referralPaidUsers, newUserId] : [newUserId]
                 };
 
@@ -121,13 +120,13 @@
         const daysElapsed = Math.floor((currentTime - investmentTime) / (1000 * 60 * 60 * 24));
 
         const investmentMap = [
-            { amount: 3500, dailyUpgrade: 160, referralBonus: 1000, referralUpgrade: 0, days: 35 },
-            { amount: 8000, dailyUpgrade: 350, referralBonus: 1000, referralUpgrade: 0, days: 35 },
-            { amount: 15000, dailyUpgrade: 750, referralBonus: 1000, referralUpgrade: 0, days: 36 },
-            { amount: 35000, dailyUpgrade: 1560, referralBonus: 1000, referralUpgrade: 0, days: 37 },
-            { amount: 70000, dailyUpgrade: 3160, referralBonus: 1000, referralUpgrade: 0, days: 39 },
-            { amount: 140000, dailyUpgrade: 6240, referralBonus: 1000, referralUpgrade: 0, days: 40 },
-            { amount: 280000, dailyUpgrade: 12300, referralBonus: 1000, referralUpgrade: 0, days: 42 },
+            { amount: 3500, dailyUpgrade: 160, days: 35 },
+            { amount: 8000, dailyUpgrade: 350, days: 35 },
+            { amount: 15000, dailyUpgrade: 750, days: 36 },
+            { amount: 35000, dailyUpgrade: 1560, days: 37 },
+            { amount: 70000, dailyUpgrade: 3160, days: 39 },
+            { amount: 140000, dailyUpgrade: 6240, days: 40 },
+            { amount: 280000, dailyUpgrade: 12300, days: 42 },
         ];
 
         let matchedPlan = investmentMap.find(plan => plan.amount === investmentData);
@@ -156,7 +155,7 @@
 
         // Ensure referral bonus is not duplicated
         if (userData.referralBy && !userData.referralPaid) {
-            await processReferralBonus(userData.referralBy, matchedPlan, userId);
+            await processReferralBonus(userData.referralBy, userId);
             updates.referralPaid = true;
         }
 
