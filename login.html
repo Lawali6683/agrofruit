@@ -336,7 +336,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         alert("Login Successful!");
-        window.location.href = "dashLod.html";
+        window.location.href = "dashboard.html";
     } catch (error) {
         if (error.code === "auth/user-not-found") {
             alert("This email address is not registered in AgroFruit. Register now!");
