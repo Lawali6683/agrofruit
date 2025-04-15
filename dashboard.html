@@ -918,110 +918,102 @@ startInvestment.addEventListener("click", () => {
 
     // Function to handle investment logic
     async function handleInvestmentLogic(userId, userData) {
-        if (!userData) {
-            alert("User data not found.");
-            window.location.href = "register.html";
-            return;
-        }
+    if (!userData) {
+        alert("User data not found.");
+        window.location.href = "register.html";
+        return;
+    }
 
-        const investmentData = parseFloat(userData.investment) || 0;
+    const investmentData = parseFloat(userData.investment) || 0;
 
-      if (investmentData === 0 || investmentData < 3500) {
-    alert("Please minimum amount deposit of ₦3500 to proceed. Share your link to social media referral bonus ₦1,000.");
-       checkInvestmentStatus(userData);
+    if (investmentData === 0 || investmentData < 3500) {
+        alert("Please minimum amount deposit of ₦3500 to proceed. Share your link to social media referral bonus ₦1,000.");
+        checkInvestmentStatus(userData);
+        return;
+    }
 
-    return;
-}
+    const currentTime = new Date();
+    const tsohonUser = userData.tsohonUser || "false";
+    const investmentTime = new Date(userData.investmentTime || currentTime.toISOString());
+    const daysElapsed = Math.floor((currentTime - investmentTime) / (1000 * 60 * 60 * 24));
 
+    const investmentMap = [
+        { amount: 3500, dailyUpgrade: 160, days: 35 },
+        { amount: 8000, dailyUpgrade: 350, days: 35 },
+        { amount: 15000, dailyUpgrade: 750, days: 36 },
+        { amount: 35000, dailyUpgrade: 1560, days: 37 },
+        { amount: 70000, dailyUpgrade: 3160, days: 39 },
+        { amount: 140000, dailyUpgrade: 6240, days: 40 },
+        { amount: 280000, dailyUpgrade: 12300, days: 42 },
+    ];
 
-        const currentTime = new Date();
-        const tsohonUser = userData.tsohonUser || "false";
-        const investmentTime = new Date(userData.investmentTime || currentTime.toISOString());
-        const daysElapsed = Math.floor((currentTime - investmentTime) / (1000 * 60 * 60 * 24));
+    let matchedPlan = investmentMap.find(plan => plan.amount === investmentData);
+    if (!matchedPlan) {
+        matchedPlan = investmentMap.reduce((prev, curr) => (curr.amount <= investmentData ? curr : prev), investmentMap[0]);
+    }
 
-        const investmentMap = [
-            { amount: 3500, dailyUpgrade: 160, days: 35 },
-            { amount: 8000, dailyUpgrade: 350, days: 35 },
-            { amount: 15000, dailyUpgrade: 750, days: 36 },
-            { amount: 35000, dailyUpgrade: 1560, days: 37 },
-            { amount: 70000, dailyUpgrade: 3160, days: 39 },
-            { amount: 140000, dailyUpgrade: 6240, days: 40 },
-            { amount: 280000, dailyUpgrade: 12300, days: 42 },
-        ];
-
-        let matchedPlan = investmentMap.find(plan => plan.amount === investmentData);
-        if (!matchedPlan) {
-            matchedPlan = investmentMap.reduce((prev, curr) => (curr.amount <= investmentData ? curr : prev), investmentMap[0]);
-        }
-
-        const updates = {
-            lastUpdate: currentTime.toISOString(),
-            tsohonUser: tsohonUser === "false" ? "yes" : tsohonUser
-        };
-
-        if (daysElapsed >= matchedPlan.days) {
-            updates.investment = 0;
-            updates.dailyUpgrade = 0;
-            updates.investmentTime = null;
-        }
-
-        if (!userData.dailyUpgrade || userData.dailyUpgrade !== matchedPlan.dailyUpgrade) {
-            updates.dailyUpgrade = matchedPlan.dailyUpgrade;
-        }
-
-        if (!userData.investmentTime) {
-            updates.investmentTime = currentTime.toISOString();
-        }
-
-        // Ensure referral bonus is not duplicated
-        if (userData.referralBy && !userData.referralPaid) {
-            await processReferralBonus(userData.referralBy, userId);
-            updates.referralPaid = true;
-        }
-
-        // Add welcome bonus for new users
-        if (tsohonUser === "false" && investmentData > 0) {
-            updates.userBalance = (userData.userBalance || 0) + 500;
-        }
-
-        await update(ref(db, `users/${userId}`), updates);
-
-        // Only send data to getUpdate endpoint if there are updates
-        if (Object.keys(updates).length > 0) {
-            const response = await fetch("https://fruit-ruddy.vercel.app/api/get", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-api-key": "@haruna66"
-                },
-                body: JSON.stringify({
-                    userId,
-                    userBalance: updates.userBalance,
-                    dailyUpgrade: updates.dailyUpgrade,
-                    investmentTime: updates.investmentTime,
-                    email: userData.email,
-                    tsohonUser: updates.tsohonUser,
-                    referralBy: userData.referralBy
-                })
-            });
-
-             if (!response.ok) {
-                console.error("Failed to send data to getUpdate endpoint");
-            }
-        }
-
-        if (daysElapsed >= matchedPlan.days) {
+    // NEW ALERT LOGIC — show once per session
     const alertShown = sessionStorage.getItem("investmentExpiryAlertShown");
+    const daysRemaining = matchedPlan.days - daysElapsed;
 
-    if (!alertShown) {
-        alert("👋 Hello, Renew Your Investment Now!");
-        alert(`You have ${matchedPlan.days - daysElapsed} days remaining for your package. NEW UPDATE REFERRAL BONUS ₦1,000`);
+    if (daysRemaining > 0 && !alertShown) {
+        alert(`You have ${daysRemaining} days remaining for your package. NEW UPDATE REFERRAL BONUS ₦1,000`);
         sessionStorage.setItem("investmentExpiryAlertShown", "true");
     }
-}
 
+    const updates = {
+        lastUpdate: currentTime.toISOString(),
+        tsohonUser: tsohonUser === "false" ? "yes" : tsohonUser
+    };
+
+    if (daysElapsed >= matchedPlan.days) {
+        updates.investment = 0;
+        updates.dailyUpgrade = 0;
+        updates.investmentTime = null;
+    }
+
+    if (!userData.dailyUpgrade || userData.dailyUpgrade !== matchedPlan.dailyUpgrade) {
+        updates.dailyUpgrade = matchedPlan.dailyUpgrade;
+    }
+
+    if (!userData.investmentTime) {
+        updates.investmentTime = currentTime.toISOString();
+    }
+
+    if (userData.referralBy && !userData.referralPaid) {
+        await processReferralBonus(userData.referralBy, userId);
+        updates.referralPaid = true;
+    }
+
+    if (tsohonUser === "false" && investmentData > 0) {
+        updates.userBalance = (userData.userBalance || 0) + 500;
+    }
+
+    await update(ref(db, `users/${userId}`), updates);
+
+    if (Object.keys(updates).length > 0) {
+        const response = await fetch("https://fruit-ruddy.vercel.app/api/get", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-api-key": "@haruna66"
+            },
+            body: JSON.stringify({
+                userId,
+                userBalance: updates.userBalance,
+                dailyUpgrade: updates.dailyUpgrade,
+                investmentTime: updates.investmentTime,
+                email: userData.email,
+                tsohonUser: updates.tsohonUser,
+                referralBy: userData.referralBy
+            })
+        });
+
+        if (!response.ok) {
+            console.error("Failed to send data to getUpdate endpoint");
+        }
+    }
     
-
     // Function to ensure referral bonus is not duplicated
     async function processReferralBonus(referralCode, newUserId) {
         try {
