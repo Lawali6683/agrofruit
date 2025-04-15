@@ -693,8 +693,8 @@ width: 70px;
         window.location.href = mailtoUrl;
     });
 </script>
-  
-   <script type="module">
+     
+<script type="module">
     import { app, analytics, firebaseConfig } from './firebase.js';
     import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
@@ -715,10 +715,8 @@ width: 70px;
     const notificationList = document.getElementById("notificationList");
     const clearNotifications = document.getElementById("clearNotifications");
     const newWelcomeMessage = document.getElementById("new-welcome-message");
-    const startInvestment = document.getElementById("start-investment");    
-
+    const startInvestment = document.getElementById("start-investment");
     const closeMessage = document.getElementById("close-message");
-    const hasShownPackageAlert = sessionStorage.getItem("hasShownPackageAlert");
     const notificationSound = new Audio("https://agrofruit.pages.dev/do.mp3");
 
     // LocalStorage keys
@@ -1008,23 +1006,22 @@ startInvestment.addEventListener("click", () => {
             });
 
              if (!response.ok) {
-            console.error("Failed to send data to getUpdate endpoint");
+                console.error("Failed to send data to getUpdate endpoint");
+            }
         }
-    }
 
-    // Show alert only once per session
-    if (!hasShownPackageAlert) {
         if (daysElapsed >= matchedPlan.days) {
-            alert("👋 Hello, Renew Your Investment Now!");
-        } else {
-            alert(`You have ${matchedPlan.days - daysElapsed} days remaining for your package. NEW UPDATE REFERRAL BONUS ₦1,000`);
-        }
-        sessionStorage.setItem("hasShownPackageAlert", "true");
+    const alertShown = sessionStorage.getItem("investmentExpiryAlertShown");
+
+    if (!alertShown) {
+        alert("👋 Hello, Renew Your Investment Now!");
+        alert(`You have ${matchedPlan.days - daysElapsed} days remaining for your package. NEW UPDATE REFERRAL BONUS ₦1,000`);
+        sessionStorage.setItem("investmentExpiryAlertShown", "true");
     }
 }
 
-                 
-              
+    
+
     // Function to ensure referral bonus is not duplicated
     async function processReferralBonus(referralCode, newUserId) {
         try {
@@ -1064,6 +1061,7 @@ startInvestment.addEventListener("click", () => {
         } catch (error) {
             console.error("Error processing referral bonus:", error);
         }
+    }
     }
 </script>
 </body>
